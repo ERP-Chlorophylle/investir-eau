@@ -3,25 +3,57 @@ import { Droplets, Flower2, Car, Waves, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { WATERING_INTENSITY } from "@/lib/constants";
+import { 
+  DEFAULT_PERSONS, 
+  DEFAULT_GARDEN_SURFACE, 
+  DEFAULT_CAR_WASHES, 
+  DEFAULT_POOL_SURFACE,
+  DEFAULT_WC_CONSUMPTION,
+  DEFAULT_CAR_WASH_VOLUME,
+  DEFAULT_WATERING_LITERS,
+  WATERING_WEEKS,
+  POOL_DEPTH,
+  POOL_APPOINT_PERCENT,
+} from "@/lib/constants";
 import { SimulationFormData } from "@/lib/validation";
+import { useEffect } from "react";
 
 export function Step2Usages() {
   const {
     register,
     watch,
     setValue,
-    formState: { errors },
   } = useFormContext<SimulationFormData>();
 
   const wcEnabled = watch("wcEnabled");
   const jardinEnabled = watch("jardinEnabled");
   const autoEnabled = watch("autoEnabled");
   const piscineEnabled = watch("piscineEnabled");
-  const piscineMode = watch("piscineMode");
-  const jardinIntensite = watch("jardinIntensite");
-  const modeAvance = watch("modeAvance");
+
+  // Set default values when checkboxes are enabled
+  useEffect(() => {
+    if (wcEnabled && !watch("wcPersonnes")) {
+      setValue("wcPersonnes", DEFAULT_PERSONS);
+    }
+  }, [wcEnabled, setValue, watch]);
+
+  useEffect(() => {
+    if (jardinEnabled && !watch("jardinSurface")) {
+      setValue("jardinSurface", DEFAULT_GARDEN_SURFACE);
+    }
+  }, [jardinEnabled, setValue, watch]);
+
+  useEffect(() => {
+    if (autoEnabled && !watch("autoLavagesMois")) {
+      setValue("autoLavagesMois", DEFAULT_CAR_WASHES);
+    }
+  }, [autoEnabled, setValue, watch]);
+
+  useEffect(() => {
+    if (piscineEnabled && !watch("piscineSurface")) {
+      setValue("piscineSurface", DEFAULT_POOL_SURFACE);
+    }
+  }, [piscineEnabled, setValue, watch]);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -50,36 +82,19 @@ export function Step2Usages() {
               
               {wcEnabled && (
                 <div className="space-y-3 animate-scale-in">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="wcPersonnes">Nombre de personnes</Label>
-                      <Input
-                        id="wcPersonnes"
-                        type="number"
-                        min={1}
-                        max={20}
-                        placeholder="2"
-                        {...register("wcPersonnes", { valueAsNumber: true })}
-                      />
-                    </div>
-                    {modeAvance && (
-                      <div className="space-y-2">
-                        <Label htmlFor="wcConso">Consommation (L/jour/pers)</Label>
-                        <Input
-                          id="wcConso"
-                          type="number"
-                          step="0.1"
-                          defaultValue={30.5}
-                          {...register("wcConsoParPersonne", { valueAsNumber: true })}
-                        />
-                      </div>
-                    )}
+                  <div className="space-y-2">
+                    <Label htmlFor="wcPersonnes">Nombre de personnes</Label>
+                    <Input
+                      id="wcPersonnes"
+                      type="number"
+                      min={1}
+                      max={20}
+                      {...register("wcPersonnes", { valueAsNumber: true })}
+                    />
                   </div>
-                  {!modeAvance && (
-                    <p className="text-sm text-muted-foreground">
-                      Base de calcul : 30,5 L/jour/personne
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Base de calcul : {DEFAULT_WC_CONSUMPTION} L/jour/personne
+                  </p>
                 </div>
               )}
             </div>
@@ -109,42 +124,11 @@ export function Step2Usages() {
                       id="jardinSurface"
                       type="number"
                       min={1}
-                      placeholder="50"
                       {...register("jardinSurface", { valueAsNumber: true })}
                     />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label>Intensité d'arrosage</Label>
-                    <RadioGroup
-                      value={jardinIntensite}
-                      onValueChange={(value) => setValue("jardinIntensite", value)}
-                      className="grid gap-2 sm:grid-cols-3"
-                    >
-                      {WATERING_INTENSITY.map((intensity) => (
-                        <Label
-                          key={intensity.value}
-                          htmlFor={`jardin-${intensity.value}`}
-                          className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-all ${
-                            jardinIntensite === intensity.value
-                              ? "border-eco-dark bg-eco-light"
-                              : "hover:border-eco-medium"
-                          }`}
-                        >
-                          <RadioGroupItem value={intensity.value} id={`jardin-${intensity.value}`} />
-                          <div>
-                            <span className="font-medium">{intensity.label}</span>
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              {intensity.liters} L/m²/sem
-                            </span>
-                          </div>
-                        </Label>
-                      ))}
-                    </RadioGroup>
-                  </div>
-
                   <p className="text-sm text-muted-foreground">
-                    Période : mai à septembre (22 semaines)
+                    Base : {DEFAULT_WATERING_LITERS} L/m²/semaine × {WATERING_WEEKS} semaines (mai → sept)
                   </p>
                 </div>
               )}
@@ -169,35 +153,19 @@ export function Step2Usages() {
               
               {autoEnabled && (
                 <div className="space-y-3 animate-scale-in">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="autoLavages">Lavages par mois</Label>
-                      <Input
-                        id="autoLavages"
-                        type="number"
-                        min={1}
-                        max={30}
-                        placeholder="2"
-                        {...register("autoLavagesMois", { valueAsNumber: true })}
-                      />
-                    </div>
-                    {modeAvance && (
-                      <div className="space-y-2">
-                        <Label htmlFor="autoVolume">Volume par lavage (L)</Label>
-                        <Input
-                          id="autoVolume"
-                          type="number"
-                          defaultValue={200}
-                          {...register("autoVolumeParLavage", { valueAsNumber: true })}
-                        />
-                      </div>
-                    )}
+                  <div className="space-y-2">
+                    <Label htmlFor="autoLavages">Lavages par mois</Label>
+                    <Input
+                      id="autoLavages"
+                      type="number"
+                      min={1}
+                      max={30}
+                      {...register("autoLavagesMois", { valueAsNumber: true })}
+                    />
                   </div>
-                  {!modeAvance && (
-                    <p className="text-sm text-muted-foreground">
-                      Base de calcul : 200 L par lavage
-                    </p>
-                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Base de calcul : {DEFAULT_CAR_WASH_VOLUME} L par lavage
+                  </p>
                 </div>
               )}
             </div>
@@ -224,99 +192,26 @@ export function Step2Usages() {
                   <div className="flex items-start gap-2 rounded-lg bg-water-light p-3">
                     <Info className="h-4 w-4 shrink-0 text-primary mt-0.5" />
                     <p className="text-sm text-muted-foreground">
-                      Le dimensionnement concerne l'appoint annuel, pas le remplissage complet d'une piscine.
+                      Le dimensionnement concerne l'appoint annuel, pas le remplissage complet.
                     </p>
                   </div>
 
-                  <RadioGroup
-                    value={piscineMode}
-                    onValueChange={(value) => setValue("piscineMode", value as "appoint" | "volume")}
-                    className="grid gap-3 sm:grid-cols-2"
-                  >
-                    <Label
-                      htmlFor="piscine-appoint"
-                      className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-4 transition-all ${
-                        piscineMode === "appoint"
-                          ? "border-primary bg-primary/5"
-                          : "hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="appoint" id="piscine-appoint" />
-                        <span className="font-medium">Appoint direct</span>
-                        <span className="rounded bg-accent/20 px-1.5 py-0.5 text-xs font-medium text-accent">
-                          Recommandé
-                        </span>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        Je connais mon appoint annuel
-                      </span>
-                    </Label>
-
-                    <Label
-                      htmlFor="piscine-volume"
-                      className={`flex cursor-pointer flex-col gap-1 rounded-lg border p-4 transition-all ${
-                        piscineMode === "volume"
-                          ? "border-primary bg-primary/5"
-                          : "hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="volume" id="piscine-volume" />
-                        <span className="font-medium">Calcul estimé</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        Basé sur le volume de la piscine
-                      </span>
-                    </Label>
-                  </RadioGroup>
-
-                  {piscineMode === "appoint" && (
-                    <div className="space-y-2 animate-scale-in">
-                      <Label htmlFor="piscineAppoint">Appoint annuel (m³/an)</Label>
-                      <Input
-                        id="piscineAppoint"
-                        type="number"
-                        step="0.1"
-                        min={0.1}
-                        placeholder="5"
-                        {...register("piscineAppoint", { valueAsNumber: true })}
-                      />
-                    </div>
-                  )}
-
-                  {piscineMode === "volume" && (
-                    <div className="grid gap-4 sm:grid-cols-2 animate-scale-in">
-                      <div className="space-y-2">
-                        <Label htmlFor="piscineVolume">Volume piscine (m³)</Label>
-                        <Input
-                          id="piscineVolume"
-                          type="number"
-                          min={1}
-                          placeholder="50"
-                          {...register("piscineVolume", { valueAsNumber: true })}
-                        />
-                      </div>
-                      {modeAvance && (
-                        <div className="space-y-2">
-                          <Label htmlFor="piscinePourcent">Appoint annuel (%)</Label>
-                          <Input
-                            id="piscinePourcent"
-                            type="number"
-                            min={1}
-                            max={50}
-                            defaultValue={12}
-                            {...register("piscinePourcent", { valueAsNumber: true })}
-                          />
-                        </div>
-                      )}
-                      {!modeAvance && (
-                        <p className="text-sm text-muted-foreground sm:col-span-2">
-                          Base : 12% du volume/an pour l'appoint
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="piscineSurface">Surface de la piscine (m²)</Label>
+                    <Input
+                      id="piscineSurface"
+                      type="number"
+                      min={1}
+                      max={200}
+                      {...register("piscineSurface", { valueAsNumber: true })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Ex : piscine 8×4m = 32 m²
+                    </p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Calcul : surface × {POOL_DEPTH}m (profondeur) × {POOL_APPOINT_PERCENT}% appoint/an
+                  </p>
                 </div>
               )}
             </div>

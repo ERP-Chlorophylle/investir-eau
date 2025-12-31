@@ -20,15 +20,16 @@ export const ROOF_TYPES = [
 export const DEFAULT_ETA = 0.85;
 export const DEFAULT_WC_CONSUMPTION = 30.5; // L/jour/personne
 export const DEFAULT_CAR_WASH_VOLUME = 200; // L/lavage
-export const DEFAULT_POOL_PERCENT = 12; // %
+export const DEFAULT_WATERING_LITERS = 15; // L/m²/semaine (moyenne)
 export const WATERING_WEEKS = 22; // mai -> sept
+export const POOL_DEPTH = 1.5; // profondeur moyenne en mètres
+export const POOL_APPOINT_PERCENT = 12; // % appoint annuel
 
-// Watering intensity (L/m²/semaine)
-export const WATERING_INTENSITY = [
-  { value: "faible", label: "Faible", liters: 10 },
-  { value: "moyen", label: "Moyen", liters: 15 },
-  { value: "fort", label: "Fort", liters: 25 },
-] as const;
+// Default form values
+export const DEFAULT_PERSONS = 2;
+export const DEFAULT_GARDEN_SURFACE = 50;
+export const DEFAULT_CAR_WASHES = 2;
+export const DEFAULT_POOL_SURFACE = 32; // m² (8x4m)
 
 // Tank market sizes (L)
 export const TANK_SIZES = [500, 1000, 2000, 3000, 4000, 5000, 6000, 7500, 10000, 15000, 20000];
