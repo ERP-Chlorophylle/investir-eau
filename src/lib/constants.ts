@@ -27,7 +27,7 @@ export const POOL_APPOINT_PERCENT = 12; // % appoint annuel
 
 // Default form values
 export const DEFAULT_PERSONS = 2;
-export const DEFAULT_GARDEN_SURFACE = 50;
+export const DEFAULT_GARDEN_SURFACE = 150;
 export const DEFAULT_CAR_WASHES = 2;
 export const DEFAULT_POOL_SURFACE = 32; // m² (8x4m)
 
