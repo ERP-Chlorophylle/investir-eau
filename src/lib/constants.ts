@@ -34,13 +34,20 @@ export const DEFAULT_POOL_SURFACE = 32; // m² (8x4m)
 // Tank market sizes (L)
 export const TANK_SIZES = [500, 1000, 2000, 3000, 4000, 5000, 6000, 7500, 10000, 15000, 20000];
 
-// Tank pricing (€ TTC)
-export const TANK_PRICING = [
-  { maxVolume: 3000, price: 11000 },
-  { maxVolume: 10000, price: 19800 },
-  { maxVolume: 15000, price: 25000 },
-  { maxVolume: 30000, price: 38500 },
-];
+// Tank pricing (€ TTC) - prix par taille exacte
+export const TANK_PRICING: Record<number, number> = {
+  500: 8500,
+  1000: 9000,
+  2000: 10000,
+  3000: 11000,
+  4000: 12500,
+  5000: 13500,
+  6000: 15000,
+  7500: 17000,
+  10000: 19800,
+  15000: 25000,
+  20000: 29500,
+};
 
 // Reserve days by option
 export const RESERVE_DAYS = {

@@ -169,9 +169,8 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
       volumeCuveArrondi = 20000;
     }
 
-    // Get price
-    const pricing = TANK_PRICING.find((p) => volumeCuveArrondi <= p.maxVolume);
-    const cout = surDevis ? null : pricing?.price ?? null;
+    // Get price from exact size
+    const cout = surDevis ? null : TANK_PRICING[volumeCuveArrondi] ?? null;
 
     const couverture = vDemand > 0 ? (vUse / vDemand) * 100 : 0;
 
