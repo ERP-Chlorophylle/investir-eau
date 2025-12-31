@@ -11,33 +11,24 @@ export const step1Schema = z.object({
     .min(10, "Minimum 10 m²")
     .max(1000, "Maximum 1000 m²"),
   typeToiture: z.string().min(1, "Sélectionnez un type de toiture"),
-  modeAvance: z.boolean().default(false),
-  eta: z.number().min(0.5).max(1).default(0.85),
-  pluieOverride: z.number().optional(),
 });
 
 export const step2Schema = z.object({
   wcEnabled: z.boolean().default(false),
   wcPersonnes: z.number().min(1).max(20).optional(),
-  wcConsoParPersonne: z.number().default(30.5),
 
   jardinEnabled: z.boolean().default(false),
   jardinSurface: z.number().min(1).max(5000).optional(),
-  jardinIntensite: z.string().optional(),
 
   autoEnabled: z.boolean().default(false),
   autoLavagesMois: z.number().min(1).max(30).optional(),
-  autoVolumeParLavage: z.number().default(200),
 
   piscineEnabled: z.boolean().default(false),
-  piscineMode: z.enum(["appoint", "volume"]).optional(),
-  piscineAppoint: z.number().min(0.1).max(100).optional(),
-  piscineVolume: z.number().min(1).max(500).optional(),
-  piscinePourcent: z.number().min(1).max(50).default(12),
+  piscineSurface: z.number().min(1).max(200).optional(),
 });
 
 export const step3Schema = z.object({
-  prixEau: z.number().min(5).max(15).default(5),
+  prixEau: z.number().min(2.5).max(8).default(5),
   horizonAnnees: z.number().min(5).max(20).default(10),
 });
 

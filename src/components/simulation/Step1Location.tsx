@@ -1,10 +1,8 @@
 import { useFormContext } from "react-hook-form";
-import { MapPin, Home, Settings2, AlertTriangle } from "lucide-react";
+import { MapPin, Home, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import { ROOF_TYPES, CALIBRATED_DEPARTMENTS, CLIMATE_DATA } from "@/lib/constants";
 import { getDepartementFromCodePostal } from "@/lib/calculations";
 import { SimulationFormData } from "@/lib/validation";
@@ -18,8 +16,6 @@ export function Step1Location() {
   } = useFormContext<SimulationFormData>();
 
   const codePostal = watch("codePostal");
-  const modeAvance = watch("modeAvance");
-  const eta = watch("eta") ?? 0.85;
   const typeToiture = watch("typeToiture");
 
   const departement = getDepartementFromCodePostal(codePostal);
@@ -52,9 +48,14 @@ export function Step1Location() {
             <p className="text-sm text-destructive">{errors.codePostal.message}</p>
           )}
           {departement && (
-            <p className="text-sm text-muted-foreground">
-              Département : <span className="font-medium text-foreground">{departement}</span>
-            </p>
+            <div className="text-sm text-muted-foreground">
+              <p>Département : <span className="font-medium text-foreground">{departement}</span></p>
+              {climateData && (
+                <p className="mt-1">
+                  Pluviométrie : <span className="font-medium text-foreground">{climateData.pluie} mm/an</span>
+                </p>
+              )}
+            </div>
           )}
         </div>
 
@@ -84,8 +85,7 @@ export function Step1Location() {
             <p className="font-medium text-foreground">Zone non calibrée</p>
             <p className="text-muted-foreground">
               Ce simulateur est calibré pour les départements 07, 30, 34, 48 et 84.
-              Les résultats sont indicatifs. Vous pouvez ajuster manuellement la
-              pluviométrie dans le mode avancé.
+              Les résultats sont indicatifs.
             </p>
           </div>
         </div>
@@ -126,63 +126,6 @@ export function Step1Location() {
           <p className="text-sm text-destructive">{errors.typeToiture.message}</p>
         )}
       </div>
-
-      {/* Mode avancé toggle */}
-      <div className="flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-        <div className="flex items-center gap-3">
-          <Settings2 className="h-5 w-5 text-muted-foreground" />
-          <div>
-            <p className="font-medium">Mode avancé</p>
-            <p className="text-sm text-muted-foreground">
-              Personnaliser le rendement et la pluviométrie
-            </p>
-          </div>
-        </div>
-        <Switch
-          checked={modeAvance}
-          onCheckedChange={(checked) => setValue("modeAvance", checked)}
-        />
-      </div>
-
-      {/* Advanced settings */}
-      {modeAvance && (
-        <div className="space-y-6 rounded-lg border bg-card p-6 animate-scale-in">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label>Rendement global (η)</Label>
-              <span className="text-sm font-medium text-primary">{eta.toFixed(2)}</span>
-            </div>
-            <Slider
-              value={[eta]}
-              onValueChange={([value]) => setValue("eta", value)}
-              min={0.5}
-              max={1}
-              step={0.01}
-              className="py-2"
-            />
-            <p className="text-xs text-muted-foreground">
-              Facteur de perte (filtration, débordement, etc.)
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="pluieOverride">
-              Pluviométrie annuelle (mm/an)
-              {climateData && !modeAvance && (
-                <span className="ml-2 text-muted-foreground">
-                  — défaut : {climateData.pluie} mm
-                </span>
-              )}
-            </Label>
-            <Input
-              id="pluieOverride"
-              type="number"
-              placeholder={climateData ? String(climateData.pluie) : "700"}
-              {...register("pluieOverride", { valueAsNumber: true })}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

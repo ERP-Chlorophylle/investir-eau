@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -20,7 +19,6 @@ import {
   SimulationFormData,
 } from "@/lib/validation";
 import { getDepartementFromCodePostal, calculateSimulation, SimulationInputs } from "@/lib/calculations";
-import { DEFAULT_ETA, DEFAULT_WC_CONSUMPTION, DEFAULT_CAR_WASH_VOLUME, DEFAULT_POOL_PERCENT } from "@/lib/constants";
 import { useToast } from "@/hooks/use-toast";
 
 const STEPS = [
@@ -40,13 +38,8 @@ export default function Simulateur() {
   const methods = useForm<SimulationFormData>({
     resolver: zodResolver(fullSchema),
     defaultValues: {
-      eta: DEFAULT_ETA,
-      wcConsoParPersonne: DEFAULT_WC_CONSUMPTION,
-      autoVolumeParLavage: DEFAULT_CAR_WASH_VOLUME,
-      piscinePourcent: DEFAULT_POOL_PERCENT,
       prixEau: 5,
       horizonAnnees: 10,
-      modeAvance: false,
       wcEnabled: false,
       jardinEnabled: false,
       autoEnabled: false,
@@ -56,7 +49,7 @@ export default function Simulateur() {
     mode: "onChange",
   });
 
-  const { handleSubmit, trigger, watch, getValues } = methods;
+  const { handleSubmit, trigger, getValues } = methods;
 
   const validateCurrentStep = async () => {
     let fieldsToValidate: (keyof SimulationFormData)[] = [];
@@ -69,18 +62,9 @@ export default function Simulateur() {
         // Validate usage fields based on what's enabled
         const values = getValues();
         if (values.wcEnabled) fieldsToValidate.push("wcPersonnes");
-        if (values.jardinEnabled) {
-          fieldsToValidate.push("jardinSurface", "jardinIntensite");
-        }
+        if (values.jardinEnabled) fieldsToValidate.push("jardinSurface");
         if (values.autoEnabled) fieldsToValidate.push("autoLavagesMois");
-        if (values.piscineEnabled) {
-          fieldsToValidate.push("piscineMode");
-          if (values.piscineMode === "appoint") {
-            fieldsToValidate.push("piscineAppoint");
-          } else if (values.piscineMode === "volume") {
-            fieldsToValidate.push("piscineVolume");
-          }
-        }
+        if (values.piscineEnabled) fieldsToValidate.push("piscineSurface");
         // At least one usage must be enabled
         if (!values.wcEnabled && !values.jardinEnabled && !values.autoEnabled && !values.piscineEnabled) {
           toast({
@@ -126,26 +110,18 @@ export default function Simulateur() {
       departement: departement || "",
       surfaceToiture: data.surfaceToiture,
       typeToiture: data.typeToiture,
-      eta: data.eta,
-      pluieOverride: data.pluieOverride,
 
       wcEnabled: data.wcEnabled,
       wcPersonnes: data.wcPersonnes,
-      wcConsoParPersonne: data.wcConsoParPersonne,
 
       jardinEnabled: data.jardinEnabled,
       jardinSurface: data.jardinSurface,
-      jardinIntensite: data.jardinIntensite,
 
       autoEnabled: data.autoEnabled,
       autoLavagesMois: data.autoLavagesMois,
-      autoVolumeParLavage: data.autoVolumeParLavage,
 
       piscineEnabled: data.piscineEnabled,
-      piscineMode: data.piscineMode,
-      piscineAppoint: data.piscineAppoint,
-      piscineVolume: data.piscineVolume,
-      piscinePourcent: data.piscinePourcent,
+      piscineSurface: data.piscineSurface,
 
       prixEau: data.prixEau,
       horizonAnnees: data.horizonAnnees,

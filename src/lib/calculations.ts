@@ -1,10 +1,13 @@
 import {
   CLIMATE_DATA,
   ROOF_TYPES,
+  DEFAULT_ETA,
   DEFAULT_WC_CONSUMPTION,
   DEFAULT_CAR_WASH_VOLUME,
+  DEFAULT_WATERING_LITERS,
   WATERING_WEEKS,
-  WATERING_INTENSITY,
+  POOL_DEPTH,
+  POOL_APPOINT_PERCENT,
   TANK_SIZES,
   TANK_PRICING,
   RESERVE_DAYS,
@@ -18,27 +21,19 @@ export interface SimulationInputs {
   departement: string;
   surfaceToiture: number;
   typeToiture: string;
-  eta: number;
-  pluieOverride?: number;
 
   // Usages
   wcEnabled: boolean;
   wcPersonnes?: number;
-  wcConsoParPersonne: number;
 
   jardinEnabled: boolean;
   jardinSurface?: number;
-  jardinIntensite?: string;
 
   autoEnabled: boolean;
   autoLavagesMois?: number;
-  autoVolumeParLavage: number;
 
   piscineEnabled: boolean;
-  piscineMode?: "appoint" | "volume";
-  piscineAppoint?: number;
-  piscineVolume?: number;
-  piscinePourcent?: number;
+  piscineSurface?: number;
 
   // Financial
   prixEau: number;
@@ -107,21 +102,16 @@ export function getRoofCoefficient(type: string): number {
   return roof?.coefficient ?? 0.9;
 }
 
-export function getWateringLiters(intensity: string): number {
-  const watering = WATERING_INTENSITY.find((w) => w.value === intensity);
-  return watering?.liters ?? 15;
-}
-
 export function calculateSimulation(inputs: SimulationInputs): SimulationResults {
   const dept = inputs.departement;
   const climateData = CLIMATE_DATA[dept];
   const isCalibrated = !!climateData;
 
-  const pluieAnnuelle = inputs.pluieOverride ?? climateData?.pluie ?? 700;
+  const pluieAnnuelle = climateData?.pluie ?? 700;
   const joursPluie = climateData?.joursPluie ?? 70;
 
   const cToit = getRoofCoefficient(inputs.typeToiture);
-  const eta = inputs.eta;
+  const eta = DEFAULT_ETA;
 
   // 1) Supply (L/an)
   const vSupply = pluieAnnuelle * inputs.surfaceToiture * cToit * eta;
@@ -133,24 +123,22 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
   let vPiscine = 0;
 
   if (inputs.wcEnabled && inputs.wcPersonnes) {
-    vWc = inputs.wcConsoParPersonne * inputs.wcPersonnes * 365;
+    vWc = DEFAULT_WC_CONSUMPTION * inputs.wcPersonnes * 365;
   }
 
-  if (inputs.jardinEnabled && inputs.jardinSurface && inputs.jardinIntensite) {
-    const litersPerWeek = getWateringLiters(inputs.jardinIntensite);
-    vJardin = inputs.jardinSurface * litersPerWeek * WATERING_WEEKS;
+  if (inputs.jardinEnabled && inputs.jardinSurface) {
+    vJardin = inputs.jardinSurface * DEFAULT_WATERING_LITERS * WATERING_WEEKS;
   }
 
   if (inputs.autoEnabled && inputs.autoLavagesMois) {
-    vAuto = inputs.autoLavagesMois * 12 * inputs.autoVolumeParLavage;
+    vAuto = inputs.autoLavagesMois * 12 * DEFAULT_CAR_WASH_VOLUME;
   }
 
-  if (inputs.piscineEnabled) {
-    if (inputs.piscineMode === "appoint" && inputs.piscineAppoint) {
-      vPiscine = inputs.piscineAppoint * 1000;
-    } else if (inputs.piscineMode === "volume" && inputs.piscineVolume && inputs.piscinePourcent) {
-      vPiscine = inputs.piscineVolume * (inputs.piscinePourcent / 100) * 1000;
-    }
+  if (inputs.piscineEnabled && inputs.piscineSurface) {
+    // Volume piscine = surface * profondeur moyenne (1.5m)
+    const volumePiscine = inputs.piscineSurface * POOL_DEPTH;
+    // Appoint = 12% du volume par an
+    vPiscine = volumePiscine * (POOL_APPOINT_PERCENT / 100) * 1000;
   }
 
   const vDemand = vWc + vJardin + vAuto + vPiscine;

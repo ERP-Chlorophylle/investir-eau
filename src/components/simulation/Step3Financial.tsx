@@ -44,14 +44,14 @@ export function Step3Financial() {
             <Slider
               value={[prixEau]}
               onValueChange={([value]) => setValue("prixEau", value)}
-              min={5}
-              max={15}
+              min={2.5}
+              max={8}
               step={0.5}
               className="py-2"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>5 €/m³</span>
-              <span>15 €/m³</span>
+              <span>2,50 €/m³</span>
+              <span>8 €/m³</span>
             </div>
           </div>
 
