@@ -10,10 +10,10 @@ import {
   POOL_APPOINT_PERCENT,
   TANK_SIZES,
   TANK_PRICING,
-  RESERVE_DAYS,
   SAVINGS_ACCOUNTS,
   WATER_INFLATION,
   MIN_RAIN_EVENT,
+  COVERAGE_OPTIONS,
 } from "./constants";
 
 export interface SimulationInputs {
@@ -41,14 +41,13 @@ export interface SimulationInputs {
 export interface TankOption {
   type: "eco" | "confort" | "autonomie";
   label: string;
-  joursReserve: number;
+  couvertureCible: number; // 70, 85 or 100%
   volumeCuveBrut: number;
   volumeCuveArrondi: number;
   volumeCuveM3: number;
   cout: number | null;
   surDevis: boolean;
-  dimensionnePar: "ressource" | "demande";
-  couverture: number;
+  volumeAnnuelCouvert: number; // L/an covered by this tank
 }
 
 export interface SimulationResults {
@@ -64,7 +63,6 @@ export interface SimulationResults {
   vPiscine: number;
 
   // Department data
-  kDep: number;
   joursPluie: number;
   pluieAnnuelle: number;
 
@@ -141,22 +139,24 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
 
   const vDemand = vWc + vJardin + vAuto + vPiscine;
 
-  // 3) Usable volume
-  const vUse = Math.min(vSupply, vDemand);
-  const dimensionnePar: "ressource" | "demande" = vUse === vSupply ? "ressource" : "demande";
+  // 3) Usable volume (max possible)
+  const vUseMax = Math.min(vSupply, vDemand);
 
-  // 4) Drought coefficient
-  const kDep = 1 + Math.max(0, (100 - joursPluie) / 200);
-
-  // 5) Guard rail for rain event
+  // 4) Guard rail for rain event
   const vEventMin = MIN_RAIN_EVENT * inputs.surfaceToiture * cToit * eta;
 
-  // 6) Calculate options
+  // 5) Calculate options based on coverage percentages (70%, 85%, 100%)
   const options: TankOption[] = (["eco", "confort", "autonomie"] as const).map((type) => {
-    const jBase = RESERVE_DAYS[type];
-    const joursReserve = Math.round(jBase * kDep);
-
-    let volumeCuveBrut = vUse * (joursReserve / 365);
+    const coverageConfig = COVERAGE_OPTIONS[type];
+    const couvertureCible = coverageConfig.percentage;
+    
+    // Volume to cover based on percentage of demand
+    const volumeAnnuelCible = vDemand * (couvertureCible / 100);
+    // But can't exceed supply
+    const volumeAnnuelCouvert = Math.min(volumeAnnuelCible, vSupply);
+    
+    // Tank size = roughly 1 month of this covered volume (as buffer)
+    let volumeCuveBrut = volumeAnnuelCouvert / 12;
     volumeCuveBrut = Math.max(volumeCuveBrut, vEventMin);
 
     // Round to market size
@@ -170,27 +170,27 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     // Get price from exact size
     const cout = surDevis ? null : TANK_PRICING[volumeCuveArrondi] ?? null;
 
-    const couverture = vDemand > 0 ? (vUse / vDemand) * 100 : 0;
-
     return {
       type,
-      label: type.charAt(0).toUpperCase() + type.slice(1),
-      joursReserve,
+      label: coverageConfig.label,
+      couvertureCible,
       volumeCuveBrut: Math.round(volumeCuveBrut),
       volumeCuveArrondi,
       volumeCuveM3: volumeCuveArrondi / 1000,
       cout,
       surDevis,
-      dimensionnePar,
-      couverture: Math.round(couverture * 10) / 10,
+      volumeAnnuelCouvert: Math.round(volumeAnnuelCouvert),
     };
   });
 
-  // 7) Financial comparisons (fixed 10 years horizon)
+  // Use the max coverage for global vUse
+  const vUse = vUseMax;
+
+  // 6) Financial comparisons (fixed 10 years horizon)
   const horizonAnnees = 10;
   const comparisons: FinancialComparison[] = options.map((option) => {
     const coutCuve = option.cout;
-    const m3Substitues = vUse / 1000;
+    const m3Substitues = option.volumeAnnuelCouvert / 1000;
 
     // Cumulated savings
     let economiesCumulees = 0;
@@ -231,7 +231,6 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     vJardin: Math.round(vJardin),
     vAuto: Math.round(vAuto),
     vPiscine: Math.round(vPiscine),
-    kDep: Math.round(kDep * 100) / 100,
     joursPluie,
     pluieAnnuelle,
     options,

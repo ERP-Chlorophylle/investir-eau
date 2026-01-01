@@ -6,14 +6,13 @@ interface TankOptionCardProps {
   option: TankOption;
   vSupply: number;
   vDemand: number;
-  vUse: number;
 }
 
 const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subtitle: string; cardClass: string; iconClass: string; badgeClass: string; featured?: boolean }> = {
   eco: {
     icon: Droplets,
-    title: "Éco",
-    subtitle: "Investissement minimal",
+    title: "Essentiel",
+    subtitle: "70% des besoins",
     cardClass: "result-card-eco",
     iconClass: "text-eco-dark",
     badgeClass: "bg-eco-light text-eco-dark",
@@ -21,7 +20,7 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   confort: {
     icon: TrendingUp,
     title: "Confort",
-    subtitle: "Équilibre optimal",
+    subtitle: "85% des besoins",
     cardClass: "result-card-confort",
     iconClass: "text-primary",
     badgeClass: "bg-water-light text-primary",
@@ -30,16 +29,22 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   autonomie: {
     icon: Shield,
     title: "Autonomie",
-    subtitle: "Sécurité maximale",
+    subtitle: "100% des besoins",
     cardClass: "result-card-autonomie",
     iconClass: "text-gold",
     badgeClass: "bg-gold-light text-gold",
   },
 };
 
-export function TankOptionCard({ option, vSupply, vDemand, vUse }: TankOptionCardProps) {
+export function TankOptionCard({ option, vSupply, vDemand }: TankOptionCardProps) {
   const config = OPTION_CONFIG[option.type];
   const Icon = config.icon;
+
+  // Calculate actual coverage (limited by supply)
+  const actualCoverage = vDemand > 0 
+    ? Math.round((option.volumeAnnuelCouvert / vDemand) * 100) 
+    : 0;
+  const isLimitedBySupply = option.volumeAnnuelCouvert < vDemand * (option.couvertureCible / 100);
 
   return (
     <div
@@ -83,13 +88,25 @@ export function TankOptionCard({ option, vSupply, vDemand, vUse }: TankOptionCar
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <p className="text-muted-foreground">Réserve</p>
-            <p className="text-lg font-semibold">{option.joursReserve} jours</p>
+            <p className="text-muted-foreground">Objectif</p>
+            <p className="text-lg font-semibold">{option.couvertureCible}%</p>
           </div>
           <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <p className="text-muted-foreground">Couverture</p>
-            <p className="text-lg font-semibold">{option.couverture}%</p>
+            <p className="text-muted-foreground">Couverture réelle</p>
+            <p className="text-lg font-semibold">{actualCoverage}%</p>
           </div>
+        </div>
+
+        {/* Volume annuel couvert */}
+        <div className="text-center text-sm text-muted-foreground">
+          <p>
+            {(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an économisés
+          </p>
+          {isLimitedBySupply && (
+            <p className="text-xs text-gold mt-1">
+              Limité par la ressource disponible
+            </p>
+          )}
         </div>
 
         {/* Price */}
@@ -107,11 +124,6 @@ export function TankOptionCard({ option, vSupply, vDemand, vUse }: TankOptionCar
             </p>
           ) : null}
         </div>
-
-        {/* Dimensioning info */}
-        <p className="text-center text-xs text-muted-foreground">
-          Dimensionné par {option.dimensionnePar === "ressource" ? "la ressource" : "la demande"}
-        </p>
       </div>
     </div>
   );
