@@ -86,14 +86,17 @@ export function TankOptionCard({ option, vSupply, vDemand }: TankOptionCardProps
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <p className="text-muted-foreground">Objectif</p>
-            <p className="text-lg font-semibold">{option.couvertureCible}%</p>
-          </div>
-          <div className="rounded-lg bg-muted/50 p-3 text-center">
-            <p className="text-muted-foreground">Couverture réelle</p>
-            <p className="text-lg font-semibold">{actualCoverage}%</p>
+        <div className="space-y-2 text-sm">
+          <div className="rounded-lg bg-muted/50 p-3">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Couverture des besoins</span>
+              <span className="text-lg font-semibold">{actualCoverage}%</span>
+            </div>
+            {isLimitedBySupply && (
+              <p className="text-xs text-gold mt-1">
+                Objectif {option.couvertureCible}% non atteint (ressource insuffisante)
+              </p>
+            )}
           </div>
         </div>
 
