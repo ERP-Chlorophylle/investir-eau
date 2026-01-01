@@ -11,94 +11,45 @@ export default function Landing() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-water-light via-background to-eco-light py-20 md:py-32">
+        <section className="relative overflow-hidden bg-gradient-to-br from-water-light via-background to-eco-light py-12 md:py-20">
           <div className="container-app relative z-10">
-            <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-              {/* Left content */}
-              <div className="text-center lg:text-left">
-                <div className="animate-slide-up">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                    <Scale className="h-4 w-4" />
-                    Comparateur gratuit
-                  </span>
-                </div>
-
-                <h1 className="animate-slide-up delay-100 mt-8 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                  <span className="gradient-text">Cuve ou Livret A ?</span>
-                  <br />
-                  <span className="text-foreground/90">Faites le match.</span>
-                </h1>
-
-                <p className="animate-slide-up delay-200 mt-6 text-lg text-muted-foreground lg:text-xl lg:max-w-xl">
-                  Investir dans une cuve de récupération d'eau de pluie ou placer son argent sur un livret d'épargne ? 
-                  <strong className="text-foreground"> Découvrez quelle option vous rapporte le plus</strong> sur 5, 10 ou 20 ans.
-                </p>
-
-                <div className="animate-slide-up delay-300 mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
-                  <Button asChild variant="hero" size="xl">
-                    <Link to="/simulateur">
-                      Comparer maintenant
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <ShieldCheck className="h-4 w-4 text-eco-dark" />
-                    Gratuit • 2 minutes • Résultat immédiat
-                  </div>
-                </div>
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="animate-slide-up">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+                  <Scale className="h-4 w-4" />
+                  Comparateur gratuit
+                </span>
               </div>
 
-              {/* Right visual - Comparison preview */}
-              <div className="animate-scale-in delay-200 hidden lg:block">
-                <div className="relative">
-                  {/* Cuve card */}
-                  <div className="absolute -left-4 top-8 z-10 w-64 rounded-2xl border-2 border-primary/30 bg-card p-6 shadow-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
-                        <Droplets className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Économies cuve</p>
-                        <p className="text-2xl font-bold text-primary">+8 450 €</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 h-2 w-full rounded-full bg-muted">
-                      <div className="h-2 w-4/5 rounded-full bg-primary"></div>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">sur 15 ans</p>
-                  </div>
+              <h1 className="animate-slide-up delay-100 mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                <span className="gradient-text">Cuve ou Livret A ?</span>
+                <br />
+                <span className="text-foreground/90">Faites le match.</span>
+              </h1>
 
-                  {/* Livret card */}
-                  <div className="ml-auto w-64 rounded-2xl border bg-card p-6 shadow-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/20">
-                        <PiggyBank className="h-6 w-6 text-gold" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Livret A</p>
-                        <p className="text-2xl font-bold text-gold">+3 200 €</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 h-2 w-full rounded-full bg-muted">
-                      <div className="h-2 w-2/5 rounded-full bg-gold"></div>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">sur 15 ans</p>
-                  </div>
+              <p className="animate-slide-up delay-200 mt-4 text-base text-muted-foreground lg:text-lg">
+                Investir dans une cuve de récupération d'eau de pluie ou placer son argent sur un livret d'épargne ? 
+                <strong className="text-foreground"> Découvrez quelle option vous rapporte le plus.</strong>
+              </p>
 
-                  {/* VS badge */}
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background font-bold text-lg shadow-xl">
-                      VS
-                    </div>
-                  </div>
+              <div className="animate-slide-up delay-300 mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
+                <Button asChild variant="hero" size="xl">
+                  <Link to="/simulateur">
+                    Comparer maintenant
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 text-eco-dark" />
+                  Gratuit • 2 minutes • Résultat immédiat
                 </div>
               </div>
             </div>
           </div>
 
           {/* Decorative blobs */}
-          <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-water-medium/20 blur-3xl" />
-          <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-eco-medium/20 blur-3xl" />
+          <div className="absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-water-medium/20 blur-3xl" />
+          <div className="absolute -right-32 -top-32 h-64 w-64 rounded-full bg-eco-medium/20 blur-3xl" />
         </section>
 
         {/* How it works */}

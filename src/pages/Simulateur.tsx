@@ -18,7 +18,7 @@ import {
   step4Schema,
   SimulationFormData,
 } from "@/lib/validation";
-import { getDepartementFromCodePostal, calculateSimulation, SimulationInputs } from "@/lib/calculations";
+import { calculateSimulation, SimulationInputs } from "@/lib/calculations";
 import { useToast } from "@/hooks/use-toast";
 
 const STEPS = [
@@ -39,11 +39,14 @@ export default function Simulateur() {
     resolver: zodResolver(fullSchema),
     defaultValues: {
       prixEau: 5,
-      horizonAnnees: 10,
-      wcEnabled: false,
-      jardinEnabled: false,
-      autoEnabled: false,
-      piscineEnabled: false,
+      wcEnabled: true,
+      wcPersonnes: 2,
+      jardinEnabled: true,
+      jardinSurface: 150,
+      autoEnabled: true,
+      autoLavagesMois: 2,
+      piscineEnabled: true,
+      piscineSurface: 32,
       newsletterOptIn: false,
     },
     mode: "onChange",
@@ -56,7 +59,7 @@ export default function Simulateur() {
 
     switch (currentStep) {
       case 1:
-        fieldsToValidate = ["codePostal", "surfaceToiture", "typeToiture"];
+        fieldsToValidate = ["departement", "surfaceToiture", "typeToiture"];
         break;
       case 2:
         // Validate usage fields based on what's enabled
@@ -76,7 +79,7 @@ export default function Simulateur() {
         }
         break;
       case 3:
-        fieldsToValidate = ["prixEau", "horizonAnnees"];
+        fieldsToValidate = ["prixEau"];
         break;
       case 4:
         fieldsToValidate = ["email", "rgpdConsent"];
@@ -103,11 +106,8 @@ export default function Simulateur() {
   };
 
   const onSubmit = (data: SimulationFormData) => {
-    const departement = getDepartementFromCodePostal(data.codePostal);
-
     const inputs: SimulationInputs = {
-      codePostal: data.codePostal,
-      departement: departement || "",
+      departement: data.departement,
       surfaceToiture: data.surfaceToiture,
       typeToiture: data.typeToiture,
 
@@ -124,7 +124,6 @@ export default function Simulateur() {
       piscineSurface: data.piscineSurface,
 
       prixEau: data.prixEau,
-      horizonAnnees: data.horizonAnnees,
     };
 
     const results = calculateSimulation(inputs);
