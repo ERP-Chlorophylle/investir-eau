@@ -106,7 +106,6 @@ export default function Resultat() {
                   option={option}
                   vSupply={results.vSupply}
                   vDemand={results.vDemand}
-                  vUse={results.vUse}
                 />
               ))}
             </div>

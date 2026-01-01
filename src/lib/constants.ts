@@ -57,11 +57,11 @@ export const TANK_PRICING: Record<number, number> = {
   20000: 29500,
 };
 
-// Reserve days by option
-export const RESERVE_DAYS = {
-  eco: 21,
-  confort: 35,
-  autonomie: 56,
+// Coverage options by type (percentage of demand covered)
+export const COVERAGE_OPTIONS = {
+  eco: { percentage: 70, label: "Essentiel (70%)" },
+  confort: { percentage: 85, label: "Confort (85%)" },
+  autonomie: { percentage: 100, label: "Autonomie (100%)" },
 };
 
 // Savings accounts rates (net, December 2025)
