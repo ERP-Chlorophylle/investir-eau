@@ -11,9 +11,17 @@ export const CALIBRATED_DEPARTMENTS = ["07", "30", "34", "48", "84"];
 
 // Roof coefficients
 export const ROOF_TYPES = [
-  { value: "tuile", label: "Tuile", coefficient: 0.9 },
-  { value: "ondule", label: "Toit ondulé", coefficient: 0.8 },
+  { value: "pente", label: "Toit en pente", coefficient: 0.9 },
   { value: "plat", label: "Toit plat", coefficient: 0.6 },
+] as const;
+
+// Department options for selection
+export const DEPARTMENT_OPTIONS = [
+  { value: "07", label: "Ardèche (07)" },
+  { value: "30", label: "Gard (30)" },
+  { value: "34", label: "Hérault (34)" },
+  { value: "48", label: "Lozère (48)" },
+  { value: "84", label: "Vaucluse (84)" },
 ] as const;
 
 // Default values

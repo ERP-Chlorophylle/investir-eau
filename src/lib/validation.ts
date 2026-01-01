@@ -1,11 +1,7 @@
 import { z } from "zod";
 
 export const step1Schema = z.object({
-  codePostal: z
-    .string()
-    .min(5, "Le code postal doit contenir 5 chiffres")
-    .max(5, "Le code postal doit contenir 5 chiffres")
-    .regex(/^\d{5}$/, "Format invalide"),
+  departement: z.string().min(1, "Sélectionnez un département"),
   surfaceToiture: z
     .number({ required_error: "Surface requise" })
     .min(10, "Minimum 10 m²")
@@ -29,7 +25,6 @@ export const step2Schema = z.object({
 
 export const step3Schema = z.object({
   prixEau: z.number().min(2.5).max(8).default(5),
-  horizonAnnees: z.number().min(5).max(20).default(10),
 });
 
 export const step4Schema = z.object({

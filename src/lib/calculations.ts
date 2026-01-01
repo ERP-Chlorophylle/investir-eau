@@ -17,7 +17,6 @@ import {
 } from "./constants";
 
 export interface SimulationInputs {
-  codePostal: string;
   departement: string;
   surfaceToiture: number;
   typeToiture: string;
@@ -37,7 +36,6 @@ export interface SimulationInputs {
 
   // Financial
   prixEau: number;
-  horizonAnnees: number;
 }
 
 export interface TankOption {
@@ -188,14 +186,15 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     };
   });
 
-  // 7) Financial comparisons
+  // 7) Financial comparisons (fixed 10 years horizon)
+  const horizonAnnees = 10;
   const comparisons: FinancialComparison[] = options.map((option) => {
     const coutCuve = option.cout;
     const m3Substitues = vUse / 1000;
 
     // Cumulated savings
     let economiesCumulees = 0;
-    for (let n = 1; n <= inputs.horizonAnnees; n++) {
+    for (let n = 1; n <= horizonAnnees; n++) {
       const prixEauN = inputs.prixEau * Math.pow(1 + WATER_INFLATION, n - 1);
       economiesCumulees += m3Substitues * prixEauN;
     }
@@ -204,7 +203,7 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     // Savings accounts
     const livrets = SAVINGS_ACCOUNTS.map((account) => {
       const valeurFuture = coutCuve
-        ? Math.round(coutCuve * Math.pow(1 + account.rate, inputs.horizonAnnees) * 100) / 100
+        ? Math.round(coutCuve * Math.pow(1 + account.rate, horizonAnnees) * 100) / 100
         : 0;
       const ecart = Math.round((economiesCumulees - valeurFuture) * 100) / 100;
 

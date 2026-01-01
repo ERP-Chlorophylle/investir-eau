@@ -49,7 +49,7 @@ export default function Resultat() {
                 Votre simulation
               </h1>
               <p className="mt-2 text-muted-foreground">
-                Département {inputs.departement} • Horizon {inputs.horizonAnnees} ans •{" "}
+                Département {inputs.departement} • Horizon 10 ans •{" "}
                 {inputs.prixEau.toFixed(1)} €/m³
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function Resultat() {
                 <TabsContent key={comparison.optionType} value={comparison.optionType}>
                   <FinancialComparison
                     comparison={comparison}
-                    horizonAnnees={inputs.horizonAnnees}
+                    horizonAnnees={10}
                   />
                 </TabsContent>
               ))}

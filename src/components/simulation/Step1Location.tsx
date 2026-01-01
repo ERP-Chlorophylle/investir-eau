@@ -1,10 +1,9 @@
 import { useFormContext } from "react-hook-form";
-import { MapPin, Home, AlertTriangle } from "lucide-react";
+import { MapPin, Home } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ROOF_TYPES, CALIBRATED_DEPARTMENTS, CLIMATE_DATA } from "@/lib/constants";
-import { getDepartementFromCodePostal } from "@/lib/calculations";
+import { ROOF_TYPES, DEPARTMENT_OPTIONS, CLIMATE_DATA } from "@/lib/constants";
 import { SimulationFormData } from "@/lib/validation";
 
 export function Step1Location() {
@@ -15,11 +14,9 @@ export function Step1Location() {
     formState: { errors },
   } = useFormContext<SimulationFormData>();
 
-  const codePostal = watch("codePostal");
+  const departement = watch("departement");
   const typeToiture = watch("typeToiture");
 
-  const departement = getDepartementFromCodePostal(codePostal);
-  const isCalibrated = departement ? CALIBRATED_DEPARTMENTS.includes(departement) : true;
   const climateData = departement ? CLIMATE_DATA[departement] : null;
 
   return (
@@ -32,29 +29,40 @@ export function Step1Location() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Code postal */}
-        <div className="space-y-2">
-          <Label htmlFor="codePostal" className="flex items-center gap-2">
+        {/* Département */}
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary" />
-            Code postal
+            Département
           </Label>
-          <Input
-            id="codePostal"
-            placeholder="34000"
-            maxLength={5}
-            {...register("codePostal")}
-          />
-          {errors.codePostal && (
-            <p className="text-sm text-destructive">{errors.codePostal.message}</p>
+          <RadioGroup
+            value={departement}
+            onValueChange={(value) => setValue("departement", value)}
+            className="grid gap-2"
+          >
+            {DEPARTMENT_OPTIONS.map((dept) => (
+              <Label
+                key={dept.value}
+                htmlFor={`dept-${dept.value}`}
+                className={`flex cursor-pointer items-center justify-between rounded-lg border-2 p-3 transition-all ${
+                  departement === dept.value
+                    ? "border-primary bg-primary/5"
+                    : "border-muted hover:border-primary/50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <RadioGroupItem value={dept.value} id={`dept-${dept.value}`} />
+                  <span className="font-medium">{dept.label}</span>
+                </div>
+              </Label>
+            ))}
+          </RadioGroup>
+          {errors.departement && (
+            <p className="text-sm text-destructive">{errors.departement.message}</p>
           )}
-          {departement && (
-            <div className="text-sm text-muted-foreground">
-              <p>Département : <span className="font-medium text-foreground">{departement}</span></p>
-              {climateData && (
-                <p className="mt-1">
-                  Pluviométrie : <span className="font-medium text-foreground">{climateData.pluie} mm/an</span>
-                </p>
-              )}
+          {climateData && (
+            <div className="text-sm text-muted-foreground mt-2">
+              Pluviométrie : <span className="font-medium text-foreground">{climateData.pluie} mm/an</span>
             </div>
           )}
         </div>
@@ -77,20 +85,6 @@ export function Step1Location() {
         </div>
       </div>
 
-      {/* Warning for non-calibrated departments */}
-      {departement && !isCalibrated && (
-        <div className="flex items-start gap-3 rounded-lg border border-gold/50 bg-gold-light p-4">
-          <AlertTriangle className="h-5 w-5 shrink-0 text-gold" />
-          <div className="text-sm">
-            <p className="font-medium text-foreground">Zone non calibrée</p>
-            <p className="text-muted-foreground">
-              Ce simulateur est calibré pour les départements 07, 30, 34, 48 et 84.
-              Les résultats sont indicatifs.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Type de toiture */}
       <div className="space-y-3">
         <Label className="flex items-center gap-2">
@@ -100,7 +94,7 @@ export function Step1Location() {
         <RadioGroup
           value={typeToiture}
           onValueChange={(value) => setValue("typeToiture", value)}
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2"
         >
           {ROOF_TYPES.map((roof) => (
             <Label
