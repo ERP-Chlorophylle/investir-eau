@@ -104,8 +104,6 @@ export default function Resultat() {
                 <TankOptionCard
                   key={option.type}
                   option={option}
-                  vSupply={results.vSupply}
-                  vDemand={results.vDemand}
                 />
               ))}
             </div>

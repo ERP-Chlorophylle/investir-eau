@@ -2,12 +2,6 @@ import { Droplets, TrendingUp, Shield } from "lucide-react";
 import { TankOption } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
-interface TankOptionCardProps {
-  option: TankOption;
-  vSupply: number;
-  vDemand: number;
-}
-
 const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subtitle: string; cardClass: string; iconClass: string; badgeClass: string; featured?: boolean }> = {
   eco: {
     icon: Droplets,
@@ -36,15 +30,9 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   },
 };
 
-export function TankOptionCard({ option, vSupply, vDemand }: TankOptionCardProps) {
+export function TankOptionCard({ option }: { option: TankOption }) {
   const config = OPTION_CONFIG[option.type];
   const Icon = config.icon;
-
-  // Calculate actual coverage (limited by supply)
-  const actualCoverage = vDemand > 0 
-    ? Math.round((option.volumeAnnuelCouvert / vDemand) * 100) 
-    : 0;
-  const isLimitedBySupply = option.volumeAnnuelCouvert < vDemand * (option.couvertureCible / 100);
 
   return (
     <div
@@ -86,17 +74,10 @@ export function TankOptionCard({ option, vSupply, vDemand }: TankOptionCardProps
         </div>
 
         {/* Stats */}
-        <div className="space-y-2 text-sm">
-          <div className="rounded-lg bg-muted/50 p-3">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Couverture des besoins</span>
-              <span className="text-lg font-semibold">{actualCoverage}%</span>
-            </div>
-            {isLimitedBySupply && (
-              <p className="text-xs text-gold mt-1">
-                Objectif {option.couvertureCible}% non atteint (ressource insuffisante)
-              </p>
-            )}
+        <div className="rounded-lg bg-muted/50 p-3">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-muted-foreground">Couverture des besoins</span>
+            <span className="text-lg font-semibold">{option.couvertureCible}%</span>
           </div>
         </div>
 
@@ -105,11 +86,6 @@ export function TankOptionCard({ option, vSupply, vDemand }: TankOptionCardProps
           <p>
             {(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an économisés
           </p>
-          {isLimitedBySupply && (
-            <p className="text-xs text-gold mt-1">
-              Limité par la ressource disponible
-            </p>
-          )}
         </div>
 
         {/* Price */}
