@@ -150,8 +150,9 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     const coverageConfig = COVERAGE_OPTIONS[type];
     const couvertureCible = coverageConfig.percentage;
     
-    // Volume annuel à couvrir = pourcentage des besoins
-    const volumeAnnuelCouvert = vDemand * (couvertureCible / 100);
+    // Volume annuel à couvrir = pourcentage des besoins, plafonné par le potentiel récupérable
+    const volumeAnnuelCouvertBrut = vDemand * (couvertureCible / 100);
+    const volumeAnnuelCouvert = Math.min(volumeAnnuelCouvertBrut, vSupply);
     
     // Taille cuve = environ 1 mois du volume couvert (comme tampon)
     let volumeCuveBrut = volumeAnnuelCouvert / 12;
