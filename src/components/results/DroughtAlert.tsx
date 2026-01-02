@@ -1,4 +1,4 @@
-import { AlertTriangle, Droplets } from "lucide-react";
+import { AlertTriangle, Droplets, ExternalLink } from "lucide-react";
 
 export function DroughtAlert() {
   return (
@@ -37,9 +37,15 @@ export function DroughtAlert() {
             </div>
           </div>
           
-          <p className="text-xs text-muted-foreground italic">
-            Sources : Bilan sécheresse 2022 / Rapport interministériel
-          </p>
+          <a 
+            href="https://www.igedd.developpement-durable.gouv.fr/retour-d-experience-sur-la-gestion-de-l-eau-lors-a3681.html" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors underline underline-offset-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Lire le rapport interministériel sur la sécheresse 2022
+          </a>
         </div>
       </div>
     </div>
