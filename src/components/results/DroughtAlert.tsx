@@ -38,7 +38,7 @@ export function DroughtAlert() {
           </div>
           
           <a 
-            href="/documents/Rapport_interministeriel_secheresse_2022.pdf" 
+            href="https://www.igedd.developpement-durable.gouv.fr/IMG/pdf/rapport_secheresse_2022_vdef_cle0c1e30.pdf" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors underline underline-offset-2"
