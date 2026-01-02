@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Droplets, Download, RefreshCw } from "lucide-react";
+import { ArrowLeft, Droplets, RefreshCw, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -10,6 +10,7 @@ import { DroughtAlert } from "@/components/results/DroughtAlert";
 import { QuoteForm } from "@/components/results/QuoteForm";
 import { SimulationResults, SimulationInputs } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Resultat() {
   const navigate = useNavigate();
@@ -90,13 +91,35 @@ export default function Resultat() {
             <h2 className="mb-6 text-2xl font-bold text-foreground">
               Dimensionnement recommandé
             </h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              {results.options.map((option) => (
+            
+            {results.isSupplyLimited && (
+              <Alert className="mb-6 border-water bg-water/10">
+                <Info className="h-4 w-4 text-water-dark" />
+                <AlertDescription className="text-foreground">
+                  <strong>Bonne nouvelle !</strong> Votre potentiel de récupération d'eau de pluie couvre déjà 100% de vos besoins. 
+                  Nous vous recommandons la cuve optimale ci-dessous.
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <div className={`grid gap-6 ${results.isSupplyLimited ? 'md:grid-cols-1 max-w-md mx-auto' : 'md:grid-cols-3'}`}>
+              {results.isSupplyLimited ? (
                 <TankOptionCard
-                  key={option.type}
-                  option={option}
+                  key={results.options[2].type}
+                  option={{
+                    ...results.options[2],
+                    label: "Cuve optimale",
+                    couvertureCible: 100,
+                  }}
                 />
-              ))}
+              ) : (
+                results.options.map((option) => (
+                  <TankOptionCard
+                    key={option.type}
+                    option={option}
+                  />
+                ))
+              )}
             </div>
           </section>
 
@@ -105,21 +128,28 @@ export default function Resultat() {
             <h2 className="mb-6 text-2xl font-bold text-foreground">
               Comparaison financière : Cuve vs Livrets
             </h2>
-            <Tabs defaultValue="confort" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="eco">Éco</TabsTrigger>
-                <TabsTrigger value="confort">Confort</TabsTrigger>
-                <TabsTrigger value="autonomie">Autonomie</TabsTrigger>
-              </TabsList>
-              {results.comparisons.map((comparison) => (
-                <TabsContent key={comparison.optionType} value={comparison.optionType}>
-                  <FinancialComparison
-                    comparison={comparison}
-                    horizonAnnees={10}
-                  />
-                </TabsContent>
-              ))}
-            </Tabs>
+            {results.isSupplyLimited ? (
+              <FinancialComparison
+                comparison={results.comparisons[2]}
+                horizonAnnees={10}
+              />
+            ) : (
+              <Tabs defaultValue="confort" className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsTrigger value="eco">Éco</TabsTrigger>
+                  <TabsTrigger value="confort">Confort</TabsTrigger>
+                  <TabsTrigger value="autonomie">Autonomie</TabsTrigger>
+                </TabsList>
+                {results.comparisons.map((comparison) => (
+                  <TabsContent key={comparison.optionType} value={comparison.optionType}>
+                    <FinancialComparison
+                      comparison={comparison}
+                      horizonAnnees={10}
+                    />
+                  </TabsContent>
+                ))}
+              </Tabs>
+            )}
           </section>
 
           {/* Drought alert */}
