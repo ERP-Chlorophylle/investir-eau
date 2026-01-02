@@ -1,4 +1,4 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet, Sparkles } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,10 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
     confort: "Confort",
     autonomie: "Autonomie",
   };
+
+  // Fun metric: calculate water equivalent
+  const litresEconomises = comparison.economiesCumulees / (comparison.coutCuve ? comparison.coutCuve / 1000 : 4);
+  const baignoiresEquivalent = Math.round(comparison.economiesCumulees / 3); // ~150L per bath, ~3€ value
 
   return (
     <div className="space-y-6">
@@ -40,26 +44,45 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
 
       {/* Main comparison grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left: Cuve savings */}
-        <div className="rounded-xl border-2 border-primary bg-gradient-to-br from-water-light to-background p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20">
-              <TrendingUp className="h-6 w-6 text-primary" />
+        {/* Left: Cuve savings - Enhanced with fun elements */}
+        <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-primary/10 via-water-light to-background p-6">
+          {/* Decorative water drops */}
+          <div className="absolute -right-4 -top-4 opacity-10">
+            <Droplet className="h-24 w-24 text-primary" />
+          </div>
+          <div className="absolute right-12 top-16 opacity-10">
+            <Droplet className="h-12 w-12 text-primary" />
+          </div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
+                <TrendingUp className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
+                <p className="text-4xl font-bold text-primary">
+                  {comparison.economiesCumulees.toLocaleString("fr-FR", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })} €
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
-              <p className="text-3xl font-bold text-primary">
-                {comparison.economiesCumulees.toLocaleString("fr-FR", {
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })} €
+            
+            {/* Fun metric */}
+            <div className="mt-5 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-3">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <p className="text-sm font-medium text-foreground">
+                C'est comme offrir <span className="font-bold text-primary">{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
               </p>
             </div>
+            
+            <p className="mt-4 text-sm text-muted-foreground">
+              Total des économies sur votre facture d'eau sur {horizonAnnees} ans
+              (avec +1%/an d'inflation du prix de l'eau)
+            </p>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Total des économies sur votre facture d'eau sur {horizonAnnees} ans
-            (avec +1%/an d'inflation du prix de l'eau)
-          </p>
         </div>
 
         {/* Right: Livrets comparison */}
@@ -107,18 +130,18 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
         </div>
       </div>
 
-      {/* Gains comparison table */}
+      {/* Gains comparison - Redesigned as visual cards */}
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="bg-muted/50 px-6 py-4 border-b">
-          <h4 className="font-semibold text-foreground">
-            🏆 Résultat : Cuve vs chaque livret
+        <div className="bg-gradient-to-r from-primary/5 to-gold/5 px-6 py-5 border-b">
+          <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            🏆 Verdict : Cuve ou Livret ?
           </h4>
-          <p className="text-sm text-muted-foreground">
-            Différence entre les économies de la cuve et les intérêts du livret
+          <p className="text-sm text-muted-foreground mt-1">
+            Quelle option vous rapporte le plus sur {horizonAnnees} ans ?
           </p>
         </div>
 
-        <div className="divide-y">
+        <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
           {comparison.livrets.map((livret) => {
             const interetsLivret = livret.valeurFuture - (comparison.coutCuve || 0);
             const gainCuve = comparison.economiesCumulees - interetsLivret;
@@ -127,35 +150,40 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             return (
               <div
                 key={livret.id}
-                className="flex items-center justify-between px-6 py-4"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="font-medium text-foreground">
-                    Cuve vs {livret.name}
-                  </span>
-                </div>
-                <div className={cn(
-                  "flex items-center gap-2 rounded-full px-4 py-2 font-semibold",
+                className={cn(
+                  "flex flex-col items-center justify-center rounded-xl p-5 text-center transition-all hover:scale-[1.02]",
                   cuveGagne 
-                    ? "bg-eco-light text-eco-dark" 
-                    : "bg-destructive/10 text-destructive"
+                    ? "bg-gradient-to-b from-eco-light to-eco-light/50 border-2 border-eco/30" 
+                    : "bg-gradient-to-b from-gold-light to-gold-light/50 border-2 border-gold/30"
+                )}
+              >
+                <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">
+                  vs {livret.name}
+                </p>
+                <div className={cn(
+                  "flex items-center gap-1 mb-2",
+                  cuveGagne ? "text-eco-dark" : "text-gold"
                 )}>
                   {cuveGagne ? (
-                    <ArrowUp className="h-4 w-4" />
+                    <ArrowUp className="h-5 w-5" />
                   ) : (
-                    <ArrowDown className="h-4 w-4" />
+                    <ArrowDown className="h-5 w-5" />
                   )}
-                  <span>
-                    {cuveGagne ? "+" : ""}
-                    {gainCuve.toLocaleString("fr-FR", {
+                  <span className="text-2xl font-bold">
+                    {Math.abs(gainCuve).toLocaleString("fr-FR", {
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0,
                     })} €
                   </span>
-                  <span className="text-sm font-normal">
-                    {cuveGagne ? "en faveur de la cuve" : "en faveur du livret"}
-                  </span>
                 </div>
+                <p className={cn(
+                  "text-xs font-semibold px-3 py-1 rounded-full",
+                  cuveGagne 
+                    ? "bg-eco/20 text-eco-dark" 
+                    : "bg-gold/20 text-gold"
+                )}>
+                  {cuveGagne ? "🚰 Cuve gagnante" : "💰 Livret gagnant"}
+                </p>
               </div>
             );
           })}
@@ -163,8 +191,8 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
       </div>
 
       {/* Disclaimer */}
-      <div className="flex items-start gap-3 rounded-lg bg-water-light/50 p-4 text-sm">
-        <Info className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+      <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-4 text-sm">
+        <Info className="h-5 w-5 shrink-0 text-muted-foreground mt-0.5" />
         <div className="text-muted-foreground">
           <p>
             <strong>Note :</strong> Ce simulateur compare les valeurs cumulées sur la période choisie. 
