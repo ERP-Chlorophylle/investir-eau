@@ -74,6 +74,9 @@ export interface SimulationResults {
 
   // Is calibrated
   isCalibrated: boolean;
+  
+  // Is supply limited (demand > supply)
+  isSupplyLimited: boolean;
 }
 
 export interface FinancialComparison {
@@ -141,6 +144,9 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
 
   // 3) Usable volume (max possible)
   const vUseMax = Math.min(vSupply, vDemand);
+  
+  // Check if supply is the limiting factor
+  const isSupplyLimited = vDemand > vSupply;
 
   // 4) Guard rail for rain event
   const vEventMin = MIN_RAIN_EVENT * inputs.surfaceToiture * cToit * eta;
@@ -235,5 +241,6 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     options,
     comparisons,
     isCalibrated,
+    isSupplyLimited,
   };
 }
