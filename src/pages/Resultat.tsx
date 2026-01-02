@@ -64,7 +64,7 @@ export default function Resultat() {
           </div>
 
           {/* Supply/Demand summary */}
-          <div className="mb-10 grid gap-4 sm:grid-cols-3">
+          <div className="mb-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border bg-card p-5">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Droplets className="h-4 w-4 text-water-dark" />
@@ -81,15 +81,6 @@ export default function Resultat() {
               </div>
               <p className="mt-2 text-2xl font-bold text-foreground">
                 {(results.vDemand / 1000).toFixed(1)} m³/an
-              </p>
-            </div>
-            <div className="rounded-xl border bg-card p-5">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Droplets className="h-4 w-4 text-primary" />
-                Volume utilisable
-              </div>
-              <p className="mt-2 text-2xl font-bold text-foreground">
-                {(results.vUse / 1000).toFixed(1)} m³/an
               </p>
             </div>
           </div>
