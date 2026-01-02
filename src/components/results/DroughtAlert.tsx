@@ -38,7 +38,7 @@ export function DroughtAlert() {
           </div>
           
           <a 
-            href="https://www.igedd.developpement-durable.gouv.fr/retour-d-experience-sur-la-gestion-de-l-eau-lors-a3681.html" 
+            href="/documents/Rapport_interministeriel_secheresse_2022.pdf" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors underline underline-offset-2"
