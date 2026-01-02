@@ -38,7 +38,7 @@ export function DroughtAlert() {
           </div>
           
           <a 
-            href="https://www.igedd.developpement-durable.gouv.fr/IMG/pdf/rapport_secheresse_2022_vdef_cle0c1e30.pdf" 
+            href="https://draaf.paca.agriculture.gouv.fr/IMG/pdf/la_gestion_de_l_eau_lors_de_la_secheresse_2022-_rapport_du_cgaaer-mars_2023.pdf" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors underline underline-offset-2"
