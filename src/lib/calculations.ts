@@ -42,6 +42,7 @@ export interface TankOption {
   type: "eco" | "confort" | "autonomie";
   label: string;
   couvertureCible: number; // 70, 85 or 100%
+  couvertureReelle: number; // Actual coverage percentage based on supply limits
   volumeCuveBrut: number;
   volumeCuveArrondi: number;
   volumeCuveM3: number;
@@ -175,10 +176,14 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     // Get price from exact size
     const cout = surDevis ? null : TANK_PRICING[volumeCuveArrondi] ?? null;
 
+    // Calculate actual coverage percentage
+    const couvertureReelle = vDemand > 0 ? Math.round((volumeAnnuelCouvert / vDemand) * 100) : 0;
+
     return {
       type,
       label: coverageConfig.label,
       couvertureCible,
+      couvertureReelle,
       volumeCuveBrut: Math.round(volumeCuveBrut),
       volumeCuveArrondi,
       volumeCuveM3: volumeCuveArrondi / 1000,
