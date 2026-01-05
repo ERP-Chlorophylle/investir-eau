@@ -93,11 +93,11 @@ export default function Resultat() {
             </h2>
             
             {results.isSupplyLimited && (
-              <Alert className="mb-6 border-water bg-water/10">
-                <Info className="h-4 w-4 text-water-dark" />
+              <Alert className="mb-6 border-amber-500 bg-amber-500/10">
+                <Info className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="text-foreground">
-                  <strong>Bonne nouvelle !</strong> Votre potentiel de récupération d'eau de pluie couvre déjà 100% de vos besoins. 
-                  Nous vous recommandons la cuve optimale ci-dessous.
+                  <strong>Attention :</strong> Vos besoins dépassent le potentiel récupérable de votre toiture. 
+                  Nous vous recommandons la cuve optimale ci-dessous pour maximiser votre récupération.
                 </AlertDescription>
               </Alert>
             )}
