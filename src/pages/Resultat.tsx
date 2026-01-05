@@ -97,29 +97,18 @@ export default function Resultat() {
                 <Info className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="text-foreground">
                   <strong>Attention :</strong> Vos besoins dépassent le potentiel récupérable de votre toiture. 
-                  Nous vous recommandons la cuve optimale ci-dessous pour maximiser votre récupération.
+                  La couverture réelle de certaines cuves sera limitée par ce potentiel.
                 </AlertDescription>
               </Alert>
             )}
             
-            <div className={`grid gap-6 ${results.isSupplyLimited ? 'md:grid-cols-1 max-w-md mx-auto' : 'md:grid-cols-3'}`}>
-              {results.isSupplyLimited ? (
+            <div className="grid gap-6 md:grid-cols-3">
+              {results.options.map((option) => (
                 <TankOptionCard
-                  key={results.options[2].type}
-                  option={{
-                    ...results.options[2],
-                    label: "Cuve optimale",
-                    couvertureCible: 100,
-                  }}
+                  key={option.type}
+                  option={option}
                 />
-              ) : (
-                results.options.map((option) => (
-                  <TankOptionCard
-                    key={option.type}
-                    option={option}
-                  />
-                ))
-              )}
+              ))}
             </div>
           </section>
 
@@ -128,28 +117,21 @@ export default function Resultat() {
             <h2 className="mb-6 text-2xl font-bold text-foreground">
               Comparaison financière : Cuve vs Livrets
             </h2>
-            {results.isSupplyLimited ? (
-              <FinancialComparison
-                comparison={results.comparisons[2]}
-                horizonAnnees={10}
-              />
-            ) : (
-              <Tabs defaultValue="confort" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="eco">Éco</TabsTrigger>
-                  <TabsTrigger value="confort">Confort</TabsTrigger>
-                  <TabsTrigger value="autonomie">Autonomie</TabsTrigger>
-                </TabsList>
-                {results.comparisons.map((comparison) => (
-                  <TabsContent key={comparison.optionType} value={comparison.optionType}>
-                    <FinancialComparison
-                      comparison={comparison}
-                      horizonAnnees={10}
-                    />
-                  </TabsContent>
-                ))}
-              </Tabs>
-            )}
+            <Tabs defaultValue="confort" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsTrigger value="eco">Éco</TabsTrigger>
+                <TabsTrigger value="confort">Confort</TabsTrigger>
+                <TabsTrigger value="autonomie">Autonomie</TabsTrigger>
+              </TabsList>
+              {results.comparisons.map((comparison) => (
+                <TabsContent key={comparison.optionType} value={comparison.optionType}>
+                  <FinancialComparison
+                    comparison={comparison}
+                    horizonAnnees={10}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
           </section>
 
           {/* Drought alert */}

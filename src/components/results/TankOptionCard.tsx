@@ -14,7 +14,7 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   confort: {
     icon: TrendingUp,
     title: "Confort",
-    subtitle: "85% des besoins",
+    subtitle: "90% des besoins",
     cardClass: "result-card-confort",
     iconClass: "text-primary",
     badgeClass: "bg-water-light text-primary",
@@ -23,7 +23,7 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   autonomie: {
     icon: Shield,
     title: "Autonomie",
-    subtitle: "100% des besoins",
+    subtitle: "120% des besoins",
     cardClass: "result-card-autonomie",
     iconClass: "text-gold",
     badgeClass: "bg-gold-light text-gold",
