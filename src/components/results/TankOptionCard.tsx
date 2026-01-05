@@ -77,7 +77,7 @@ export function TankOptionCard({ option }: { option: TankOption }) {
         <div className="rounded-lg bg-muted/50 p-3">
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Couverture des besoins</span>
-            <span className="text-lg font-semibold">{option.couvertureReelle}%</span>
+            <span className="text-lg font-semibold">{option.couvertureReelle ?? option.couvertureCible}%</span>
           </div>
         </div>
 
