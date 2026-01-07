@@ -102,7 +102,7 @@ export default function Resultat() {
               </Alert>
             )}
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-3">
               {results.options.map((option) => (
                 <TankOptionCard
                   key={option.type}
@@ -118,10 +118,9 @@ export default function Resultat() {
               Comparaison financière : Cuve vs Livrets
             </h2>
             <Tabs defaultValue="confort" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="eco">Éco</TabsTrigger>
                 <TabsTrigger value="confort">Confort</TabsTrigger>
-                <TabsTrigger value="autonomie">Autonomie</TabsTrigger>
                 <TabsTrigger value="extra">Extra</TabsTrigger>
               </TabsList>
               {results.comparisons.map((comparison) => (
