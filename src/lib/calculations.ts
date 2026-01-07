@@ -193,6 +193,20 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     };
   });
 
+  // Ensure "extra" tank is always larger than "confort" tank
+  const confortOption = options.find(o => o.type === "confort");
+  const extraOption = options.find(o => o.type === "extra");
+  if (confortOption && extraOption && extraOption.volumeCuveArrondi <= confortOption.volumeCuveArrondi) {
+    // Find next larger tank size
+    const nextSize = TANK_SIZES.find(size => size > confortOption.volumeCuveArrondi);
+    if (nextSize) {
+      extraOption.volumeCuveArrondi = nextSize;
+      extraOption.volumeCuveM3 = nextSize / 1000;
+      extraOption.cout = TANK_PRICING[nextSize] ?? null;
+      extraOption.surDevis = nextSize > 20000;
+    }
+  }
+
   // Use the max coverage for global vUse
   const vUse = vUseMax;
 
