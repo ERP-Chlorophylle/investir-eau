@@ -52,10 +52,7 @@ export function TankOptionCard({ option }: { option: TankOption }) {
           <div className={cn("rounded-lg p-2", config.badgeClass)}>
             <Icon className={cn("h-6 w-6", config.iconClass)} />
           </div>
-          <div>
-            <h3 className="text-xl font-bold">{config.title}</h3>
-            <p className="text-sm text-muted-foreground">{option.couvertureReelle ?? option.couvertureCible}% des besoins</p>
-          </div>
+          <h3 className="text-xl font-bold">{config.title}</h3>
         </div>
       </div>
 
