@@ -1,4 +1,4 @@
-import { Droplets, TrendingUp, Shield } from "lucide-react";
+import { Droplets, TrendingUp, Shield, Sparkles } from "lucide-react";
 import { TankOption } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,14 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
     cardClass: "result-card-autonomie",
     iconClass: "text-gold",
     badgeClass: "bg-gold-light text-gold",
+  },
+  extra: {
+    icon: Sparkles,
+    title: "Un petit truc en plus",
+    subtitle: "150% des besoins",
+    cardClass: "result-card-extra",
+    iconClass: "text-purple",
+    badgeClass: "bg-purple-light text-purple",
   },
 };
 

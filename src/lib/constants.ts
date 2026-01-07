@@ -62,6 +62,7 @@ export const COVERAGE_OPTIONS = {
   eco: { percentage: 70, label: "Essentiel (70%)" },
   confort: { percentage: 90, label: "Confort (90%)" },
   autonomie: { percentage: 120, label: "Autonomie (120%)" },
+  extra: { percentage: 150, label: "Un petit truc en plus (150%)" },
 };
 
 // Savings accounts rates (net, December 2025)
