@@ -186,10 +186,6 @@
     @apply border-primary/30 bg-water-light/30 hover:border-primary hover:shadow-lg;
   }
 
-  .result-card-autonomie {
-    @apply border-gold/30 bg-gold-light/30 hover:border-gold hover:shadow-lg;
-  }
-
   .result-card-extra {
     @apply border-purple/30 bg-purple-light/30 hover:border-purple hover:shadow-lg;
   }

@@ -39,9 +39,9 @@ export interface SimulationInputs {
 }
 
 export interface TankOption {
-  type: "eco" | "confort" | "autonomie" | "extra";
+  type: "eco" | "confort" | "extra";
   label: string;
-  couvertureCible: number; // 70, 90, 120 or 150%
+  couvertureCible: number; // 70, 90 or 150%
   couvertureReelle: number; // Actual coverage percentage based on supply limits
   volumeCuveBrut: number;
   volumeCuveArrondi: number;
@@ -81,7 +81,7 @@ export interface SimulationResults {
 }
 
 export interface FinancialComparison {
-  optionType: "eco" | "confort" | "autonomie" | "extra";
+  optionType: "eco" | "confort" | "extra";
   coutCuve: number | null;
   economiesCumulees: number;
   livrets: {
@@ -152,8 +152,8 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
   // 4) Guard rail for rain event
   const vEventMin = MIN_RAIN_EVENT * inputs.surfaceToiture * cToit * eta;
 
-  // 5) Calculate options based on coverage percentages (70%, 90%, 120%, 150%)
-  const options: TankOption[] = (["eco", "confort", "autonomie", "extra"] as const).map((type) => {
+  // 5) Calculate options based on coverage percentages (70%, 90%, 150%)
+  const options: TankOption[] = (["eco", "confort", "extra"] as const).map((type) => {
     const coverageConfig = COVERAGE_OPTIONS[type];
     const couvertureCible = coverageConfig.percentage;
     

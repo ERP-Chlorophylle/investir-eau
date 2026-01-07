@@ -1,12 +1,11 @@
-import { Droplets, TrendingUp, Shield, Sparkles } from "lucide-react";
+import { Droplets, TrendingUp, Sparkles } from "lucide-react";
 import { TankOption } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
-const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subtitle: string; cardClass: string; iconClass: string; badgeClass: string; featured?: boolean }> = {
+const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; cardClass: string; iconClass: string; badgeClass: string; featured?: boolean }> = {
   eco: {
     icon: Droplets,
     title: "Essentiel",
-    subtitle: "70% des besoins",
     cardClass: "result-card-eco",
     iconClass: "text-eco-dark",
     badgeClass: "bg-eco-light text-eco-dark",
@@ -14,24 +13,14 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; subt
   confort: {
     icon: TrendingUp,
     title: "Confort",
-    subtitle: "90% des besoins",
     cardClass: "result-card-confort",
     iconClass: "text-primary",
     badgeClass: "bg-water-light text-primary",
     featured: true,
   },
-  autonomie: {
-    icon: Shield,
-    title: "Autonomie",
-    subtitle: "120% des besoins",
-    cardClass: "result-card-autonomie",
-    iconClass: "text-gold",
-    badgeClass: "bg-gold-light text-gold",
-  },
   extra: {
     icon: Sparkles,
     title: "Un petit truc en plus",
-    subtitle: "150% des besoins",
     cardClass: "result-card-extra",
     iconClass: "text-purple",
     badgeClass: "bg-purple-light text-purple",
@@ -65,7 +54,7 @@ export function TankOptionCard({ option }: { option: TankOption }) {
           </div>
           <div>
             <h3 className="text-xl font-bold">{config.title}</h3>
-            <p className="text-sm text-muted-foreground">{config.subtitle}</p>
+            <p className="text-sm text-muted-foreground">{option.couvertureReelle ?? option.couvertureCible}% des besoins</p>
           </div>
         </div>
       </div>
