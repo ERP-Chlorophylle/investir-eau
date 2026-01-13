@@ -20,7 +20,7 @@ import {
 } from "@/lib/validation";
 import { calculateSimulation, SimulationInputs } from "@/lib/calculations";
 import { useToast } from "@/hooks/use-toast";
-
+import { supabase } from "@/integrations/supabase/client";
 const STEPS = [
   { label: "Localisation" },
   { label: "Usages" },
@@ -105,7 +105,7 @@ export default function Simulateur() {
     }
   };
 
-  const onSubmit = (data: SimulationFormData) => {
+  const onSubmit = async (data: SimulationFormData) => {
     const inputs: SimulationInputs = {
       departement: data.departement,
       surfaceToiture: data.surfaceToiture,
@@ -133,6 +133,44 @@ export default function Simulateur() {
     sessionStorage.setItem("simulationInputs", JSON.stringify(inputs));
     sessionStorage.setItem("simulationEmail", data.email);
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
+
+    // Send email notification (non-blocking)
+    if (supabase) {
+      const confortOption = results.options.find(o => o.type === 'confort');
+      const confortComparison = results.comparisons.find(c => c.optionType === 'confort');
+      const economiesAnnuelles = confortComparison ? confortComparison.economiesCumulees / 10 : 0;
+      
+      supabase.functions.invoke('send-simulation-notification', {
+        body: {
+          email: data.email,
+          newsletter: data.newsletterOptIn,
+          departement: data.departement,
+          surfaceToiture: data.surfaceToiture,
+          typeToiture: data.typeToiture,
+          usages: {
+            wc: data.wcEnabled ? data.wcPersonnes : null,
+            jardin: data.jardinEnabled ? data.jardinSurface : null,
+            auto: data.autoEnabled ? data.autoLavagesMois : null,
+            piscine: data.piscineEnabled ? data.piscineSurface : null,
+          },
+          prixEau: data.prixEau,
+          resultats: {
+            potentiel: results.vSupply / 1000,
+            besoin: results.vDemand / 1000,
+            cuveConfort: confortOption?.volumeCuveArrondi || 0,
+            economiesAnnuelles: economiesAnnuelles,
+          }
+        }
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Erreur envoi notification simulation:', error);
+        } else {
+          console.log('Notification simulation envoyée');
+        }
+      }).catch(err => {
+        console.error('Erreur envoi notification simulation:', err);
+      });
+    }
 
     navigate("/resultat");
   };

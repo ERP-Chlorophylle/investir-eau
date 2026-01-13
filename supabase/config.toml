@@ -1,0 +1,7 @@
+project_id = ""
+
+[functions.send-simulation-notification]
+verify_jwt = false
+
+[functions.send-quote-request]
+verify_jwt = false

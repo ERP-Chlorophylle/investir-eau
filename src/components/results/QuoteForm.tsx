@@ -1,31 +1,91 @@
 import { useState } from "react";
-import { Send, Check } from "lucide-react";
+import { Send, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 
 interface QuoteFormProps {
   email: string;
+  simulationInputs: SimulationInputs;
+  simulationResults: SimulationResults;
 }
 
-export function QuoteForm({ email }: QuoteFormProps) {
+export function QuoteForm({ email, simulationInputs, simulationResults }: QuoteFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, this would send data to the backend
-    console.log("Quote request:", { email, phone, comment });
-    setIsSubmitted(true);
-    toast({
-      title: "Demande envoyée !",
-      description: "Nous vous recontacterons dans les meilleurs délais.",
-    });
+    setIsLoading(true);
+
+    try {
+      const confortOption = simulationResults.options.find(o => o.type === 'confort');
+      const confortComparison = simulationResults.comparisons.find(c => c.optionType === 'confort');
+      const economiesAnnuelles = confortComparison ? confortComparison.economiesCumulees / 10 : 0;
+      
+      if (supabase) {
+        const { error } = await supabase.functions.invoke('send-quote-request', {
+          body: {
+            email,
+            phone,
+            comment,
+            simulation: {
+              departement: simulationInputs.departement,
+              surfaceToiture: simulationInputs.surfaceToiture,
+              typeToiture: simulationInputs.typeToiture,
+              usages: {
+                wc: simulationInputs.wcEnabled ? simulationInputs.wcPersonnes : null,
+                jardin: simulationInputs.jardinEnabled ? simulationInputs.jardinSurface : null,
+                auto: simulationInputs.autoEnabled ? simulationInputs.autoLavagesMois : null,
+                piscine: simulationInputs.piscineEnabled ? simulationInputs.piscineSurface : null,
+              },
+              prixEau: simulationInputs.prixEau,
+              resultats: {
+                potentiel: simulationResults.vSupply / 1000,
+                besoin: simulationResults.vDemand / 1000,
+                cuveConfort: confortOption?.volumeCuveArrondi || 0,
+                economiesAnnuelles: economiesAnnuelles,
+              }
+            }
+          }
+        });
+
+        if (error) {
+          console.error('Erreur envoi demande de devis:', error);
+          toast({
+            title: "Erreur",
+            description: "Une erreur est survenue. Veuillez réessayer.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      console.log("Quote request sent:", { email, phone, comment });
+      setIsSubmitted(true);
+      toast({
+        title: "Demande envoyée !",
+        description: "Nous vous recontacterons dans les meilleurs délais.",
+      });
+    } catch (error) {
+      console.error('Erreur envoi demande de devis:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -86,12 +146,21 @@ export function QuoteForm({ email }: QuoteFormProps) {
       </div>
 
       <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
           Annuler
         </Button>
-        <Button type="submit" variant="cta">
-          <Send className="mr-2 h-4 w-4" />
-          Envoyer ma demande
+        <Button type="submit" variant="cta" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Envoi en cours...
+            </>
+          ) : (
+            <>
+              <Send className="mr-2 h-4 w-4" />
+              Envoyer ma demande
+            </>
+          )}
         </Button>
       </div>
     </form>
