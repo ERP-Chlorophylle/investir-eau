@@ -141,7 +141,11 @@ export default function Resultat() {
 
           {/* Quote form */}
           <section className="mb-12">
-            <QuoteForm email={email} />
+            <QuoteForm 
+              email={email} 
+              simulationInputs={inputs}
+              simulationResults={results}
+            />
           </section>
 
           {/* Back button */}
