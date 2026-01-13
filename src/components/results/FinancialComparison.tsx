@@ -137,7 +137,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             🏆 Verdict : Cuve ou Livret ?
           </h4>
           <p className="text-sm text-muted-foreground mt-1">
-            Quelle option vous rapporte le plus sur {horizonAnnees} ans ?
+            Quelle option est la plus rentable sur {horizonAnnees} ans ?
           </p>
         </div>
 
