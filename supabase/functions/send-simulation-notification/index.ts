@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
       connection: {
         hostname: "smtp.office365.com",
         port: 587,
-        tls: true,
+        tls: false,
         auth: {
           username: Deno.env.get("SMTP_USER")!,
           password: Deno.env.get("SMTP_PASSWORD")!,
