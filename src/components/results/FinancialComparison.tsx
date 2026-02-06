@@ -1,4 +1,4 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { FallingBills } from "./FallingBills";
 import { cn } from "@/lib/utils";
@@ -49,12 +49,35 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
           {/* Falling bills animation */}
           <FallingBills />
           
-          {/* Decorative water elements */}
-          <div className="absolute -right-3 -top-3 opacity-[0.08]">
-            <Droplet className="h-28 w-28 text-primary" />
+          {/* Decorative tree */}
+          <div className="absolute -left-2 -bottom-2 opacity-[0.10]">
+            <svg width="120" height="160" viewBox="0 0 120 160" fill="none" className="text-eco-dark">
+              {/* Trunk */}
+              <rect x="52" y="100" width="16" height="50" rx="3" fill="currentColor" opacity="0.7" />
+              {/* Foliage layers */}
+              <ellipse cx="60" cy="85" rx="40" ry="30" fill="currentColor" opacity="0.5" />
+              <ellipse cx="60" cy="65" rx="32" ry="26" fill="currentColor" opacity="0.6" />
+              <ellipse cx="60" cy="48" rx="22" ry="20" fill="currentColor" opacity="0.7" />
+            </svg>
           </div>
-          <div className="absolute left-4 bottom-6 opacity-[0.06]">
-            <Droplet className="h-16 w-16 text-primary -rotate-45" />
+
+          {/* Decorative water tank (cuve) */}
+          <div className="absolute -right-2 -bottom-1 opacity-[0.10]">
+            <svg width="100" height="140" viewBox="0 0 100 140" fill="none" className="text-primary">
+              {/* Tank body */}
+              <rect x="15" y="30" width="70" height="90" rx="8" fill="currentColor" opacity="0.6" />
+              {/* Tank top dome */}
+              <path d="M15 38 C15 20, 85 20, 85 38" fill="currentColor" opacity="0.7" />
+              {/* Tank lid */}
+              <rect x="38" y="16" width="24" height="10" rx="4" fill="currentColor" opacity="0.5" />
+              {/* Water level inside */}
+              <rect x="20" y="65" width="60" height="50" rx="4" fill="currentColor" opacity="0.3" />
+              {/* Pipe */}
+              <rect x="80" y="70" width="18" height="6" rx="2" fill="currentColor" opacity="0.5" />
+              <rect x="94" y="70" width="6" height="30" rx="2" fill="currentColor" opacity="0.5" />
+              {/* Droplet on tank */}
+              <path d="M50 50 C50 44, 56 44, 56 50 C56 54, 50 58, 50 58 C50 58, 44 54, 44 50 C44 44, 50 44, 50 50Z" fill="currentColor" opacity="0.4" />
+            </svg>
           </div>
           
           <div className="relative z-10">
