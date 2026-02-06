@@ -1,4 +1,4 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet, Sparkles } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Coins, Sparkles } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
@@ -44,24 +44,24 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
 
       {/* Main comparison grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left: Cuve savings - Enhanced with fun elements */}
-        <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-primary/10 via-water-light to-background p-6">
-          {/* Decorative water drops */}
-          <div className="absolute -right-4 -top-4 opacity-10">
-            <Droplet className="h-24 w-24 text-primary" />
+        {/* Left: Cuve savings - Money/Gold themed */}
+        <div className="relative overflow-hidden rounded-xl border-2 border-gold bg-gradient-to-br from-gold-light via-gold-light/60 to-background p-6">
+          {/* Decorative coins */}
+          <div className="absolute -right-3 -top-3 opacity-[0.08]">
+            <Coins className="h-28 w-28 text-gold" />
           </div>
-          <div className="absolute right-12 top-16 opacity-10">
-            <Droplet className="h-12 w-12 text-primary" />
+          <div className="absolute right-16 bottom-4 opacity-[0.06]">
+            <Coins className="h-16 w-16 text-gold rotate-12" />
           </div>
           
           <div className="relative z-10">
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
-                <TrendingUp className="h-7 w-7 text-primary" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/20 ring-4 ring-gold/10">
+                <TrendingUp className="h-7 w-7 text-gold" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
-                <p className="text-4xl font-bold text-primary">
+                <p className="text-4xl font-bold" style={{ color: "hsl(var(--gold))" }}>
                   {comparison.economiesCumulees.toLocaleString("fr-FR", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
@@ -71,10 +71,10 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             </div>
             
             {/* Fun metric */}
-            <div className="mt-5 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-3">
-              <Sparkles className="h-5 w-5 text-primary" />
+            <div className="mt-5 flex items-center gap-2 rounded-lg bg-gold/10 px-4 py-3">
+              <Sparkles className="h-5 w-5 text-gold" />
               <p className="text-sm font-medium text-foreground">
-                C'est comme offrir <span className="font-bold text-primary">{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
+                C'est comme offrir <span className="font-bold" style={{ color: "hsl(var(--gold))" }}>{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
               </p>
             </div>
             
