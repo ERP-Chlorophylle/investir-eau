@@ -1,7 +1,6 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet, Calendar, Wallet, Droplets } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { FallingBills } from "./FallingBills";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface FinancialComparisonProps {
@@ -16,13 +15,8 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
     autonomie: "Autonomie",
   };
 
-  // Derived metrics
-  const economiesParAn = comparison.economiesCumulees / horizonAnnees;
-  const economiesParMois = economiesParAn / 12;
-  const volumeM3Total = (comparison.volumeAnnuelCouvert / 1000) * horizonAnnees;
-  const ratioInvestissement = comparison.coutCuve
-    ? (comparison.economiesCumulees / comparison.coutCuve) * 100
-    : 0;
+
+
 
   return (
     <div className="space-y-6">
@@ -64,7 +58,6 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
           </div>
           
           <div className="relative z-10">
-            {/* Main savings figure */}
             <div className="flex items-center gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
                 <TrendingUp className="h-7 w-7 text-primary" />
@@ -72,51 +65,18 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
                 <p className="text-4xl font-bold text-primary">
-                  {Math.round(comparison.economiesCumulees).toLocaleString("fr-FR")} €
+                  {comparison.economiesCumulees.toLocaleString("fr-FR", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })} €
                 </p>
               </div>
             </div>
-
-            {/* Mini indicators grid */}
-            <div className="mt-5 grid grid-cols-3 gap-3">
-              <div className="rounded-lg bg-primary/10 p-3 text-center">
-                <Calendar className="mx-auto h-4 w-4 text-primary mb-1" />
-                <p className="text-lg font-bold text-foreground">
-                  ~{Math.round(economiesParAn).toLocaleString("fr-FR")} €
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-tight">par an</p>
-              </div>
-              <div className="rounded-lg bg-primary/10 p-3 text-center">
-                <Wallet className="mx-auto h-4 w-4 text-primary mb-1" />
-                <p className="text-lg font-bold text-foreground">
-                  ~{Math.round(economiesParMois).toLocaleString("fr-FR")} €
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-tight">par mois</p>
-              </div>
-              <div className="rounded-lg bg-primary/10 p-3 text-center">
-                <Droplets className="mx-auto h-4 w-4 text-primary mb-1" />
-                <p className="text-lg font-bold text-foreground">
-                  {volumeM3Total.toFixed(1)} m³
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-tight">d'eau économisés</p>
-              </div>
-            </div>
-
-            {/* Progress bar: savings vs investment */}
-            {comparison.coutCuve && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                  <span>Retour sur investissement</span>
-                  <span className="font-semibold text-primary">{Math.round(ratioInvestissement)}%</span>
-                </div>
-                <Progress value={Math.min(ratioInvestissement, 100)} className="h-2.5" />
-                {ratioInvestissement >= 100 && (
-                  <p className="mt-1.5 text-xs font-medium text-primary">
-                    ✓ Investissement rentabilisé sur {horizonAnnees} ans
-                  </p>
-                )}
-              </div>
-            )}
+            
+            <p className="mt-5 text-sm text-muted-foreground">
+              Total des économies sur votre facture d'eau sur {horizonAnnees} ans
+              (avec +1%/an d'inflation du prix de l'eau)
+            </p>
           </div>
         </div>
 
