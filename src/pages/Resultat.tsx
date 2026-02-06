@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { TankOptionCard } from "@/components/results/TankOptionCard";
 import { FinancialComparison } from "@/components/results/FinancialComparison";
 import { FunMetrics } from "@/components/results/FunMetrics";
-import { DroughtAlert } from "@/components/results/DroughtAlert";
+
 import { QuoteForm } from "@/components/results/QuoteForm";
 import { SimulationResults, SimulationInputs } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -153,10 +153,6 @@ export default function Resultat() {
             </Tabs>
           </section>
 
-          {/* Drought alert */}
-          <section className="mb-12">
-            <DroughtAlert />
-          </section>
 
           {/* Quote form */}
           <section className="mb-12">
