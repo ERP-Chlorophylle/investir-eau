@@ -8,7 +8,7 @@ import { TankOptionCard } from "@/components/results/TankOptionCard";
 import { FinancialComparison } from "@/components/results/FinancialComparison";
 import { FunMetrics } from "@/components/results/FunMetrics";
 
-import { QuoteForm } from "@/components/results/QuoteForm";
+
 import { SimulationResults, SimulationInputs } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -147,6 +147,7 @@ export default function Resultat() {
                   <FinancialComparison
                     comparison={comparison}
                     horizonAnnees={10}
+                    email={email}
                   />
                 </TabsContent>
               ))}
@@ -154,10 +155,8 @@ export default function Resultat() {
           </section>
 
 
-          {/* Quote form */}
-          <section className="mb-12">
-            <QuoteForm email={email} />
-          </section>
+
+
 
           {/* Back button */}
           <div className="text-center">
