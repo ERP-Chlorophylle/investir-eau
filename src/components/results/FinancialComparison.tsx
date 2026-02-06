@@ -89,69 +89,63 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
           </div>
         </div>
 
-        {/* Right: Livrets comparison + Verdict merged */}
+        {/* Right: Livrets comparison - Simplified face-to-face */}
         <div className="rounded-xl border bg-card p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-5">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold/20">
               <PiggyBank className="h-6 w-6 text-gold" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Si vous placiez {comparison.coutCuve?.toLocaleString("fr-FR")} € sur un livret
+              <p className="text-sm font-medium text-foreground">
+                Avec {comparison.coutCuve?.toLocaleString("fr-FR")} €, que gagnez-vous en {horizonAnnees} ans ?
               </p>
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {comparison.livrets.map((livret) => {
               const interetsLivret = livret.valeurFuture - (comparison.coutCuve || 0);
               const gainCuve = comparison.economiesCumulees - interetsLivret;
               const cuveGagne = gainCuve > 0;
 
               return (
-                <div
-                  key={livret.id}
-                  className="rounded-lg bg-muted/50 p-4"
-                >
-                  <div className="flex items-center justify-between">
+                <div key={livret.id} className="rounded-lg border bg-muted/30 p-4">
+                  {/* Face-to-face comparison */}
+                  <div className="grid grid-cols-2 gap-4 text-center">
                     <div>
-                      <p className="font-medium text-foreground">{livret.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        +{(livret.valeurFuture - (comparison.coutCuve || 0)).toLocaleString("fr-FR", {
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        })} € d'intérêts en {horizonAnnees} ans
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-semibold text-foreground">
-                        {livret.valeurFuture.toLocaleString("fr-FR", {
+                      <p className="text-xs text-muted-foreground mb-1">🚰 Cuve</p>
+                      <p className="text-xl font-bold text-primary">
+                        +{comparison.economiesCumulees.toLocaleString("fr-FR", {
                           minimumFractionDigits: 0,
                           maximumFractionDigits: 0,
                         })} €
                       </p>
+                      <p className="text-xs text-muted-foreground">d'économies d'eau</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">💰 {livret.name}</p>
+                      <p className="text-xl font-bold text-gold">
+                        +{interetsLivret.toLocaleString("fr-FR", {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })} €
+                      </p>
+                      <p className="text-xs text-muted-foreground">d'intérêts</p>
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2">
-                    <span className={cn(
-                      "flex items-center gap-1 text-sm font-semibold",
-                      cuveGagne ? "text-eco-dark" : "text-gold"
-                    )}>
-                      {cuveGagne ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
-                      {cuveGagne ? "Cuve +" : "Livret +"}
-                      {Math.abs(gainCuve).toLocaleString("fr-FR", {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })} €
-                    </span>
-                    <span className={cn(
-                      "text-xs font-semibold px-2 py-0.5 rounded-full",
-                      cuveGagne 
-                        ? "bg-eco/20 text-eco-dark" 
-                        : "bg-gold/20 text-gold"
-                    )}>
-                      {cuveGagne ? "🚰 Cuve gagnante" : "💰 Livret gagnant"}
-                    </span>
+
+                  {/* Verdict line */}
+                  <div className={cn(
+                    "mt-3 flex items-center justify-center gap-1.5 rounded-full py-1.5 text-sm font-semibold",
+                    cuveGagne 
+                      ? "bg-primary/10 text-primary" 
+                      : "bg-gold/10 text-gold"
+                  )}>
+                    {cuveGagne ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+                    La cuve rapporte {Math.abs(gainCuve).toLocaleString("fr-FR", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })} € {cuveGagne ? "de plus" : "de moins"} que le {livret.name}
                   </div>
                 </div>
               );
@@ -165,8 +159,8 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
               return comparison.economiesCumulees - interets > 0;
             });
             return allCuveWins ? (
-              <div className="mt-4 rounded-lg bg-eco-light p-4 text-center">
-                <p className="text-lg font-bold text-eco-dark">
+              <div className="mt-4 rounded-lg bg-primary/10 p-4 text-center">
+                <p className="text-lg font-bold text-primary">
                   🏆 La banque perd.
                 </p>
               </div>
