@@ -1,6 +1,7 @@
 import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { FallingBills } from "./FallingBills";
+import { DroughtAlert } from "./DroughtAlert";
 import { cn } from "@/lib/utils";
 
 interface FinancialComparisonProps {
@@ -44,40 +45,38 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
 
       {/* Main comparison grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left: Cuve savings - Blue water themed with falling bills */}
-        <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-6 min-h-[260px]">
-          {/* Falling bills animation */}
-          <FallingBills />
-          
-          {/* Decorative water elements */}
-          <div className="absolute -right-3 -top-3 opacity-[0.08]">
-            <Droplet className="h-28 w-28 text-primary" />
-          </div>
-          <div className="absolute left-4 bottom-6 opacity-[0.06]">
-            <Droplet className="h-16 w-16 text-primary -rotate-45" />
-          </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
-                <TrendingUp className="h-7 w-7 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
-                <p className="text-4xl font-bold text-primary">
-                  {comparison.economiesCumulees.toLocaleString("fr-FR", {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })} €
-                </p>
-              </div>
+        {/* Left column: Compact cuve savings + Drought alert */}
+        <div className="flex flex-col gap-6">
+          {/* Cuve savings - Blue water themed with falling bills */}
+          <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-5">
+            <FallingBills />
+            <div className="absolute -right-3 -top-3 opacity-[0.08]">
+              <Droplet className="h-20 w-20 text-primary" />
             </div>
             
-            <p className="mt-5 text-sm text-muted-foreground">
-              Total des économies sur votre facture d'eau sur {horizonAnnees} ans
-              (avec +1%/an d'inflation du prix de l'eau)
-            </p>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
+                  <TrendingUp className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Économies cuve cumulées</p>
+                  <p className="text-3xl font-bold text-primary">
+                    {comparison.economiesCumulees.toLocaleString("fr-FR", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })} €
+                  </p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Sur {horizonAnnees} ans (inflation eau +1%/an)
+              </p>
+            </div>
           </div>
+
+          {/* Drought alert - moved here */}
+          <DroughtAlert />
         </div>
 
         {/* Right: Livrets comparison - Simplified face-to-face */}
