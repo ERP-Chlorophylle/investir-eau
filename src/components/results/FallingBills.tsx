@@ -59,16 +59,6 @@ export function FallingBills() {
           💶
         </span>
       ))}
-      {/* Pile at the bottom - static, doesn't grow */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-0 text-sm opacity-60 leading-none">
-        <span>💶</span>
-        <span className="-ml-1">💶</span>
-        <span className="-ml-1">💶</span>
-        <span className="-ml-1">💶</span>
-        <span className="-ml-1">💶</span>
-        <span className="-ml-1">💶</span>
-        <span className="-ml-1">💶</span>
-      </div>
     </div>
   );
 }
