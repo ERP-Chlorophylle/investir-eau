@@ -88,7 +88,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">
-                Avec {comparison.coutCuve?.toLocaleString("fr-FR")} €, que gagnez-vous en {horizonAnnees} ans ?
+                Avec un investissement de {comparison.coutCuve?.toLocaleString("fr-FR")} €, que gagnez-vous en {horizonAnnees} ans ?
               </p>
             </div>
           </div>
@@ -115,7 +115,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">💰 {livret.name}</p>
-                      <p className="text-xl font-bold text-gold">
+                      <p className="text-xl font-bold text-destructive/70">
                         +{interetsLivret.toLocaleString("fr-FR", {
                           minimumFractionDigits: 0,
                           maximumFractionDigits: 0,
