@@ -66,10 +66,10 @@ export const COVERAGE_OPTIONS = {
 
 // Savings accounts rates (net, December 2025)
 export const SAVINGS_ACCOUNTS = [
-  { id: "livretA", name: "Livret A", rate: 0.017 },
-  { id: "ldds", name: "LDDS", rate: 0.017 },
-  { id: "cel", name: "CEL", rate: 0.0088, note: "1,25% brut - PFU 30%" },
-  { id: "pel", name: "PEL", rate: 0.0123, note: "1,75% brut - PFU 30% (PEL après 2018)" },
+  { id: "livretA", name: "Livret A", rate: 0.017, ceiling: 22950 },
+  { id: "ldds", name: "LDDS", rate: 0.017, ceiling: 12000 },
+  { id: "cel", name: "CEL", rate: 0.0088, ceiling: null, note: "1,25% brut - PFU 30%" },
+  { id: "pel", name: "PEL", rate: 0.0123, ceiling: null, note: "1,75% brut - PFU 30% (PEL après 2018)" },
 ];
 
 // Water price inflation
