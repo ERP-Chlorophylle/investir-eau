@@ -1,47 +1,40 @@
-import { Cat, GlassWater, ShowerHead, MessageCircle } from "lucide-react";
-
 interface FunMetricsProps {
   volumeAnnuelCouvertLitres: number;
-  horizonAnnees: number;
 }
 
-// Fun equivalence constants
+// Fun equivalence constants (all based on ANNUAL volume)
 const CAT_DAILY_WATER_L = 0.2; // 200ml/day
 const PASTIS_VOLUME_L = 0.25; // 25cl with water
 const GPT_REQUEST_WATER_L = 0.5; // ~0.5L cooling per request
 const TEEN_SHOWER_DAILY_L = 60; // "reasonable" teen shower
 
-export function FunMetrics({ volumeAnnuelCouvertLitres, horizonAnnees }: FunMetricsProps) {
-  const totalLitres = volumeAnnuelCouvertLitres * horizonAnnees;
+export function FunMetrics({ volumeAnnuelCouvertLitres }: FunMetricsProps) {
+  const annualLitres = volumeAnnuelCouvertLitres;
 
-  const cats = Math.round(totalLitres / (CAT_DAILY_WATER_L * 365));
-  const pastis = Math.round(totalLitres / PASTIS_VOLUME_L);
-  const gptRequests = Math.round(totalLitres / GPT_REQUEST_WATER_L);
-  const teenShowerYears = (totalLitres / (TEEN_SHOWER_DAILY_L * 365)).toFixed(1);
+  const cats = Math.round(annualLitres / (CAT_DAILY_WATER_L * 365));
+  const pastis = Math.round(annualLitres / PASTIS_VOLUME_L);
+  const gptRequests = Math.round(annualLitres / GPT_REQUEST_WATER_L);
+  const teenShowerDays = Math.round(annualLitres / TEEN_SHOWER_DAILY_L);
 
   const metrics = [
     {
-      icon: Cat,
       value: cats.toLocaleString("fr-FR"),
       label: `chat${cats > 1 ? "s" : ""} abreuvé${cats > 1 ? "s" : ""} pendant 1 an`,
       emoji: "🐱",
     },
     {
-      icon: GlassWater,
       value: pastis.toLocaleString("fr-FR"),
       label: "pastis bien frais",
       emoji: "🍹",
     },
     {
-      icon: MessageCircle,
       value: gptRequests.toLocaleString("fr-FR"),
       label: "requêtes ChatGPT",
       emoji: "🤖",
     },
     {
-      icon: ShowerHead,
-      value: teenShowerYears,
-      label: "an(s) de douches pour un ado raisonnable",
+      value: teenShowerDays.toLocaleString("fr-FR"),
+      label: `jour${teenShowerDays > 1 ? "s" : ""} de douches pour un ado raisonnable`,
       emoji: "🚿",
     },
   ];
@@ -49,7 +42,7 @@ export function FunMetrics({ volumeAnnuelCouvertLitres, horizonAnnees }: FunMetr
   return (
     <div className="rounded-xl border bg-card p-6">
       <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4">
-        En équivalent, sur {horizonAnnees} ans c'est…
+        Chaque année, vos économies d'eau c'est…
       </h4>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {metrics.map((metric) => (

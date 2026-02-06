@@ -1,5 +1,6 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Coins, Sparkles } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Leaf, Sparkles } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
+import { FallingBills } from "./FallingBills";
 import { cn } from "@/lib/utils";
 
 interface FinancialComparisonProps {
@@ -44,24 +45,27 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
 
       {/* Main comparison grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left: Cuve savings - Money/Gold themed */}
-        <div className="relative overflow-hidden rounded-xl border-2 border-gold bg-gradient-to-br from-gold-light via-gold-light/60 to-background p-6">
-          {/* Decorative coins */}
+        {/* Left: Cuve savings - Green nature themed with falling bills */}
+        <div className="relative overflow-hidden rounded-xl border-2 border-eco-medium bg-gradient-to-br from-eco-light via-eco-light/60 to-background p-6 min-h-[260px]">
+          {/* Falling bills animation */}
+          <FallingBills />
+          
+          {/* Decorative nature elements */}
           <div className="absolute -right-3 -top-3 opacity-[0.08]">
-            <Coins className="h-28 w-28 text-gold" />
+            <Leaf className="h-28 w-28 text-eco-dark" />
           </div>
-          <div className="absolute right-16 bottom-4 opacity-[0.06]">
-            <Coins className="h-16 w-16 text-gold rotate-12" />
+          <div className="absolute left-4 bottom-6 opacity-[0.06]">
+            <Leaf className="h-16 w-16 text-eco-dark -rotate-45" />
           </div>
           
           <div className="relative z-10">
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/20 ring-4 ring-gold/10">
-                <TrendingUp className="h-7 w-7 text-gold" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-eco-medium/30 ring-4 ring-eco-medium/10">
+                <TrendingUp className="h-7 w-7 text-eco-dark" />
               </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Économies cuve cumulées</p>
-                <p className="text-4xl font-bold" style={{ color: "hsl(var(--gold))" }}>
+                <p className="text-4xl font-bold text-eco-dark">
                   {comparison.economiesCumulees.toLocaleString("fr-FR", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
@@ -71,10 +75,10 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             </div>
             
             {/* Fun metric */}
-            <div className="mt-5 flex items-center gap-2 rounded-lg bg-gold/10 px-4 py-3">
-              <Sparkles className="h-5 w-5 text-gold" />
+            <div className="mt-5 flex items-center gap-2 rounded-lg bg-eco-medium/20 px-4 py-3">
+              <Sparkles className="h-5 w-5 text-eco-dark" />
               <p className="text-sm font-medium text-foreground">
-                C'est comme offrir <span className="font-bold" style={{ color: "hsl(var(--gold))" }}>{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
+                C'est comme offrir <span className="font-bold text-eco-dark">{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
               </p>
             </div>
             
