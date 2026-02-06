@@ -224,20 +224,26 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     }
     economiesCumulees = Math.round(economiesCumulees * 100) / 100;
 
-    // Savings accounts
-    const livrets = SAVINGS_ACCOUNTS.map((account) => {
-      const valeurFuture = coutCuve
-        ? Math.round(coutCuve * Math.pow(1 + account.rate, horizonAnnees) * 100) / 100
-        : 0;
-      const ecart = Math.round((economiesCumulees - valeurFuture) * 100) / 100;
+    // Savings accounts - filter out those whose ceiling is below the tank cost
+    const livrets = SAVINGS_ACCOUNTS
+      .filter((account) => {
+        if (!coutCuve) return true;
+        if (account.ceiling === null) return true;
+        return account.ceiling >= coutCuve;
+      })
+      .map((account) => {
+        const valeurFuture = coutCuve
+          ? Math.round(coutCuve * Math.pow(1 + account.rate, horizonAnnees) * 100) / 100
+          : 0;
+        const ecart = Math.round((economiesCumulees - valeurFuture) * 100) / 100;
 
-      return {
-        id: account.id,
-        name: account.name,
-        valeurFuture,
-        ecart,
-      };
-    });
+        return {
+          id: account.id,
+          name: account.name,
+          valeurFuture,
+          ecart,
+        };
+      });
 
     return {
       optionType: option.type,
