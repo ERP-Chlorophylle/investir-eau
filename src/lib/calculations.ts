@@ -84,6 +84,8 @@ export interface FinancialComparison {
   optionType: "eco" | "confort" | "extra";
   coutCuve: number | null;
   economiesCumulees: number;
+  volumeAnnuelCouvert: number;
+  prixEau: number;
   livrets: {
     id: string;
     name: string;
@@ -249,6 +251,8 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
       optionType: option.type,
       coutCuve,
       economiesCumulees,
+      volumeAnnuelCouvert: option.volumeAnnuelCouvert,
+      prixEau: inputs.prixEau,
       livrets,
     };
   });
