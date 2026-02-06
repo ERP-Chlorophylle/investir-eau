@@ -105,7 +105,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">🚰 Cuve</p>
-                      <p className="text-xl font-bold text-primary">
+                      <p className="text-xl font-bold text-eco-dark">
                         +{comparison.economiesCumulees.toLocaleString("fr-FR", {
                           minimumFractionDigits: 0,
                           maximumFractionDigits: 0,
