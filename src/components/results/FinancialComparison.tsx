@@ -1,4 +1,4 @@
-import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet, Sparkles } from "lucide-react";
+import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { FallingBills } from "./FallingBills";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,8 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
     autonomie: "Autonomie",
   };
 
-  // Fun metric: calculate water equivalent
-  const litresEconomises = comparison.economiesCumulees / (comparison.coutCuve ? comparison.coutCuve / 1000 : 4);
-  const baignoiresEquivalent = Math.round(comparison.economiesCumulees / 3); // ~150L per bath, ~3€ value
+
+
 
   return (
     <div className="space-y-6">
@@ -74,15 +73,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
               </div>
             </div>
             
-            {/* Fun metric */}
-            <div className="mt-5 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-3">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <p className="text-sm font-medium text-foreground">
-                C'est comme offrir <span className="font-bold text-primary">{baignoiresEquivalent} bains</span> gratuits à votre famille ! 🛁
-              </p>
-            </div>
-            
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-5 text-sm text-muted-foreground">
               Total des économies sur votre facture d'eau sur {horizonAnnees} ans
               (avec +1%/an d'inflation du prix de l'eau)
             </p>
