@@ -2,14 +2,16 @@ import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { FallingBills } from "./FallingBills";
 import { DroughtAlert } from "./DroughtAlert";
+import { QuoteForm } from "./QuoteForm";
 import { cn } from "@/lib/utils";
 
 interface FinancialComparisonProps {
   comparison: FinancialComparisonType;
   horizonAnnees: number;
+  email: string;
 }
 
-export function FinancialComparison({ comparison, horizonAnnees }: FinancialComparisonProps) {
+export function FinancialComparison({ comparison, horizonAnnees, email }: FinancialComparisonProps) {
   const optionLabels = {
     eco: "Éco",
     confort: "Confort",
@@ -75,8 +77,11 @@ export function FinancialComparison({ comparison, horizonAnnees }: FinancialComp
             </div>
           </div>
 
-          {/* Drought alert - moved here */}
+          {/* Drought alert */}
           <DroughtAlert />
+
+          {/* Quote form */}
+          <QuoteForm email={email} />
         </div>
 
         {/* Right: Livrets comparison - Simplified face-to-face */}
