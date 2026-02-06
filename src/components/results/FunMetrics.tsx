@@ -56,6 +56,7 @@ export function FunMetrics({ volumeAnnuelCouvertLitres }: FunMetricsProps) {
           </div>
         ))}
       </div>
+      <p className="text-xs text-muted-foreground mt-3 text-right italic">* Chiffres non certifiés</p>
     </div>
   );
 }
