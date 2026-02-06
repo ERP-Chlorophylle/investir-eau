@@ -5,45 +5,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-
 interface QuoteFormProps {
   email: string;
 }
-
-export function QuoteForm({ email }: QuoteFormProps) {
+export function QuoteForm({
+  email
+}: QuoteFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      console.log("Quote request submitted:", { email, phone, comment });
+      console.log("Quote request submitted:", {
+        email,
+        phone,
+        comment
+      });
       setIsSubmitted(true);
       toast({
         title: "Demande envoyée !",
-        description: "Nous vous recontacterons dans les meilleurs délais.",
+        description: "Nous vous recontacterons dans les meilleurs délais."
       });
     } catch (error) {
       console.error('Erreur demande de devis:', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   if (isSubmitted) {
-    return (
-      <div className="rounded-xl border-2 border-accent bg-eco-light p-6 text-center">
+    return <div className="rounded-xl border-2 border-accent bg-eco-light p-6 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
           <Check className="h-6 w-6 text-accent-foreground" />
         </div>
@@ -51,23 +53,17 @@ export function QuoteForm({ email }: QuoteFormProps) {
         <p className="mt-2 text-muted-foreground">
           Notre équipe vous recontactera dans les meilleurs délais.
         </p>
-      </div>
-    );
+      </div>;
   }
-
   if (!isOpen) {
-    return (
-      <div className="text-center">
+    return <div className="text-center my-[80px]">
         <Button onClick={() => setIsOpen(true)} variant="gold" size="lg">
           <Send className="mr-2 h-5 w-5" />
           Demander un devis
         </Button>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 space-y-4">
+  return <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 space-y-4">
       <h3 className="text-lg font-semibold">Demander un devis personnalisé</h3>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -77,25 +73,13 @@ export function QuoteForm({ email }: QuoteFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="quote-phone">Téléphone (optionnel)</Label>
-          <Input
-            id="quote-phone"
-            type="tel"
-            placeholder="06 12 34 56 78"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
+          <Input id="quote-phone" type="tel" placeholder="06 12 34 56 78" value={phone} onChange={e => setPhone(e.target.value)} />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="quote-comment">Commentaire (optionnel)</Label>
-        <Textarea
-          id="quote-comment"
-          placeholder="Précisez vos besoins ou questions..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows={3}
-        />
+        <Textarea id="quote-comment" placeholder="Précisez vos besoins ou questions..." value={comment} onChange={e => setComment(e.target.value)} rows={3} />
       </div>
 
       <div className="flex gap-3">
@@ -103,19 +87,14 @@ export function QuoteForm({ email }: QuoteFormProps) {
           Annuler
         </Button>
         <Button type="submit" variant="cta" disabled={isLoading}>
-          {isLoading ? (
-            <>
+          {isLoading ? <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Envoi en cours...
-            </>
-          ) : (
-            <>
+            </> : <>
               <Send className="mr-2 h-4 w-4" />
               Envoyer ma demande
-            </>
-          )}
+            </>}
         </Button>
       </div>
-    </form>
-  );
+    </form>;
 }
