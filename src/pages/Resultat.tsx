@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Droplets, RefreshCw, Info } from "lucide-react";
+import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { TankOptionCard } from "@/components/results/TankOptionCard";
 import { FinancialComparison } from "@/components/results/FinancialComparison";
+import { FunMetrics } from "@/components/results/FunMetrics";
 import { DroughtAlert } from "@/components/results/DroughtAlert";
 import { QuoteForm } from "@/components/results/QuoteForm";
 import { SimulationResults, SimulationInputs } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Resultat() {
   const navigate = useNavigate();
   const [results, setResults] = useState<SimulationResults | null>(null);
   const [inputs, setInputs] = useState<SimulationInputs | null>(null);
   const [email, setEmail] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState<string>("confort");
 
   useEffect(() => {
     const storedResults = sessionStorage.getItem("simulationResults");
@@ -93,13 +94,10 @@ export default function Resultat() {
             </h2>
             
             {results.isSupplyLimited && (
-              <Alert className="mb-6 border-amber-500 bg-amber-500/10">
-                <Info className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-foreground">
-                  <strong>Attention :</strong> Vos besoins dépassent le potentiel récupérable de votre toiture. 
-                  La couverture réelle de certaines cuves sera limitée par ce potentiel.
-                </AlertDescription>
-              </Alert>
+              <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <Info className="h-4 w-4 shrink-0" />
+                Vos besoins dépassent le potentiel récupérable de votre toiture. La couverture réelle sera limitée.
+              </p>
             )}
             
             <div className="grid gap-6 md:grid-cols-3">
@@ -107,17 +105,39 @@ export default function Resultat() {
                 <TankOptionCard
                   key={option.type}
                   option={option}
+                  isSelected={selectedOption === option.type}
+                  onClick={() => setSelectedOption(option.type)}
                 />
               ))}
             </div>
+
+            {/* Discreet simulation disclaimer */}
+            <p className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+              Ceci est une estimation. Les précipitations varient d'une année à l'autre. 
+              Plus la cuve est volumineuse, plus vous avez de chances de disposer d'eau pendant les périodes sèches.
+            </p>
           </section>
+
+          {/* Fun metrics for selected option */}
+          {(() => {
+            const selectedOpt = results.options.find(o => o.type === selectedOption);
+            return selectedOpt ? (
+              <section className="mb-12">
+                <FunMetrics
+                  volumeAnnuelCouvertLitres={selectedOpt.volumeAnnuelCouvert}
+                  horizonAnnees={10}
+                />
+              </section>
+            ) : null;
+          })()}
 
           {/* Financial comparison */}
           <section className="mb-12">
             <h2 className="mb-6 text-2xl font-bold text-foreground">
               Comparaison financière : Cuve vs Livrets
             </h2>
-            <Tabs defaultValue="confort" className="w-full">
+            <Tabs value={selectedOption} onValueChange={setSelectedOption} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="eco">Éco</TabsTrigger>
                 <TabsTrigger value="confort">Confort</TabsTrigger>

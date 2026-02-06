@@ -27,16 +27,23 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; card
   },
 };
 
-export function TankOptionCard({ option }: { option: TankOption }) {
+interface TankOptionCardProps {
+  option: TankOption;
+  isSelected?: boolean;
+  onClick?: () => void;
+}
+
+export function TankOptionCard({ option, isSelected, onClick }: TankOptionCardProps) {
   const config = OPTION_CONFIG[option.type];
   const Icon = config.icon;
 
   return (
     <div
+      onClick={onClick}
       className={cn(
-        "result-card relative",
+        "result-card relative cursor-pointer",
         config.cardClass,
-        config.featured && "ring-2 ring-primary ring-offset-2"
+        isSelected && "ring-2 ring-primary ring-offset-2"
       )}
     >
       {config.featured && (
