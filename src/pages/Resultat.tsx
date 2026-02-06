@@ -126,7 +126,6 @@ export default function Resultat() {
               <section className="mb-12">
                 <FunMetrics
                   volumeAnnuelCouvertLitres={selectedOpt.volumeAnnuelCouvert}
-                  horizonAnnees={10}
                 />
               </section>
             ) : null;
