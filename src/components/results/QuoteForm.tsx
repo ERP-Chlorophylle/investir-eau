@@ -5,16 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 
 interface QuoteFormProps {
   email: string;
-  simulationInputs: SimulationInputs;
-  simulationResults: SimulationResults;
 }
 
-export function QuoteForm({ email, simulationInputs, simulationResults }: QuoteFormProps) {
+export function QuoteForm({ email }: QuoteFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,57 +23,14 @@ export function QuoteForm({ email, simulationInputs, simulationResults }: QuoteF
     setIsLoading(true);
 
     try {
-      const confortOption = simulationResults.options.find(o => o.type === 'confort');
-      const confortComparison = simulationResults.comparisons.find(c => c.optionType === 'confort');
-      const economiesAnnuelles = confortComparison ? confortComparison.economiesCumulees / 10 : 0;
-      
-      if (supabase) {
-        const { error } = await supabase.functions.invoke('send-quote-request', {
-          body: {
-            email,
-            phone,
-            comment,
-            simulation: {
-              departement: simulationInputs.departement,
-              surfaceToiture: simulationInputs.surfaceToiture,
-              typeToiture: simulationInputs.typeToiture,
-              usages: {
-                wc: simulationInputs.wcEnabled ? simulationInputs.wcPersonnes : null,
-                jardin: simulationInputs.jardinEnabled ? simulationInputs.jardinSurface : null,
-                auto: simulationInputs.autoEnabled ? simulationInputs.autoLavagesMois : null,
-                piscine: simulationInputs.piscineEnabled ? simulationInputs.piscineSurface : null,
-              },
-              prixEau: simulationInputs.prixEau,
-              resultats: {
-                potentiel: simulationResults.vSupply / 1000,
-                besoin: simulationResults.vDemand / 1000,
-                cuveConfort: confortOption?.volumeCuveArrondi || 0,
-                economiesAnnuelles: economiesAnnuelles,
-              }
-            }
-          }
-        });
-
-        if (error) {
-          console.error('Erreur envoi demande de devis:', error);
-          toast({
-            title: "Erreur",
-            description: "Une erreur est survenue. Veuillez réessayer.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      console.log("Quote request sent:", { email, phone, comment });
+      console.log("Quote request submitted:", { email, phone, comment });
       setIsSubmitted(true);
       toast({
         title: "Demande envoyée !",
         description: "Nous vous recontacterons dans les meilleurs délais.",
       });
     } catch (error) {
-      console.error('Erreur envoi demande de devis:', error);
+      console.error('Erreur demande de devis:', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue. Veuillez réessayer.",
