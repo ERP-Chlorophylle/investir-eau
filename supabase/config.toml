@@ -1,1 +1,7 @@
 project_id = "yrzkqennrfepnlpzywxs"
+
+[functions.send-simulation-results]
+verify_jwt = false
+
+[functions.send-quote-request]
+verify_jwt = false
