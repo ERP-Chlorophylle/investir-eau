@@ -1,50 +1,82 @@
 
+# Integration Brevo : Emails de simulation et devis
 
-# Enrichir le gros carré bleu des économies cuve
+## Ce qui va se passer
 
-## Constat actuel
+### Quand un utilisateur termine sa simulation (clic "Voir mon resultat") :
+- **Vous** recevez un email avec les resultats complets de la simulation (departement, surface toiture, usages, options de cuves, economies estimees, email du prospect)
+- **Le client** recoit un email recapitulatif de sa simulation avec ses resultats personnalises
 
-Le carré bleu affiche seulement :
-- Un gros chiffre d'économies cumulées
-- Une phrase explicative générique
+### Quand un utilisateur demande un devis :
+- **Vous** recevez un email de demande de devis (avec telephone, commentaire + rappel des resultats de simulation)
+- **Le client** recoit un email de confirmation que sa demande de devis a bien ete prise en compte
 
-C'est effectivement assez vide et peu informatif pour l'utilisateur.
+## Etapes de mise en place
 
-## Ce qui va changer
+### 1. Cle API Brevo (prealable)
+Vous devrez fournir votre cle API Brevo, a creer sur [https://app.brevo.com/settings/keys/api](https://app.brevo.com/settings/keys/api). Elle sera stockee en secret du projet (`BREVO_API_KEY`).
 
-Le carré bleu va devenir un vrai **tableau de bord des économies**, avec des informations concrètes et utiles :
+Il faudra aussi definir :
+- Votre adresse email de reception (ex: `contact@lesjeunespousses.fr`)
+- L'adresse d'envoi verifiee sur Brevo (ex: `noreply@lesjeunespousses.fr`)
 
-1. **Le chiffre principal** (conserve) -- les economies cumulees bien visibles en grand
-2. **3 mini-indicateurs concrets** sous le chiffre principal :
-   - Economies par an (ex: "~261 €/an")
-   - Economies par mois (ex: "~22 €/mois sur votre facture")
-   - Volume d'eau economise (ex: "52 m3 d'eau potable economises")
-3. **Barre de progression visuelle** montrant les economies par rapport a l'investissement initial (ex: "Economies = 193% de l'investissement")
-4. **Le texte explicatif** sera plus court et precis
+### 2. Edge function `send-simulation-results`
+Envoyee automatiquement a la fin de la simulation :
+- **Email au client** : recapitulatif visuel (departement, surface, usages, 3 options de cuves avec volumes et couts, economies estimees)
+- **Email a vous** : notification "Nouvelle simulation" avec toutes les donnees du prospect + resultats
 
-Le tout reste dans le theme bleu eau avec les billets qui tombent et les gouttes decoratives.
+### 3. Edge function `send-quote-request`
+Envoyee quand le client clique "Envoyer ma demande" dans le formulaire de devis :
+- **Email a vous** : demande de devis avec telephone, commentaire, option selectionnee et rappel des resultats de simulation
+- **Email au client** : confirmation "Votre demande de devis a bien ete prise en compte"
+
+### 4. Modifications frontend
+
+**`src/pages/Simulateur.tsx`** : Apres le `navigate("/resultat")`, appel a la edge function `send-simulation-results` avec les inputs et resultats.
+
+**`src/components/results/QuoteForm.tsx`** : Le `handleSubmit` appelle la edge function `send-quote-request` au lieu du simple `console.log`. On lui passe aussi les donnees de simulation (option selectionnee, economies, cout cuve).
+
+**`src/components/results/FinancialComparison.tsx`** : Passer les donnees de simulation au `QuoteForm` (option type, economies, cout cuve, volume).
+
+**`src/pages/Resultat.tsx`** : Passer les inputs complets au composant `FinancialComparison` pour que le devis contienne toutes les infos.
 
 ## Details techniques
 
-### Fichier modifie : `src/components/results/FinancialComparison.tsx`
+### Structure des edge functions
 
-- Ajouter les props `prixEau` et `volumeAnnuelCouvert` au composant (ou les calculer a partir des donnees existantes)
-- Calculer dans le composant :
-  - `economiesParAn = economiesCumulees / horizonAnnees`
-  - `economiesParMois = economiesParAn / 12`
-  - `volumeM3Total = (economiesCumulees / prixEau)` approximation, ou mieux passer le volume directement
-  - `ratioInvestissement = (economiesCumulees / coutCuve) * 100`
-- Ajouter une grille 3 colonnes avec les mini-indicateurs (icones Calendar, Wallet, Droplets)
-- Ajouter un composant Progress de shadcn pour la barre visuelle
-- Imports supplementaires : `Calendar`, `Wallet` depuis lucide-react
+Deux fichiers :
+- `supabase/functions/send-simulation-results/index.ts`
+- `supabase/functions/send-quote-request/index.ts`
 
-### Fichier modifie : `src/pages/Resultat.tsx`
+Chaque fonction :
+- Utilise l'API Brevo v3 (`https://api.brevo.com/v3/smtp/email`)
+- Gestion CORS standard
+- `verify_jwt = false` dans `supabase/config.toml`
+- Lit `BREVO_API_KEY` depuis `Deno.env.get()`
 
-- Passer les donnees supplementaires au composant `FinancialComparison` (le `volumeAnnuelCouvert` de l'option selectionnee et le `prixEau` des inputs)
+### Donnees envoyees a `send-simulation-results`
 
-### Modifications du type `FinancialComparison` dans `src/lib/calculations.ts`
+```text
+{
+  email, departement, surfaceToiture, typeToiture,
+  usages (wc, jardin, auto, piscine),
+  prixEau,
+  vSupply, vDemand,
+  options: [{ type, label, volumeCuveM3, cout, couvertureReelle, volumeAnnuelCouvert }],
+  comparisons: [{ optionType, economiesCumulees, coutCuve }]
+}
+```
 
-- Ajouter `volumeAnnuelCouvert: number` et `prixEau: number` a l'interface `FinancialComparison` pour que le composant ait toutes les donnees necessaires
+### Donnees envoyees a `send-quote-request`
 
-Pas de nouvelle dependance a installer.
+```text
+{
+  email, phone, comment,
+  selectedOption, economiesCumulees, coutCuve,
+  departement, surfaceToiture
+}
+```
 
+### Emails HTML
+
+Les emails seront en HTML simple et lisible, avec le branding "Les Jeunes Pousses" et les couleurs du site. Pas de template externe, tout inline dans les edge functions.
