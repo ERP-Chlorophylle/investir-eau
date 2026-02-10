@@ -9,9 +9,11 @@ interface FinancialComparisonProps {
   comparison: FinancialComparisonType;
   horizonAnnees: number;
   email: string;
+  departement?: string;
+  surfaceToiture?: number;
 }
 
-export function FinancialComparison({ comparison, horizonAnnees, email }: FinancialComparisonProps) {
+export function FinancialComparison({ comparison, horizonAnnees, email, departement, surfaceToiture }: FinancialComparisonProps) {
   const optionLabels = {
     eco: "Éco",
     confort: "Confort",
@@ -81,7 +83,14 @@ export function FinancialComparison({ comparison, horizonAnnees, email }: Financ
           <DroughtAlert />
 
           {/* Quote form */}
-          <QuoteForm email={email} />
+          <QuoteForm
+            email={email}
+            selectedOption={comparison.optionType}
+            economiesCumulees={comparison.economiesCumulees}
+            coutCuve={comparison.coutCuve}
+            departement={departement}
+            surfaceToiture={surfaceToiture}
+          />
         </div>
 
         {/* Right: Livrets comparison - Simplified face-to-face */}

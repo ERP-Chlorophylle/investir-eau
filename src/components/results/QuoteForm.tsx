@@ -7,9 +7,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 interface QuoteFormProps {
   email: string;
+  selectedOption?: string;
+  economiesCumulees?: number;
+  coutCuve?: number | null;
+  departement?: string;
+  surfaceToiture?: number;
 }
 export function QuoteForm({
-  email
+  email,
+  selectedOption,
+  economiesCumulees,
+  coutCuve,
+  departement,
+  surfaceToiture,
 }: QuoteFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -23,11 +33,26 @@ export function QuoteForm({
     e.preventDefault();
     setIsLoading(true);
     try {
-      console.log("Quote request submitted:", {
-        email,
-        phone,
-        comment
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/send-quote-request`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          phone,
+          comment,
+          selectedOption: selectedOption || "confort",
+          economiesCumulees: economiesCumulees || 0,
+          coutCuve: coutCuve ?? null,
+          departement: departement || "",
+          surfaceToiture: surfaceToiture || 0,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Erreur serveur");
+      }
+
       setIsSubmitted(true);
       toast({
         title: "Demande envoyée !",

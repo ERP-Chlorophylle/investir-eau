@@ -134,6 +134,49 @@ export default function Simulateur() {
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
 
     navigate("/resultat");
+
+    // Send simulation results email (fire and forget)
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      fetch(`${supabaseUrl}/functions/v1/send-simulation-results`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email,
+          departement: inputs.departement,
+          surfaceToiture: inputs.surfaceToiture,
+          typeToiture: inputs.typeToiture,
+          usages: {
+            wc: inputs.wcEnabled,
+            wcPersonnes: inputs.wcPersonnes,
+            jardin: inputs.jardinEnabled,
+            jardinSurface: inputs.jardinSurface,
+            auto: inputs.autoEnabled,
+            autoLavagesMois: inputs.autoLavagesMois,
+            piscine: inputs.piscineEnabled,
+            piscineSurface: inputs.piscineSurface,
+          },
+          prixEau: inputs.prixEau,
+          vSupply: results.vSupply,
+          vDemand: results.vDemand,
+          options: results.options.map((o) => ({
+            type: o.type,
+            label: o.label,
+            volumeCuveM3: o.volumeCuveM3,
+            cout: o.cout,
+            couvertureReelle: o.couvertureReelle,
+            volumeAnnuelCouvert: o.volumeAnnuelCouvert,
+          })),
+          comparisons: results.comparisons.map((c) => ({
+            optionType: c.optionType,
+            economiesCumulees: c.economiesCumulees,
+            coutCuve: c.coutCuve,
+          })),
+        }),
+      }).catch((err) => console.error("Erreur envoi email simulation:", err));
+    } catch (err) {
+      console.error("Erreur envoi email simulation:", err);
+    }
   };
 
   return (

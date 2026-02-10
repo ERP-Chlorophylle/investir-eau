@@ -148,6 +148,8 @@ export default function Resultat() {
                     comparison={comparison}
                     horizonAnnees={10}
                     email={email}
+                    departement={inputs.departement}
+                    surfaceToiture={inputs.surfaceToiture}
                   />
                 </TabsContent>
               ))}
