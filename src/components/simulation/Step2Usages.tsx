@@ -26,7 +26,9 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const { register, watch, setValue } = useFormContext<SimulationFormData>();
   const [hasWcInteracted, setHasWcInteracted] = useState(false);
   const [isWcStableForNextStep, setIsWcStableForNextStep] = useState(false);
+  const [hasJardinInteracted, setHasJardinInteracted] = useState(false);
   const [isJardinConfirmed, setIsJardinConfirmed] = useState(false);
+  const [isJardinStableForNextStep, setIsJardinStableForNextStep] = useState(false);
   const [isPiscineConfirmed, setIsPiscineConfirmed] = useState(false);
   const [hasPiscineInteracted, setHasPiscineInteracted] = useState(false);
   const [isPiscineStableForNextStep, setIsPiscineStableForNextStep] = useState(false);
@@ -55,7 +57,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
     (typeof autoLavagesMois === "number" && Number.isFinite(autoLavagesMois) && autoLavagesMois >= 1 && autoLavagesMois <= 30);
 
   const wcReadyForNextStep = !wcEnabled || (wcDone && isWcStableForNextStep);
-  const jardinReadyForNextStep = !jardinEnabled || (jardinDone && isJardinConfirmed);
+  const jardinReadyForNextStep = !jardinEnabled || (jardinDone && (isJardinConfirmed || isJardinStableForNextStep));
   const piscineReadyForNextStep = !piscineEnabled || (piscineDone && (isPiscineConfirmed || isPiscineStableForNextStep));
   const autoReadyForNextStep = !autoEnabled || (autoDone && hasAutoInteracted);
   const shouldGuideAutoAfterPiscine = piscineReadyForNextStep && !hasAutoInteracted;
@@ -102,6 +104,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
     if (jardinEnabled && watch("jardinSurface") === undefined) {
       setValue("jardinSurface", DEFAULT_GARDEN_SURFACE);
       setIsJardinConfirmed(false);
+      setIsJardinStableForNextStep(false);
     }
   }, [jardinEnabled, setValue, watch]);
 
@@ -135,6 +138,24 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
 
     return () => window.clearTimeout(timer);
   }, [wcEnabled, hasWcInteracted, wcDone, wcPersonnes]);
+
+  useEffect(() => {
+    if (!jardinEnabled) {
+      setIsJardinStableForNextStep(true);
+      return;
+    }
+
+    if (!hasJardinInteracted || !jardinDone) {
+      setIsJardinStableForNextStep(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsJardinStableForNextStep(true);
+    }, 1500);
+
+    return () => window.clearTimeout(timer);
+  }, [jardinEnabled, hasJardinInteracted, jardinDone, jardinSurface]);
 
   useEffect(() => {
     if (!piscineEnabled) return;
@@ -208,6 +229,16 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
 
     return () => window.clearTimeout(timer);
   }, [jardinReadyForNextStep]);
+
+  useEffect(() => {
+    if (activeUsage !== "piscine") return;
+
+    const timer = window.setTimeout(() => {
+      scrollToWithHeaderOffset(piscineSectionRef.current);
+    }, 60);
+
+    return () => window.clearTimeout(timer);
+  }, [activeUsage]);
 
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -355,9 +386,18 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                           inputMode="numeric"
                           min={1}
                           className="w-10 border-0 bg-transparent p-0 text-right text-sm outline-none placeholder:text-muted-foreground [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                          {...register("jardinSurface", { valueAsNumber: true })}
+                          {...register("jardinSurface", {
+                            valueAsNumber: true,
+                            onChange: () => {
+                              setHasJardinInteracted(true);
+                              setIsJardinConfirmed(false);
+                              setIsJardinStableForNextStep(false);
+                            },
+                          })}
                           onFocus={() => {
+                            setHasJardinInteracted(true);
                             setIsJardinConfirmed(false);
+                            setIsJardinStableForNextStep(false);
                             setValue("jardinSurface", undefined, { shouldValidate: true });
                           }}
                         />
@@ -369,7 +409,9 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                         size="icon"
                         disabled={!jardinDone}
                         onClick={() => {
+                          setHasJardinInteracted(true);
                           setIsJardinConfirmed(true);
+                          setIsJardinStableForNextStep(true);
                           window.setTimeout(() => {
                             scrollToWithHeaderOffset(piscineSectionRef.current);
                           }, 60);
@@ -443,6 +485,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                             },
                           })}
                           onFocus={() => {
+                            setHasPiscineInteracted(true);
                             setIsPiscineConfirmed(false);
                             setIsPiscineStableForNextStep(false);
                             setValue("piscineSurface", undefined, { shouldValidate: true });

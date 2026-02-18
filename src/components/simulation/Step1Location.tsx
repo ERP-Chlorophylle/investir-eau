@@ -39,6 +39,17 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
   const surfaceRegister = register("surfaceToiture", { valueAsNumber: true });
 
   useEffect(() => {
+    if (isSurfaceConfirmed) return;
+    if (!isSurfaceValid) return;
+
+    const timer = window.setTimeout(() => {
+      setIsSurfaceConfirmed(true);
+    }, 1500);
+
+    return () => window.clearTimeout(timer);
+  }, [isSurfaceConfirmed, isSurfaceValid, surfaceToiture]);
+
+  useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     const previousActiveField = previousActiveFieldRef.current;
 
