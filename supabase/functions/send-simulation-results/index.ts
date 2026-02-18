@@ -44,11 +44,28 @@ interface SimulationPayload {
     optionType: string;
     economiesCumulees: number;
     coutCuve: number | null;
+    livrets?: {
+      id: string;
+      name: string;
+      valeurFuture: number;
+      ecart: number;
+    }[];
   }[];
 }
 
 function formatNumber(n: number): string {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function getOptionLabel(optionType: string): string {
+  if (optionType === "eco") return "Essentiel";
+  if (optionType === "confort") return "Confort";
+  return "Serenite +";
+}
+
+function getLivretAGain(comp: SimulationPayload["comparisons"][number]): number | null {
+  const livretA = comp.livrets?.find((livret) => livret.id === "livretA");
+  return livretA ? livretA.ecart : null;
 }
 
 function buildClientEmail(data: SimulationPayload): string {
@@ -68,8 +85,13 @@ function buildClientEmail(data: SimulationPayload): string {
   `).join("");
 
   const comparisonsHtml = data.comparisons.map((comp) => {
-    const label = comp.optionType === "eco" ? "Éco" : comp.optionType === "confort" ? "Confort" : "Extra";
-    return `<li style="margin-bottom:4px;"><strong>${label}</strong> : ${formatNumber(comp.economiesCumulees)} € d'économies sur 10 ans</li>`;
+    const label = getOptionLabel(comp.optionType);
+    const livretAGain = getLivretAGain(comp);
+    const livretAText =
+      livretAGain === null
+        ? "Gain vs Livret A : non disponible"
+        : `Gain vs Livret A : ${livretAGain >= 0 ? "+" : "-"}${formatNumber(Math.abs(livretAGain))} €`;
+    return `<li style="margin-bottom:8px;"><strong>${label}</strong> : ${formatNumber(comp.economiesCumulees)} € d'économies sur 10 ans<br><span style="color:#2d5a3d;">${livretAText}</span></li>`;
   }).join("");
 
   return `
@@ -139,8 +161,13 @@ function buildAdminEmail(data: SimulationPayload): string {
   ).join("<br>");
 
   const comparisonsText = data.comparisons.map((comp) => {
-    const label = comp.optionType === "eco" ? "Éco" : comp.optionType === "confort" ? "Confort" : "Extra";
-    return `• ${label} : ${formatNumber(comp.economiesCumulees)} € d'économies`;
+    const label = getOptionLabel(comp.optionType);
+    const livretAGain = getLivretAGain(comp);
+    const livretAText =
+      livretAGain === null
+        ? "Gain vs Livret A non disponible"
+        : `Gain vs Livret A ${livretAGain >= 0 ? "+" : "-"}${formatNumber(Math.abs(livretAGain))} €`;
+    return `• ${label} : ${formatNumber(comp.economiesCumulees)} € d'économies — ${livretAText}`;
   }).join("<br>");
 
   return `

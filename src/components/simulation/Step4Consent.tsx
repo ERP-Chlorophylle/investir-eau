@@ -1,4 +1,4 @@
-import { useFormContext } from "react-hook-form";
+﻿import { useFormContext } from "react-hook-form";
 import { Mail, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,13 +15,14 @@ export function Step4Consent() {
   } = useFormContext<SimulationFormData>();
 
   const rgpdConsent = watch("rgpdConsent");
+  const emailValue = watch("email");
 
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-foreground">Vos coordonnées</h2>
+        <h2 className="text-2xl font-bold text-foreground">Recevez notre comparatif</h2>
         <p className="mt-2 text-muted-foreground">
-          Recevez votre rapport personnalisé par email
+          merci d'indiquer votre e-mail :
         </p>
       </div>
 
@@ -38,7 +39,7 @@ export function Step4Consent() {
             placeholder="votre@email.fr"
             {...register("email")}
           />
-          {errors.email && (
+          {errors.email && emailValue?.trim().length > 0 && (
             <p className="text-sm text-destructive">{errors.email.message}</p>
           )}
         </div>
@@ -71,9 +72,9 @@ export function Step4Consent() {
                   className="text-primary underline hover:no-underline"
                   target="_blank"
                 >
-                  politique de confidentialité
+                  politique de confidentialitÃ©
                 </Link>
-                {" "}et je souhaite recevoir des conseils et actualités sur la récupération d'eau de pluie. Mes données seront utilisées uniquement par Les Jeunes Pousses.
+                {" "}et je souhaite recevoir des conseils et actualitÃ©s sur la rÃ©cupÃ©ration d'eau de pluie. Mes donnÃ©es seront utilisÃ©es uniquement par Les Jeunes Pousses.
               </p>
             </div>
           </div>
@@ -86,12 +87,14 @@ export function Step4Consent() {
         <div className="rounded-lg bg-water-light p-4 text-sm">
           <p className="font-medium text-foreground">Que se passe-t-il ensuite ?</p>
           <ul className="mt-2 space-y-1 text-muted-foreground">
-            <li>✓ Vos données sont enregistrées chez Les Jeunes Pousses</li>
-            <li>✓ Aucun engagement de votre part</li>
-            <li>✓ Possibilité de demander un devis personnalisé</li>
+            <li>âœ“ Vos donnÃ©es sont enregistrÃ©es chez Les Jeunes Pousses</li>
+            <li>âœ“ Aucun engagement de votre part</li>
+            <li>âœ“ PossibilitÃ© de demander un devis personnalisÃ©</li>
           </ul>
         </div>
       </div>
     </div>
   );
 }
+
+

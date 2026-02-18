@@ -15,9 +15,9 @@ interface FinancialComparisonProps {
 
 export function FinancialComparison({ comparison, horizonAnnees, email, departement, surfaceToiture }: FinancialComparisonProps) {
   const optionLabels = {
-    eco: "Éco",
+    eco: "Essentiel",
     confort: "Confort",
-    autonomie: "Autonomie",
+    extra: "Serenite +",
   };
 
 
@@ -187,3 +187,4 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
     </div>
   );
 }
+

@@ -20,7 +20,7 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; card
   },
   extra: {
     icon: Sparkles,
-    title: "Un petit truc en plus",
+    title: "Serenite +",
     cardClass: "result-card-extra",
     iconClass: "text-purple",
     badgeClass: "bg-purple-light text-purple",

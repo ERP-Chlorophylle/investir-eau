@@ -41,7 +41,7 @@ export interface SimulationInputs {
 export interface TankOption {
   type: "eco" | "confort" | "extra";
   label: string;
-  couvertureCible: number; // 70, 90 or 150%
+  couvertureCible: number; // 70, 100 or 110%
   couvertureReelle: number; // Actual coverage percentage based on supply limits
   volumeCuveBrut: number;
   volumeCuveArrondi: number;
@@ -152,7 +152,7 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
   // 4) Guard rail for rain event
   const vEventMin = MIN_RAIN_EVENT * inputs.surfaceToiture * cToit * eta;
 
-  // 5) Calculate options based on coverage percentages (70%, 90%, 150%)
+  // 5) Calculate options based on coverage percentages (70%, 100%, 110%)
   const options: TankOption[] = (["eco", "confort", "extra"] as const).map((type) => {
     const coverageConfig = COVERAGE_OPTIONS[type];
     const couvertureCible = coverageConfig.percentage;
@@ -161,8 +161,8 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     const volumeAnnuelCouvertBrut = vDemand * (couvertureCible / 100);
     const volumeAnnuelCouvert = Math.min(volumeAnnuelCouvertBrut, vSupply);
     
-    // Taille cuve = environ 1 mois du volume couvert (comme tampon)
-    let volumeCuveBrut = volumeAnnuelCouvert / 12;
+    // Taille cuve = environ 1 mois du volume cible de consommation (dimensionnement)
+    let volumeCuveBrut = volumeAnnuelCouvertBrut / 12;
     volumeCuveBrut = Math.max(volumeCuveBrut, vEventMin);
 
     // Round to market size

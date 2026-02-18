@@ -60,8 +60,8 @@ export const TANK_PRICING: Record<number, number> = {
 // Coverage options by type (percentage of demand covered)
 export const COVERAGE_OPTIONS = {
   eco: { percentage: 70, label: "Essentiel (70%)" },
-  confort: { percentage: 90, label: "Confort (90%)" },
-  extra: { percentage: 150, label: "Un petit truc en plus (150%)" },
+  confort: { percentage: 100, label: "Confort (100%)" },
+  extra: { percentage: 110, label: "Serenite + (110%)" },
 };
 
 // Savings accounts rates (net, December 2025)

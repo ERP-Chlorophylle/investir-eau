@@ -57,7 +57,7 @@ function buildClientConfirmation(): string {
 }
 
 function buildAdminQuoteEmail(data: QuotePayload): string {
-  const optionLabel = data.selectedOption === "eco" ? "Éco" : data.selectedOption === "confort" ? "Confort" : "Extra";
+  const optionLabel = data.selectedOption === "eco" ? "Essentiel" : data.selectedOption === "confort" ? "Confort" : "Serenite +";
 
   return `
 <!DOCTYPE html>

@@ -1,12 +1,18 @@
-import { useFormContext } from "react-hook-form";
-import { MapPin, Home } from "lucide-react";
-import { Input } from "@/components/ui/input";
+﻿import { useFormContext } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Check, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ROOF_TYPES, DEPARTMENT_OPTIONS, CLIMATE_DATA } from "@/lib/constants";
+import { ROOF_TYPES } from "@/lib/constants";
 import { SimulationFormData } from "@/lib/validation";
+import { cn } from "@/lib/utils";
 
-export function Step1Location() {
+interface Step1LocationProps {
+  onProgressChange?: (progressPercent: number) => void;
+}
+
+export function Step1Location({ onProgressChange }: Step1LocationProps) {
   const {
     register,
     watch,
@@ -14,71 +20,89 @@ export function Step1Location() {
     formState: { errors },
   } = useFormContext<SimulationFormData>();
 
-  const departement = watch("departement");
+  const surfaceToiture = watch("surfaceToiture");
   const typeToiture = watch("typeToiture");
+  const [isSurfaceConfirmed, setIsSurfaceConfirmed] = useState(false);
+  const isSurfaceValid =
+    typeof surfaceToiture === "number" &&
+    Number.isFinite(surfaceToiture) &&
+    surfaceToiture >= 10 &&
+    surfaceToiture <= 1000;
 
-  const climateData = departement ? CLIMATE_DATA[departement] : null;
+  const activeField = !isSurfaceConfirmed ? "surface" : !typeToiture ? "toiture" : null;
+  const previousActiveFieldRef = useRef<typeof activeField>(activeField);
+  const surfaceSectionRef = useRef<HTMLDivElement>(null);
+  const toitureSectionRef = useRef<HTMLDivElement>(null);
+
+  const isToitureLocked = activeField === "surface";
+
+  const surfaceRegister = register("surfaceToiture", { valueAsNumber: true });
+
+  useEffect(() => {
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const previousActiveField = previousActiveFieldRef.current;
+
+    if (isMobile && previousActiveField === "surface" && activeField === "toiture") {
+      toitureSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    previousActiveFieldRef.current = activeField;
+  }, [activeField]);
+
+  useEffect(() => {
+    const progress = !isSurfaceConfirmed ? 0 : !typeToiture ? 50 : 100;
+    onProgressChange?.(progress);
+  }, [isSurfaceConfirmed, typeToiture, onProgressChange]);
 
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-foreground">Localisation & Toiture</h2>
+        <h2 className="text-2xl font-bold text-foreground">Caractéristiques de votre toit</h2>
         <p className="mt-2 text-muted-foreground">
-          Indiquez votre situation géographique et les caractéristiques de votre toiture
+          Pour connaitre son potentiel de collecte
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Département */}
-        <div className="space-y-3">
-          <Label className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-primary" />
-            Département
-          </Label>
-          <RadioGroup
-            value={departement}
-            onValueChange={(value) => setValue("departement", value)}
-            className="grid gap-2"
-          >
-            {DEPARTMENT_OPTIONS.map((dept) => (
-              <Label
-                key={dept.value}
-                htmlFor={`dept-${dept.value}`}
-                className={`flex cursor-pointer items-center justify-between rounded-lg border-2 p-3 transition-all ${
-                  departement === dept.value
-                    ? "border-primary bg-primary/5"
-                    : "border-muted hover:border-primary/50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value={dept.value} id={`dept-${dept.value}`} />
-                  <span className="font-medium">{dept.label}</span>
-                </div>
-              </Label>
-            ))}
-          </RadioGroup>
-          {errors.departement && (
-            <p className="text-sm text-destructive">{errors.departement.message}</p>
-          )}
-          {climateData && (
-            <div className="text-sm text-muted-foreground mt-2">
-              Pluviométrie : <span className="font-medium text-foreground">{climateData.pluie} mm/an</span>
-            </div>
-          )}
-        </div>
-
+      <div className="grid gap-6">
         {/* Surface toiture */}
-        <div className="space-y-2">
+        <div
+          ref={surfaceSectionRef}
+          className={cn(
+            "space-y-2 rounded-xl p-3 transition-all",
+            activeField === "surface" && "ring-2 ring-primary/70 bg-primary/5"
+          )}
+        >
           <Label htmlFor="surfaceToiture" className="flex items-center gap-2">
             <Home className="h-4 w-4 text-primary" />
             Surface de toiture collectée (m²)
           </Label>
-          <Input
-            id="surfaceToiture"
-            type="number"
-            placeholder="100"
-            {...register("surfaceToiture", { valueAsNumber: true })}
-          />
+          <div className="mx-auto flex max-w-[220px] items-center justify-center gap-2">
+            <div className="flex h-10 w-28 items-center justify-center rounded-md border border-input bg-background px-2">
+              <input
+                id="surfaceToiture"
+                type="number"
+                inputMode="numeric"
+                placeholder="100"
+                className="w-10 border-0 bg-transparent p-0 text-right text-sm outline-none placeholder:text-muted-foreground [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                {...surfaceRegister}
+                onFocus={(e) => {
+                  surfaceRegister.onFocus?.(e);
+                  setIsSurfaceConfirmed(false);
+                  setValue("surfaceToiture", undefined, { shouldValidate: true });
+                }}
+              />
+              <span className="ml-0.5 text-xs text-muted-foreground">m²</span>
+            </div>
+            <Button
+              type="button"
+              variant="hero"
+              size="icon"
+              disabled={!isSurfaceValid}
+              onClick={() => setIsSurfaceConfirmed(true)}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          </div>
           {errors.surfaceToiture && (
             <p className="text-sm text-destructive">{errors.surfaceToiture.message}</p>
           )}
@@ -86,7 +110,14 @@ export function Step1Location() {
       </div>
 
       {/* Type de toiture */}
-      <div className="space-y-3">
+      <div
+        ref={toitureSectionRef}
+        className={cn(
+          "space-y-3 rounded-xl p-3 transition-all",
+          activeField === "toiture" && "ring-2 ring-primary/70 bg-primary/5",
+          isToitureLocked && "pointer-events-none opacity-50"
+        )}
+      >
         <Label className="flex items-center gap-2">
           <Home className="h-4 w-4 text-primary" />
           Type de toiture
@@ -123,3 +154,4 @@ export function Step1Location() {
     </div>
   );
 }
+

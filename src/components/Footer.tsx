@@ -10,9 +10,6 @@ export function Footer() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <Droplets className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-semibold text-foreground">
-              Simulateur Cuve vs Livrets
-            </span>
           </div>
           <nav className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
             <Link to="/mentions-legales" className="transition-colors hover:text-foreground">
