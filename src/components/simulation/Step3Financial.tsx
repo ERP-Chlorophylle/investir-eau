@@ -10,6 +10,8 @@ type CommuneSuggestion = {
   city: string;
   postcode: string;
   citycode: string;
+  lat: number;
+  lon: number;
 };
 
 type CommuneRates = {
@@ -44,15 +46,43 @@ async function fetchCommuneSuggestions(input: string): Promise<CommuneSuggestion
   return features
     .map((feature: any) => {
       const p = feature?.properties;
-      if (!p?.citycode || !p?.label) return null;
+      const coordinates = feature?.geometry?.coordinates;
+      const lon = Array.isArray(coordinates) ? toNumberOrNull(coordinates[0]) : null;
+      const lat = Array.isArray(coordinates) ? toNumberOrNull(coordinates[1]) : null;
+      if (!p?.citycode || !p?.label || lat === null || lon === null) return null;
       return {
         label: p.label,
         city: p.city ?? p.name ?? p.label,
         postcode: p.postcode ?? "",
         citycode: p.citycode,
+        lat,
+        lon,
       } as CommuneSuggestion;
     })
     .filter(Boolean) as CommuneSuggestion[];
+}
+
+async function fetchAnnualRainfallMm(latitude: number, longitude: number): Promise<number | null> {
+  const referenceYear = new Date().getFullYear() - 1;
+  const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${encodeURIComponent(
+    latitude
+  )}&longitude=${encodeURIComponent(
+    longitude
+  )}&start_date=${referenceYear}-01-01&end_date=${referenceYear}-12-31&daily=precipitation_sum&timezone=auto`;
+
+  const response = await fetch(url);
+  if (!response.ok) return null;
+
+  const json = await response.json();
+  const values = Array.isArray(json?.daily?.precipitation_sum) ? json.daily.precipitation_sum : [];
+  if (values.length === 0) return null;
+
+  const total = values.reduce((sum: number, value: unknown) => {
+    const mm = toNumberOrNull(value);
+    return mm === null ? sum : sum + mm;
+  }, 0);
+
+  return normalizePrice(total);
 }
 
 async function fetchLatestIndicator(codeInsee: string, typeService: "AEP" | "AC", indicatorCode: string): Promise<number | null> {
@@ -163,13 +193,19 @@ export function Step3Financial() {
     setIsLoadingPrice(true);
 
     try {
-      const prixAep = await fetchLatestIndicator(suggestion.citycode, "AEP", "D102.0");
-      let prixAc = await fetchLatestIndicator(suggestion.citycode, "AC", "D204.0");
+      const [prixAep, prixAcRaw, pluieAnnuelle] = await Promise.all([
+        fetchLatestIndicator(suggestion.citycode, "AEP", "D102.0"),
+        fetchLatestIndicator(suggestion.citycode, "AC", "D204.0"),
+        fetchAnnualRainfallMm(suggestion.lat, suggestion.lon),
+      ]);
+
+      let prixAc = prixAcRaw;
       let acEstimated = false;
       if (prixAc === null) {
         prixAc = await fetchDepartmentAverageAc(suggestion.citycode);
         acEstimated = prixAc !== null;
       }
+      setValue("pluieAnnuelleCommune", pluieAnnuelle ?? undefined, { shouldDirty: true });
 
       if (prixAep === null && prixAc === null) {
         setApiMessage(`Tarif non disponible pour ${suggestion.city}.`);

@@ -58,6 +58,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const jardinReadyForNextStep = !jardinEnabled || (jardinDone && isJardinConfirmed);
   const piscineReadyForNextStep = !piscineEnabled || (piscineDone && (isPiscineConfirmed || isPiscineStableForNextStep));
   const autoReadyForNextStep = !autoEnabled || (autoDone && hasAutoInteracted);
+  const shouldGuideAutoAfterPiscine = piscineReadyForNextStep && !hasAutoInteracted;
 
   const activeUsage = !wcReadyForNextStep
     ? "wc"
@@ -65,7 +66,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       ? "jardin"
       : !piscineReadyForNextStep
         ? "piscine"
-        : !autoReadyForNextStep
+        : shouldGuideAutoAfterPiscine || !autoReadyForNextStep
           ? "auto"
           : null;
 
@@ -367,7 +368,12 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                         variant="hero"
                         size="icon"
                         disabled={!jardinDone}
-                        onClick={() => setIsJardinConfirmed(true)}
+                        onClick={() => {
+                          setIsJardinConfirmed(true);
+                          window.setTimeout(() => {
+                            scrollToWithHeaderOffset(piscineSectionRef.current);
+                          }, 60);
+                        }}
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -485,7 +491,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
               onCheckedChange={(checked) => {
                 const isChecked = !!checked;
                 setValue("autoEnabled", isChecked);
-                setHasAutoInteracted(false);
+                setHasAutoInteracted(true);
               }}
               className="mt-1"
             />

@@ -20,6 +20,7 @@ export interface SimulationInputs {
   departement: string;
   surfaceToiture: number;
   typeToiture: string;
+  pluieAnnuelleCommune?: number;
 
   // Usages
   wcEnabled: boolean;
@@ -83,6 +84,7 @@ export interface SimulationResults {
 export interface FinancialComparison {
   optionType: "eco" | "confort" | "extra";
   coutCuve: number | null;
+  capitalReference: number;
   economiesCumulees: number;
   livrets: {
     id: string;
@@ -105,9 +107,10 @@ export function getRoofCoefficient(type: string): number {
 export function calculateSimulation(inputs: SimulationInputs): SimulationResults {
   const dept = inputs.departement;
   const climateData = CLIMATE_DATA[dept];
-  const isCalibrated = !!climateData;
+  const hasCommuneRain = typeof inputs.pluieAnnuelleCommune === "number" && Number.isFinite(inputs.pluieAnnuelleCommune);
+  const isCalibrated = !!climateData || hasCommuneRain;
 
-  const pluieAnnuelle = climateData?.pluie ?? 700;
+  const pluieAnnuelle = hasCommuneRain ? (inputs.pluieAnnuelleCommune as number) : (climateData?.pluie ?? 700);
   const joursPluie = climateData?.joursPluie ?? 70;
 
   const cToit = getRoofCoefficient(inputs.typeToiture);
@@ -207,13 +210,25 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     }
   }
 
+  // If "confort" already reaches the max standard size, force "extra" to custom quote.
+  if (confortOption && extraOption && confortOption.volumeCuveArrondi >= 20000) {
+    extraOption.surDevis = true;
+    extraOption.cout = null;
+  }
+
   // Use the max coverage for global vUse
   const vUse = vUseMax;
 
   // 6) Financial comparisons (fixed 10 years horizon)
   const horizonAnnees = 10;
+  const SUR_DEVIS_BASE = 20000;
+  const confortReference = options.find((o) => o.type === "confort")?.cout ?? SUR_DEVIS_BASE;
   const comparisons: FinancialComparison[] = options.map((option) => {
     const coutCuve = option.cout;
+    const isSurDevisOption = option.surDevis || coutCuve === null;
+    const capitalReference = isSurDevisOption
+      ? Math.max(SUR_DEVIS_BASE, confortReference)
+      : (coutCuve as number);
     const m3Substitues = option.volumeAnnuelCouvert / 1000;
 
     // Cumulated savings
@@ -227,15 +242,15 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     // Savings accounts - filter out those whose ceiling is below the tank cost
     const livrets = SAVINGS_ACCOUNTS
       .filter((account) => {
-        if (!coutCuve) return true;
+        if (isSurDevisOption && account.id === "livretA") return false;
+        if (!capitalReference) return true;
         if (account.ceiling === null) return true;
-        return account.ceiling >= coutCuve;
+        return account.ceiling >= capitalReference;
       })
       .map((account) => {
-        const valeurFuture = coutCuve
-          ? Math.round(coutCuve * Math.pow(1 + account.rate, horizonAnnees) * 100) / 100
-          : 0;
-        const ecart = Math.round((economiesCumulees - valeurFuture) * 100) / 100;
+        const valeurFuture = Math.round(capitalReference * Math.pow(1 + account.rate, horizonAnnees) * 100) / 100;
+        const interets = valeurFuture - capitalReference;
+        const ecart = Math.round((economiesCumulees - interets) * 100) / 100;
 
         return {
           id: account.id,
@@ -248,6 +263,7 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
     return {
       optionType: option.type,
       coutCuve,
+      capitalReference,
       economiesCumulees,
       livrets,
     };

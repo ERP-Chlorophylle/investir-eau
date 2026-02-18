@@ -36,6 +36,7 @@ export const step2Schema = z.object({
 
 export const step3Schema = z.object({
   prixEau: z.number().min(0).max(20).default(5),
+  pluieAnnuelleCommune: z.number().min(0).max(4000).optional(),
 });
 
 export const step4Schema = z.object({

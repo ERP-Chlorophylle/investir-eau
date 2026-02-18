@@ -91,6 +91,7 @@ export function Step4Consent() {
         <div className="rounded-lg bg-water-light p-4 text-sm">
           <p className="font-medium text-foreground">Que se passe-t-il ensuite ?</p>
           <ul className="mt-2 space-y-1 text-muted-foreground">
+            <li>✓ Visualisez notre rapport de simulation d'investissement</li>
             <li>✓ Vos données sont enregistrées chez Les Jeunes Pousses</li>
             <li>✓ Aucun engagement de votre part</li>
             <li>✓ Possibilité de demander un devis personnalisé</li>

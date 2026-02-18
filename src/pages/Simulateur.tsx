@@ -149,6 +149,7 @@ export default function Simulateur() {
       departement: data.departement,
       surfaceToiture: data.surfaceToiture,
       typeToiture: data.typeToiture,
+      pluieAnnuelleCommune: data.pluieAnnuelleCommune,
       wcEnabled: data.wcEnabled,
       wcPersonnes: data.wcPersonnes,
       jardinEnabled: data.jardinEnabled,
@@ -190,6 +191,7 @@ export default function Simulateur() {
             piscineSurface: inputs.piscineSurface,
           },
           prixEau: inputs.prixEau,
+          pluieAnnuelleCommune: inputs.pluieAnnuelleCommune,
           vSupply: results.vSupply,
           vDemand: results.vDemand,
           options: results.options.map((o) => ({
