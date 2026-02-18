@@ -46,60 +46,60 @@ export default function Resultat() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/30">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-muted/30">
       <Header />
 
-      <main className="flex-1 py-8 md:py-12">
+      <main className="flex-1 py-4 md:py-12">
         <div className="container-app">
-          <div className="mb-6 flex flex-col gap-3 sm:mb-10 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-3 flex flex-col gap-2 sm:mb-10 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="whitespace-nowrap text-[clamp(0.92rem,3.1vw,2.25rem)] font-bold text-foreground">
-                Votre simulation d'économie potentielle
+              <h1 className="text-[clamp(0.92rem,3.1vw,2.25rem)] font-bold leading-tight text-foreground">
+                Résultas des gains potentiels
               </h1>
             </div>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 gap-2 md:mb-10 md:gap-4">
-            <div className="rounded-xl border bg-card p-3 md:p-5">
-              <div className="flex items-center gap-1 text-[11px] text-muted-foreground md:text-sm">
+          <div className="mb-6 grid grid-cols-2 gap-3 md:mb-10 md:gap-4">
+            <div className="rounded-2xl border border-water-medium/40 bg-card p-3.5 shadow-sm md:p-5">
+              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-water-light/60 px-2 py-1 text-[11px] text-muted-foreground md:text-xs">
                 <Droplets className="h-3.5 w-3.5 text-water-dark md:h-4 md:w-4" />
-                <span className="leading-tight">Potentiel récupérable</span>
+                Potentiel récupérable
               </div>
-              <p className="mt-1 text-[clamp(0.88rem,2.8vw,1.5rem)] font-bold text-foreground">
-                {(results.vSupply / 1000).toFixed(1)} m³/an
+              <p className="flex items-end gap-1 whitespace-nowrap leading-none">
+                <span className="text-[clamp(1rem,3.3vw,1.55rem)] font-bold tabular-nums text-foreground">
+                  {(results.vSupply / 1000).toFixed(1)}
+                </span>
+                <span className="pb-[1px] text-[clamp(0.72rem,2.2vw,0.95rem)] font-semibold text-muted-foreground">m³/an</span>
               </p>
             </div>
-            <div className="rounded-xl border bg-card p-3 md:p-5">
-              <div className="flex items-center gap-1 text-[11px] text-muted-foreground md:text-sm">
+            <div className="rounded-2xl border border-eco-medium/40 bg-card p-3.5 shadow-sm md:p-5">
+              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-eco-light/60 px-2 py-1 text-[11px] text-muted-foreground md:text-xs">
                 <Droplets className="h-3.5 w-3.5 text-eco-dark md:h-4 md:w-4" />
-                <span className="leading-tight">Besoin annuel</span>
+                Besoin annuel
               </div>
-              <p className="mt-1 text-[clamp(0.88rem,2.8vw,1.5rem)] font-bold text-foreground">
-                {(results.vDemand / 1000).toFixed(1)} m³/an
+              <p className="flex items-end gap-1 whitespace-nowrap leading-none">
+                <span className="text-[clamp(1rem,3.3vw,1.55rem)] font-bold tabular-nums text-foreground">
+                  {(results.vDemand / 1000).toFixed(1)}
+                </span>
+                <span className="pb-[1px] text-[clamp(0.72rem,2.2vw,0.95rem)] font-semibold text-muted-foreground">m³/an</span>
               </p>
             </div>
           </div>
 
           <section className="mb-8 md:mb-12">
-            <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Dimensionnement recommandé</h2>
+            <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Nos recommandations de cuves</h2>
 
-            {results.isSupplyLimited && (
-              <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <Info className="h-4 w-4 shrink-0" />
-                Vos besoins dépassent le potentiel récupérable de votre toiture. La couverture réelle sera limitée.
-              </p>
-            )}
-
-            <div className="-mx-2 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible px-2 pb-2 pt-3 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 md:pt-0">
+            <div className="mx-0 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible px-1 pb-2 pt-3 [scrollbar-width:none] md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 md:pt-0">
               {results.options.map((option) => {
                 const comparison = results.comparisons.find((c) => c.optionType === option.type);
                 const capitalReference =
                   typeof comparison?.capitalReference === "number" && Number.isFinite(comparison.capitalReference)
                     ? comparison.capitalReference
-                    : comparison?.coutCuve ?? 20000;
+                    : comparison?.coutCuve ?? 29500;
+                const cuveGain = comparison?.economiesCumulees ?? 0;
                 const interestGains = comparison
                   ? [
-                      { name: "Cuve", gain: comparison.economiesCumulees },
+                      { name: "Cuve", gain: cuveGain },
                       ...comparison.livrets.map((livret) => ({
                         name: livret.name,
                         gain: livret.valeurFuture - capitalReference,
@@ -125,6 +125,13 @@ export default function Resultat() {
                 );
               })}
             </div>
+
+            {results.isSupplyLimited && (
+              <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground md:mt-4 md:text-sm">
+                <Info className="h-4 w-4 shrink-0" />
+                Vos besoins dépassent le potentiel récupérable de votre toiture. La couverture réelle sera limitée.
+              </p>
+            )}
 
             <p className="mt-2 flex items-start gap-2 text-xs text-muted-foreground md:mt-4">
               <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />

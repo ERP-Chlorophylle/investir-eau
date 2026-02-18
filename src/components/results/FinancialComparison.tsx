@@ -23,23 +23,10 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
   const capitalReference =
     typeof comparison.capitalReference === "number" && Number.isFinite(comparison.capitalReference)
       ? comparison.capitalReference
-      : (comparison.coutCuve ?? 20000);
+      : (comparison.coutCuve ?? 29500);
   const investmentLabel = comparison.coutCuve
     ? `${comparison.coutCuve.toLocaleString("fr-FR")} €`
     : `${capitalReference.toLocaleString("fr-FR")} € (base Sur devis)`;
-
-  const gainRows = [
-    {
-      key: "cuve",
-      label: "Gain cuve",
-      gain: comparison.economiesCumulees,
-    },
-    ...comparison.livrets.map((livret) => ({
-      key: livret.id,
-      label: `Gain ${livret.name}`,
-      gain: livret.valeurFuture - capitalReference,
-    })),
-  ].sort((a, b) => b.gain - a.gain);
 
   return (
     <div className="space-y-6">
@@ -53,44 +40,6 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
             <p className="text-sm text-muted-foreground">Investissement initial</p>
             <p className="text-xl font-bold text-foreground">{investmentLabel}</p>
           </div>
-        </div>
-      </div>
-
-      <div className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-background via-water-light/20 to-background p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h4 className="text-base font-semibold text-foreground">Classement des gains</h4>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            Ordre décroissant
-          </span>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {gainRows.map((row, index) => (
-            <div
-              key={row.key}
-              className={cn(
-                "rounded-lg border bg-card/90 p-3 transition-colors",
-                index === 0 ? "border-primary/50" : "border-border/70"
-              )}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
-                      index === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="text-sm font-medium text-foreground">{row.label}</span>
-                </div>
-                <span className={cn("text-sm font-semibold", row.gain >= 0 ? "text-primary" : "text-destructive")}>
-                  {row.gain >= 0 ? "+" : ""}
-                  {Math.round(row.gain).toLocaleString("fr-FR")} €
-                </span>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 

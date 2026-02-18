@@ -221,7 +221,7 @@ export function calculateSimulation(inputs: SimulationInputs): SimulationResults
 
   // 6) Financial comparisons (fixed 10 years horizon)
   const horizonAnnees = 10;
-  const SUR_DEVIS_BASE = 20000;
+  const SUR_DEVIS_BASE = 29500;
   const confortReference = options.find((o) => o.type === "confort")?.cout ?? SUR_DEVIS_BASE;
   const comparisons: FinancialComparison[] = options.map((option) => {
     const coutCuve = option.cout;

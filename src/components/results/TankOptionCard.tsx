@@ -67,7 +67,7 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
         </div>
       </div>
 
-      <div className="mt-3 space-y-3 md:mt-6 md:space-y-4">
+      <div className="mt-2.5 space-y-2 md:mt-6 md:space-y-4">
         {/* Volume */}
         <div className="text-center">
           <p className="text-[clamp(1.35rem,4.6vw,2.2rem)] font-bold leading-tight text-foreground">
@@ -79,9 +79,9 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
         </div>
 
         {/* Stats */}
-        <div className="rounded-lg bg-muted/50 p-2 md:p-3">
-          <div className="flex items-center justify-between gap-1 text-[clamp(0.72rem,1.8vw,0.9rem)]">
-            <span className="text-muted-foreground md:hidden">Couverture</span>
+        <div className="rounded-lg bg-muted/50 p-1.5 md:p-3">
+          <div className="flex items-center justify-center gap-1 text-[clamp(0.72rem,1.8vw,0.9rem)]">
+            <span className="text-muted-foreground md:hidden">Couverture des besoins :</span>
             <span className="hidden text-muted-foreground md:inline">Couverture des besoins</span>
             <span className="whitespace-nowrap text-[clamp(0.95rem,2.8vw,1.125rem)] font-semibold leading-none">
               {option.couvertureReelle ?? option.couvertureCible}%
@@ -90,7 +90,7 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
         </div>
 
         {/* Volume annuel couvert */}
-        <div className="text-center text-[clamp(0.72rem,1.9vw,0.9rem)] text-muted-foreground">
+        <div className="text-center text-[clamp(0.72rem,1.9vw,0.9rem)] text-muted-foreground leading-tight">
           <p>
             <span className="md:hidden">{(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an</span>
             <span className="hidden md:inline">{(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an économisés</span>
@@ -115,15 +115,20 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
 
         {interestGains.length > 0 && (
           <div className="rounded-lg border bg-background/80 p-2 md:p-3">
-            <p className="mb-1 text-[clamp(9px,1.1vw,0.75rem)] font-semibold uppercase tracking-wide text-muted-foreground md:mb-2">
-              <span className="md:hidden">Top gains</span>
-              <span className="hidden md:inline">Gains d'intérêts</span>
+            <p className="mb-1 text-[clamp(10px,1.25vw,0.88rem)] font-semibold uppercase tracking-wide text-muted-foreground md:mb-2">
+              <span className="md:hidden">Intérêts possibles sur 10 ans</span>
+              <span className="hidden md:inline">Intérêts possibles sur 10 ans</span>
             </p>
             <div className="space-y-1 md:hidden">
               {mobileInterestGains.map((row) => (
-                <div key={row.name} className="flex items-center justify-between gap-2 text-[clamp(9px,1.05vw,0.75rem)]">
+                <div key={row.name} className="grid grid-cols-[auto_auto] items-center justify-center gap-x-2 text-[clamp(11px,1.45vw,0.98rem)]">
                   <span className="text-muted-foreground">{row.name}</span>
-                  <span className={cn("font-semibold tabular-nums", row.gain >= 0 ? "text-primary" : "text-destructive")}>
+                  <span
+                    className={cn(
+                      "font-semibold tabular-nums",
+                      row.name === "Cuve" ? "text-eco-dark" : "text-destructive"
+                    )}
+                  >
                     {row.gain >= 0 ? "+" : ""}
                     {Math.round(row.gain).toLocaleString("fr-FR")} €
                   </span>
@@ -132,9 +137,14 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
             </div>
             <div className="hidden space-y-1.5 md:block">
               {interestGains.map((row) => (
-                <div key={row.name} className="flex items-center justify-between gap-2 text-[clamp(10px,1.05vw,0.9rem)]">
+                <div key={row.name} className="grid grid-cols-[auto_auto] items-center justify-center gap-x-2 text-[clamp(12px,1.1vw,1rem)]">
                   <span className="text-muted-foreground">{row.name}</span>
-                  <span className={cn("font-semibold tabular-nums", row.gain >= 0 ? "text-primary" : "text-destructive")}>
+                  <span
+                    className={cn(
+                      "font-semibold tabular-nums",
+                      row.name === "Cuve" ? "text-eco-dark" : "text-destructive"
+                    )}
+                  >
                     {row.gain >= 0 ? "+" : ""}
                     {Math.round(row.gain).toLocaleString("fr-FR")} €
                   </span>
