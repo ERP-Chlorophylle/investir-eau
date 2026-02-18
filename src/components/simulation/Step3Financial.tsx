@@ -288,7 +288,7 @@ export function Step3Financial() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-center gap-2">
               <button
                 type="button"
                 className={`rounded-md border px-3 py-1 text-xs ${

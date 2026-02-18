@@ -449,7 +449,12 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                         variant="hero"
                         size="icon"
                         disabled={!piscineDone}
-                        onClick={() => setIsPiscineConfirmed(true)}
+                        onClick={() => {
+                          setIsPiscineConfirmed(true);
+                          window.setTimeout(() => {
+                            scrollToWithHeaderOffset(autoSectionRef.current);
+                          }, 60);
+                        }}
                       >
                         <Check className="h-4 w-4" />
                       </Button>

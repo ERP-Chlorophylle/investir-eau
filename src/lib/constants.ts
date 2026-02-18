@@ -59,7 +59,7 @@ export const TANK_PRICING: Record<number, number> = {
 
 // Coverage options by type (percentage of demand covered)
 export const COVERAGE_OPTIONS = {
-  eco: { percentage: 70, label: "Essentiel (70%)" },
+  eco: { percentage: 80, label: "Essentiel (80%)" },
   confort: { percentage: 100, label: "Confort (100%)" },
   extra: { percentage: 110, label: "Serenite + (110%)" },
 };
