@@ -41,7 +41,7 @@ export const step3Schema = z.object({
 export const step4Schema = z.object({
   email: z.string().email("Email invalide"),
   rgpdConsent: z.literal(true, {
-    errorMap: () => ({ message: "Vous devez accepter la politique de confidentialite" }),
+    errorMap: () => ({ message: "Vous devez accepter la politique de confidentialité" }),
   }),
   newsletterOptIn: z.boolean().default(false),
 });

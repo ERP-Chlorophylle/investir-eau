@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,10 +50,6 @@ export default function Resultat() {
               <h1 className="text-3xl font-bold text-foreground md:text-4xl">
                 Votre simulation
               </h1>
-              <p className="mt-2 text-muted-foreground">
-                Département {inputs.departement} • Horizon 10 ans •{" "}
-                {inputs.prixEau.toFixed(1)} €/m³
-              </p>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" asChild>
@@ -176,3 +172,4 @@ export default function Resultat() {
     </div>
   );
 }
+

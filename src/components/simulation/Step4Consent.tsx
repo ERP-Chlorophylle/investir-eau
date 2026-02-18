@@ -11,6 +11,7 @@ export function Step4Consent() {
     register,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useFormContext<SimulationFormData>();
 
@@ -53,6 +54,9 @@ export function Step4Consent() {
               onCheckedChange={(checked) => {
                 setValue("rgpdConsent", checked === true ? true : undefined as any);
                 setValue("newsletterOptIn", checked === true);
+                if (checked === true) {
+                  clearErrors("rgpdConsent");
+                }
               }}
               className="mt-1"
             />
@@ -72,9 +76,9 @@ export function Step4Consent() {
                   className="text-primary underline hover:no-underline"
                   target="_blank"
                 >
-                  politique de confidentialitÃ©
+                  politique de confidentialité
                 </Link>
-                {" "}et je souhaite recevoir des conseils et actualitÃ©s sur la rÃ©cupÃ©ration d'eau de pluie. Mes donnÃ©es seront utilisÃ©es uniquement par Les Jeunes Pousses.
+                {" "}et je souhaite recevoir des conseils et actualités sur la récupération d'eau de pluie. Mes données seront utilisées uniquement par Les Jeunes Pousses.
               </p>
             </div>
           </div>
@@ -87,9 +91,9 @@ export function Step4Consent() {
         <div className="rounded-lg bg-water-light p-4 text-sm">
           <p className="font-medium text-foreground">Que se passe-t-il ensuite ?</p>
           <ul className="mt-2 space-y-1 text-muted-foreground">
-            <li>âœ“ Vos donnÃ©es sont enregistrÃ©es chez Les Jeunes Pousses</li>
-            <li>âœ“ Aucun engagement de votre part</li>
-            <li>âœ“ PossibilitÃ© de demander un devis personnalisÃ©</li>
+            <li>✓ Vos données sont enregistrées chez Les Jeunes Pousses</li>
+            <li>✓ Aucun engagement de votre part</li>
+            <li>✓ Possibilité de demander un devis personnalisé</li>
           </ul>
         </div>
       </div>
