@@ -18,7 +18,7 @@ import {
   step4Schema,
   SimulationFormData,
 } from "@/lib/validation";
-import { calculateSimulation, SimulationInputs } from "@/lib/calculations";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -145,26 +145,34 @@ export default function Simulateur() {
   };
 
   const onSubmit = async (data: SimulationFormData) => {
-    const inputs: SimulationInputs = {
-      departement: data.departement,
-      surfaceToiture: data.surfaceToiture,
-      typeToiture: data.typeToiture,
-      pluieAnnuelleCommune: data.pluieAnnuelleCommune,
-      wcEnabled: data.wcEnabled,
-      wcPersonnes: data.wcPersonnes,
-      jardinEnabled: data.jardinEnabled,
-      jardinSurface: data.jardinSurface,
-      autoEnabled: data.autoEnabled,
-      autoLavagesMois: data.autoLavagesMois,
-      piscineEnabled: data.piscineEnabled,
-      piscineSurface: data.piscineSurface,
-      prixEau: data.prixEau,
-    };
+    const { data: results, error: rpcError } = await supabase.rpc("calculate_water_simulation", {
+      p_departement: data.departement,
+      p_surface_toiture: data.surfaceToiture,
+      p_type_toiture: data.typeToiture,
+      p_wc_enabled: data.wcEnabled,
+      p_wc_personnes: data.wcPersonnes,
+      p_jardin_enabled: data.jardinEnabled,
+      p_jardin_surface: data.jardinSurface,
+      p_auto_enabled: data.autoEnabled,
+      p_auto_lavages_mois: data.autoLavagesMois,
+      p_piscine_enabled: data.piscineEnabled,
+      p_piscine_surface: data.piscineSurface,
+      p_prix_eau: data.prixEau,
+      p_pluie_annuelle_commune: data.pluieAnnuelleCommune,
+    });
 
-    const results = calculateSimulation(inputs);
+    if (rpcError || !results) {
+      console.error("Erreur calcul simulation:", rpcError);
+      toast({
+        title: "Erreur de calcul",
+        description: "Une erreur est survenue lors de la simulation. Veuillez réessayer.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     sessionStorage.setItem("simulationResults", JSON.stringify(results));
-    sessionStorage.setItem("simulationInputs", JSON.stringify(inputs));
+    sessionStorage.setItem("simulationInputs", JSON.stringify(data));
     sessionStorage.setItem("simulationEmail", data.email);
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
 
@@ -181,38 +189,21 @@ export default function Simulateur() {
           surfaceToiture: inputs.surfaceToiture,
           typeToiture: inputs.typeToiture,
           usages: {
-            wc: inputs.wcEnabled,
-            wcPersonnes: inputs.wcPersonnes,
-            jardin: inputs.jardinEnabled,
-            jardinSurface: inputs.jardinSurface,
-            auto: inputs.autoEnabled,
-            autoLavagesMois: inputs.autoLavagesMois,
-            piscine: inputs.piscineEnabled,
-            piscineSurface: inputs.piscineSurface,
+            wc: data.wcEnabled,
+            wcPersonnes: data.wcPersonnes,
+            jardin: data.jardinEnabled,
+            jardinSurface: data.jardinSurface,
+            auto: data.autoEnabled,
+            autoLavagesMois: data.autoLavagesMois,
+            piscine: data.piscineEnabled,
+            piscineSurface: data.piscineSurface,
           },
-          prixEau: inputs.prixEau,
-          pluieAnnuelleCommune: inputs.pluieAnnuelleCommune,
+          prixEau: data.prixEau,
+          pluieAnnuelleCommune: data.pluieAnnuelleCommune,
           vSupply: results.vSupply,
           vDemand: results.vDemand,
-          options: results.options.map((o) => ({
-            type: o.type,
-            label: o.label,
-            volumeCuveM3: o.volumeCuveM3,
-            cout: o.cout,
-            couvertureReelle: o.couvertureReelle,
-            volumeAnnuelCouvert: o.volumeAnnuelCouvert,
-          })),
-          comparisons: results.comparisons.map((c) => ({
-            optionType: c.optionType,
-            economiesCumulees: c.economiesCumulees,
-            coutCuve: c.coutCuve,
-            livrets: c.livrets.map((livret) => ({
-              id: livret.id,
-              name: livret.name,
-              valeurFuture: livret.valeurFuture,
-              ecart: livret.ecart,
-            })),
-          })),
+          options: results.options,
+          comparisons: results.comparisons,
         }),
       }).catch((err) => console.error("Erreur envoi email simulation:", err));
     } catch (err) {
