@@ -23,6 +23,7 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
   const surfaceToiture = watch("surfaceToiture");
   const typeToiture = watch("typeToiture");
   const [isSurfaceConfirmed, setIsSurfaceConfirmed] = useState(false);
+  const [hasSurfaceChanged, setHasSurfaceChanged] = useState(false);
   const isSurfaceValid =
     typeof surfaceToiture === "number" &&
     Number.isFinite(surfaceToiture) &&
@@ -40,6 +41,7 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
 
   useEffect(() => {
     if (isSurfaceConfirmed) return;
+    if (!hasSurfaceChanged) return;
     if (!isSurfaceValid) return;
 
     const timer = window.setTimeout(() => {
@@ -47,7 +49,7 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
     }, 1500);
 
     return () => window.clearTimeout(timer);
-  }, [isSurfaceConfirmed, isSurfaceValid, surfaceToiture]);
+  }, [isSurfaceConfirmed, hasSurfaceChanged, isSurfaceValid, surfaceToiture]);
 
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -96,6 +98,11 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
                 placeholder="100"
                 className="w-10 border-0 bg-transparent p-0 text-right text-sm outline-none placeholder:text-muted-foreground [appearance:textfield] [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 {...surfaceRegister}
+                onChange={(e) => {
+                  surfaceRegister.onChange(e);
+                  setHasSurfaceChanged(true);
+                  setIsSurfaceConfirmed(false);
+                }}
                 onFocus={(e) => {
                   surfaceRegister.onFocus?.(e);
                   setIsSurfaceConfirmed(false);
@@ -109,7 +116,10 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
               variant="hero"
               size="icon"
               disabled={!isSurfaceValid}
-              onClick={() => setIsSurfaceConfirmed(true)}
+              onClick={() => {
+                setHasSurfaceChanged(true);
+                setIsSurfaceConfirmed(true);
+              }}
             >
               <Check className="h-4 w-4" />
             </Button>

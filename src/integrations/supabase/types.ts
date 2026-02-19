@@ -20,7 +20,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_water_simulation: {
+        Args: {
+          p_departement: string
+          p_surface_toiture: number
+          p_type_toiture: string
+          p_wc_enabled: boolean
+          p_wc_personnes?: number
+          p_jardin_enabled: boolean
+          p_jardin_surface?: number
+          p_auto_enabled: boolean
+          p_auto_lavages_mois?: number
+          p_piscine_enabled: boolean
+          p_piscine_surface?: number
+          p_prix_eau: number
+          p_pluie_annuelle_commune?: number
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

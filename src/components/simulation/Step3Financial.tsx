@@ -21,6 +21,24 @@ type CommuneRates = {
   acEstimated: boolean;
 };
 
+type AdresseFeature = {
+  properties?: {
+    label?: string;
+    city?: string;
+    name?: string;
+    postcode?: string;
+    citycode?: string;
+  };
+  geometry?: {
+    coordinates?: unknown[];
+  };
+};
+
+type HubeauRow = {
+  annee?: number;
+  indicateurs?: Record<string, unknown>;
+};
+
 function toNumberOrNull(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string") {
@@ -44,7 +62,7 @@ async function fetchCommuneSuggestions(input: string): Promise<CommuneSuggestion
   const features = Array.isArray(json.features) ? json.features : [];
 
   return features
-    .map((feature: any) => {
+    .map((feature: AdresseFeature) => {
       const p = feature?.properties;
       const coordinates = feature?.geometry?.coordinates;
       const lon = Array.isArray(coordinates) ? toNumberOrNull(coordinates[0]) : null;
@@ -94,7 +112,7 @@ async function fetchLatestIndicator(codeInsee: string, typeService: "AEP" | "AC"
   if (!response.ok) return null;
 
   const json = await response.json();
-  const rows = Array.isArray(json.data) ? json.data : [];
+  const rows: HubeauRow[] = Array.isArray(json.data) ? json.data : [];
   const sortedRows = rows
     .filter((row) => typeof row?.annee === "number")
     .sort((a, b) => (b.annee as number) - (a.annee as number));
@@ -121,9 +139,9 @@ async function fetchDepartmentAverageAc(codeInsee: string): Promise<number | nul
   if (!response.ok) return null;
 
   const json = await response.json();
-  const rows = Array.isArray(json.data) ? json.data : [];
+  const rows: HubeauRow[] = Array.isArray(json.data) ? json.data : [];
   const candidates = rows
-    .map((row: any) => ({
+    .map((row) => ({
       year: typeof row?.annee === "number" ? row.annee : null,
       value: toNumberOrNull(row?.indicateurs?.["D204.0"]),
     }))

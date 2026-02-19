@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ export default function Resultat() {
   const optionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
     const storedResults = sessionStorage.getItem("simulationResults");
     const storedInputs = sessionStorage.getItem("simulationInputs");
     const storedEmail = sessionStorage.getItem("simulationEmail");
@@ -32,6 +34,75 @@ export default function Resultat() {
     setInputs(JSON.parse(storedInputs));
     setEmail(storedEmail || "");
   }, [navigate]);
+
+  const { recommendedOptionType, medalsByOptionType } = useMemo(() => {
+    if (!results) {
+      return {
+        recommendedOptionType: null as string | null,
+        medalsByOptionType: {} as Record<string, { rank: 1 | 2 | 3; label: string }[]>,
+      };
+    }
+
+    const investmentCandidates = results.comparisons
+      .map((comparison) => {
+        const capitalReference =
+          typeof comparison.capitalReference === "number" && Number.isFinite(comparison.capitalReference)
+            ? comparison.capitalReference
+            : comparison.coutCuve ?? 29500;
+        const livretA = comparison.livrets.find((livret) => livret.id === "livretA");
+        if (!livretA) return null;
+
+        const livretAGain = livretA.valeurFuture - capitalReference;
+        const spreadVsLivretA = comparison.economiesCumulees - livretAGain;
+
+        return {
+          optionType: comparison.optionType,
+          spreadVsLivretA,
+        };
+      })
+      .filter((entry): entry is { optionType: string; spreadVsLivretA: number } => entry !== null)
+      .sort((a, b) => b.spreadVsLivretA - a.spreadVsLivretA);
+
+    const recommended = investmentCandidates[0]?.optionType ?? null;
+
+    const usageCandidates = results.options
+      .filter((option) => option.type === "eco" || option.type === "confort")
+      .map((option) => ({
+        optionType: option.type,
+        coverage: Number.isFinite(option.couvertureReelle) ? option.couvertureReelle : 0,
+        cost: typeof option.cout === "number" ? option.cout : Number.POSITIVE_INFINITY,
+      }))
+      .sort((a, b) => {
+        if (b.coverage !== a.coverage) return b.coverage - a.coverage;
+        return a.cost - b.cost;
+      });
+
+    const medalMap: Record<string, { rank: 1 | 2 | 3; label: string }[]> = {};
+    const pushMedal = (optionType: string | null, medal: { rank: 1 | 2 | 3; label: string }) => {
+      if (!optionType) return;
+      if (!medalMap[optionType]) medalMap[optionType] = [];
+      medalMap[optionType].push(medal);
+    };
+
+    const investmentWinner = recommended;
+    pushMedal(investmentWinner, { rank: 1, label: "Meilleur investissement" });
+
+    const usageWinner = usageCandidates[0]?.optionType ?? null;
+    pushMedal(usageWinner, { rank: 2, label: "Meilleur usage" });
+
+    const resilienceWinner = results.options.find((option) => option.type === "extra")?.type ?? null;
+    pushMedal(resilienceWinner, { rank: 3, label: "Meilleure résilience" });
+
+    return { recommendedOptionType: recommended, medalsByOptionType: medalMap };
+  }, [results]);
+
+  useEffect(() => {
+    if (!results) return;
+    const fallbackOption = results.options[0]?.type ?? null;
+    const optionToSelect = recommendedOptionType ?? fallbackOption;
+    if (!optionToSelect) return;
+    setSelectedOption(optionToSelect);
+  }, [results, recommendedOptionType]);
 
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -54,34 +125,34 @@ export default function Resultat() {
           <div className="mb-3 flex flex-col gap-2 sm:mb-10 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-[clamp(0.92rem,3.1vw,2.25rem)] font-bold leading-tight text-foreground">
-                Résultas des gains potentiels
+                Résultats de la simulation de vos intérêts
               </h1>
             </div>
           </div>
 
-          <div className="mb-6 grid grid-cols-2 gap-3 md:mb-10 md:gap-4">
-            <div className="rounded-2xl border border-water-medium/40 bg-card p-3.5 shadow-sm md:p-5">
-              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-water-light/60 px-2 py-1 text-[11px] text-muted-foreground md:text-xs">
+          <div className="mb-5 grid grid-cols-2 gap-3 md:mb-8 md:gap-4">
+            <div className="rounded-2xl border border-water-medium/40 bg-card p-3 shadow-sm md:p-4">
+              <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-water-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
                 <Droplets className="h-3.5 w-3.5 text-water-dark md:h-4 md:w-4" />
                 Potentiel récupérable
               </div>
               <p className="flex items-end gap-1 whitespace-nowrap leading-none">
-                <span className="text-[clamp(1rem,3.3vw,1.55rem)] font-bold tabular-nums text-foreground">
+                <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
                   {(results.vSupply / 1000).toFixed(1)}
                 </span>
-                <span className="pb-[1px] text-[clamp(0.72rem,2.2vw,0.95rem)] font-semibold text-muted-foreground">m³/an</span>
+                <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-eco-medium/40 bg-card p-3.5 shadow-sm md:p-5">
-              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-eco-light/60 px-2 py-1 text-[11px] text-muted-foreground md:text-xs">
+            <div className="rounded-2xl border border-eco-medium/40 bg-card p-3 shadow-sm md:p-4">
+              <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-eco-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
                 <Droplets className="h-3.5 w-3.5 text-eco-dark md:h-4 md:w-4" />
                 Besoin annuel
               </div>
               <p className="flex items-end gap-1 whitespace-nowrap leading-none">
-                <span className="text-[clamp(1rem,3.3vw,1.55rem)] font-bold tabular-nums text-foreground">
+                <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
                   {(results.vDemand / 1000).toFixed(1)}
                 </span>
-                <span className="pb-[1px] text-[clamp(0.72rem,2.2vw,0.95rem)] font-semibold text-muted-foreground">m³/an</span>
+                <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
               </p>
             </div>
           </div>
@@ -118,6 +189,8 @@ export default function Resultat() {
                     <TankOptionCard
                       option={option}
                       isSelected={selectedOption === option.type}
+                      isRecommended={recommendedOptionType === option.type}
+                      medals={medalsByOptionType[option.type] ?? []}
                       onClick={() => setSelectedOption(option.type)}
                       interestGains={interestGains}
                     />
@@ -192,3 +265,5 @@ export default function Resultat() {
     </div>
   );
 }
+
+

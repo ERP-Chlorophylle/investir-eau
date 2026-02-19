@@ -52,7 +52,7 @@ export function Step4Consent() {
               id="rgpdConsent"
               checked={rgpdConsent === true}
               onCheckedChange={(checked) => {
-                setValue("rgpdConsent", checked === true ? true : undefined as any);
+                setValue("rgpdConsent", checked === true ? true : (undefined as never));
                 setValue("newsletterOptIn", checked === true);
                 if (checked === true) {
                   clearErrors("rgpdConsent");

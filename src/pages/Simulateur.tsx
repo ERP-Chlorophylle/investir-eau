@@ -21,6 +21,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import type { SimulationResults } from "@/lib/calculations";
 
 const STEPS = [
   { label: "Toiture" },
@@ -123,7 +124,7 @@ export default function Simulateur() {
         break;
     }
 
-    return trigger(fieldsToValidate as any);
+    return trigger(fieldsToValidate);
   };
 
   const handleNext = async () => {
@@ -144,6 +145,24 @@ export default function Simulateur() {
     }
   };
 
+  let rightActionButton: JSX.Element = <div />;
+
+  if (showNextButton) {
+    rightActionButton = (
+      <Button type="button" variant="hero" onClick={handleNext}>
+        Suivant
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
+    );
+  } else if (showSubmitButton) {
+    rightActionButton = (
+      <Button type="submit" variant="cta">
+        <Send className="mr-2 h-4 w-4" />
+        Voir mon resultat
+      </Button>
+    );
+  }
+
   const onSubmit = async (data: SimulationFormData) => {
     const { data: results, error: rpcError } = await supabase.rpc("calculate_water_simulation", {
       p_departement: data.departement,
@@ -160,8 +179,9 @@ export default function Simulateur() {
       p_prix_eau: data.prixEau,
       p_pluie_annuelle_commune: data.pluieAnnuelleCommune,
     });
+    const typedResults = results as unknown as SimulationResults | null;
 
-    if (rpcError || !results) {
+    if (rpcError || !typedResults) {
       console.error("Erreur calcul simulation:", rpcError);
       toast({
         title: "Erreur de calcul",
@@ -171,7 +191,7 @@ export default function Simulateur() {
       return;
     }
 
-    sessionStorage.setItem("simulationResults", JSON.stringify(results));
+    sessionStorage.setItem("simulationResults", JSON.stringify(typedResults));
     sessionStorage.setItem("simulationInputs", JSON.stringify(data));
     sessionStorage.setItem("simulationEmail", data.email);
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
@@ -185,9 +205,9 @@ export default function Simulateur() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: data.email,
-          departement: inputs.departement,
-          surfaceToiture: inputs.surfaceToiture,
-          typeToiture: inputs.typeToiture,
+          departement: data.departement,
+          surfaceToiture: data.surfaceToiture,
+          typeToiture: data.typeToiture,
           usages: {
             wc: data.wcEnabled,
             wcPersonnes: data.wcPersonnes,
@@ -200,10 +220,10 @@ export default function Simulateur() {
           },
           prixEau: data.prixEau,
           pluieAnnuelleCommune: data.pluieAnnuelleCommune,
-          vSupply: results.vSupply,
-          vDemand: results.vDemand,
-          options: results.options,
-          comparisons: results.comparisons,
+          vSupply: typedResults.vSupply,
+          vDemand: typedResults.vDemand,
+          options: typedResults.options,
+          comparisons: typedResults.comparisons,
         }),
       }).catch((err) => console.error("Erreur envoi email simulation:", err));
     } catch (err) {
@@ -241,19 +261,7 @@ export default function Simulateur() {
                         <div />
                       )}
 
-                      {showNextButton ? (
-                        <Button type="button" variant="hero" onClick={handleNext}>
-                          Suivant
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      ) : showSubmitButton ? (
-                        <Button type="submit" variant="cta">
-                          <Send className="mr-2 h-4 w-4" />
-                          Voir mon resultat
-                        </Button>
-                      ) : (
-                        <div />
-                      )}
+                      {rightActionButton}
                     </div>
                   )}
                 </form>

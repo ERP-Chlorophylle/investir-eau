@@ -2,7 +2,7 @@
 import { TankOption } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
-const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; cardClass: string; iconClass: string; badgeClass: string; featured?: boolean }> = {
+const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; cardClass: string; iconClass: string; badgeClass: string }> = {
   eco: {
     icon: Droplets,
     title: "Essentiel",
@@ -16,7 +16,6 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; card
     cardClass: "result-card-confort",
     iconClass: "text-primary",
     badgeClass: "bg-water-light text-primary",
-    featured: true,
   },
   extra: {
     icon: Sparkles,
@@ -30,14 +29,29 @@ const OPTION_CONFIG: Record<string, { icon: typeof Droplets; title: string; card
 interface TankOptionCardProps {
   option: TankOption;
   isSelected?: boolean;
+  isRecommended?: boolean;
+  medals?: {
+    rank: 1 | 2 | 3;
+    label: string;
+  }[];
   onClick?: () => void;
   interestGains?: { name: string; gain: number }[];
 }
 
-export function TankOptionCard({ option, isSelected, onClick, interestGains = [] }: TankOptionCardProps) {
+export function TankOptionCard({ option, isSelected, isRecommended = false, medals = [], onClick, interestGains = [] }: TankOptionCardProps) {
   const config = OPTION_CONFIG[option.type];
   const Icon = config.icon;
   const mobileInterestGains = interestGains.slice(0, 4);
+  const volumeCuveM3 = Number.isFinite(option.volumeCuveM3) ? option.volumeCuveM3 : 0;
+  const volumeCuveArrondi = Number.isFinite(option.volumeCuveArrondi)
+    ? option.volumeCuveArrondi
+    : Math.round(volumeCuveM3 * 1000);
+  const couverture = Number.isFinite(option.couvertureReelle)
+    ? option.couvertureReelle
+    : Number.isFinite(option.couvertureCible)
+      ? option.couvertureCible
+      : 0;
+  const volumeAnnuelCouvert = Number.isFinite(option.volumeAnnuelCouvert) ? option.volumeAnnuelCouvert : 0;
 
   return (
     <div
@@ -48,7 +62,7 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
         isSelected && "ring-2 ring-primary ring-offset-2"
       )}
     >
-      {config.featured && (
+      {isRecommended && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
           <span className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
             Recommandé
@@ -66,15 +80,24 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
           </h3>
         </div>
       </div>
+      {medals.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {medals.map((medal) => (
+            <div
+              key={`${medal.rank}-${medal.label}`}
+              className="inline-flex rounded-full border border-border/70 bg-background/80 px-2 py-1 text-[10px] font-semibold text-foreground md:text-xs"
+            >
+              {medal.rank === 1 ? "🥇" : medal.rank === 2 ? "🥈" : "🥉"} {medal.label}
+            </div>
+          ))}
+        </div>
+      )}
 
         <div className="mt-2.5 space-y-0 md:mt-6 md:space-y-0">
         {/* Volume */}
         <div className="text-center">
           <p className="text-[clamp(1.35rem,4.6vw,2.2rem)] font-bold leading-tight text-foreground">
-            <span className="break-words [overflow-wrap:anywhere]">{option.volumeCuveArrondi.toLocaleString("fr-FR")}</span> L
-          </p>
-          <p className="text-[clamp(0.72rem,1.9vw,0.875rem)] text-muted-foreground">
-            soit {option.volumeCuveM3} m³
+            <span className="break-words [overflow-wrap:anywhere]">{volumeCuveArrondi.toLocaleString("fr-FR")}</span> L
           </p>
         </div>
 
@@ -83,8 +106,13 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
           <div className="flex items-center justify-center gap-1 text-[clamp(0.72rem,1.8vw,0.9rem)]">
             <span className="text-muted-foreground md:hidden">Couverture des besoins :</span>
             <span className="hidden text-muted-foreground md:inline">Couverture des besoins</span>
-            <span className="whitespace-nowrap text-[clamp(0.95rem,2.8vw,1.125rem)] font-semibold leading-none">
-              {option.couvertureReelle ?? option.couvertureCible}%
+            <span
+              className={cn(
+                "whitespace-nowrap text-[clamp(0.95rem,2.8vw,1.125rem)] font-semibold leading-none",
+                option.type === "confort" && couverture === 100 && "text-primary"
+              )}
+            >
+              {couverture}%
             </span>
           </div>
         </div>
@@ -92,8 +120,8 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
         {/* Volume annuel couvert */}
         <div className="-mt-0.5 mb-1.5 text-center text-[clamp(0.72rem,1.9vw,0.9rem)] text-muted-foreground leading-tight md:-mt-0.5 md:mb-2">
           <p>
-            <span className="md:hidden">{(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an</span>
-            <span className="hidden md:inline">{(option.volumeAnnuelCouvert / 1000).toFixed(1)} m³/an économisés</span>
+            <span className="md:hidden">{(volumeAnnuelCouvert / 1000).toFixed(1)} m³/an</span>
+            <span className="hidden md:inline">{(volumeAnnuelCouvert / 1000).toFixed(1)} m³/an économisés</span>
           </p>
         </div>
 
@@ -135,7 +163,6 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
                       row.name === "Cuve" ? "text-eco-dark" : "text-destructive"
                     )}
                   >
-                    {row.gain >= 0 ? "+" : ""}
                     {Math.round(row.gain).toLocaleString("fr-FR")} €
                   </span>
                 </div>
@@ -154,7 +181,6 @@ export function TankOptionCard({ option, isSelected, onClick, interestGains = []
                       row.name === "Cuve" ? "text-eco-dark" : "text-destructive"
                     )}
                   >
-                    {row.gain >= 0 ? "+" : ""}
                     {Math.round(row.gain).toLocaleString("fr-FR")} €
                   </span>
                 </div>
