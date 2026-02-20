@@ -281,7 +281,7 @@ export function Step3Financial() {
       </div>
 
       <div className="mx-auto max-w-lg space-y-8">
-        <div className={`space-y-4 rounded-xl border bg-card p-6 ${!communeRates ? "ring-2 ring-primary/70 bg-primary/5" : ""}`}>
+        <div className={`space-y-4 rounded-xl border bg-card p-6 ${communeRates ? "" : "ring-2 ring-primary/70 bg-primary/5"}`}>
           <Label htmlFor="commune-search" className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-primary" />
             Commune
@@ -347,7 +347,7 @@ export function Step3Financial() {
               <button
                 type="button"
                 className={`flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
-                  !includeSanitation
+                  includeSanitation === false
                     ? "border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
                     : "border-muted-foreground/20 bg-background text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
                 }`}

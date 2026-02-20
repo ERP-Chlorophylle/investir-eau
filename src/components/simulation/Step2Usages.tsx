@@ -23,16 +23,57 @@ interface Step2UsagesProps {
   onProgressChange?: (progressPercent: number) => void;
 }
 
-export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
+/** Hook pour stabiliser le passage à l'étape suivante après un délai */
+function useStabilize(
+  enabled: boolean,
+  interacted: boolean,
+  done: boolean,
+  deps: unknown[],
+): [boolean, React.Dispatch<React.SetStateAction<boolean>>] {
+  const [stable, setStable] = useState(false);
+
+  useEffect(() => {
+    if (!enabled) {
+      setStable(true);
+      return;
+    }
+    if (!interacted || !done) {
+      setStable(false);
+      return;
+    }
+    const timer = globalThis.setTimeout(() => setStable(true), 1500);
+    return () => globalThis.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, interacted, done, ...deps]);
+
+  return [stable, setStable];
+}
+
+function isFiniteInRange(value: unknown, min: number, max?: number): boolean {
+  return typeof value === "number" && Number.isFinite(value) && value >= min && (max === undefined || value <= max);
+}
+
+function getActiveUsage(
+  wcReady: boolean,
+  jardinReady: boolean,
+  piscineReady: boolean,
+  autoReady: boolean,
+  shouldGuideAuto: boolean,
+): "wc" | "jardin" | "piscine" | "auto" | null {
+  if (!wcReady) return "wc";
+  if (!jardinReady) return "jardin";
+  if (!piscineReady) return "piscine";
+  if (shouldGuideAuto || !autoReady) return "auto";
+  return null;
+}
+
+export function Step2Usages({ onProgressChange }: Readonly<Step2UsagesProps>) {
   const { register, watch, setValue } = useFormContext<SimulationFormData>();
   const [hasWcInteracted, setHasWcInteracted] = useState(false);
-  const [isWcStableForNextStep, setIsWcStableForNextStep] = useState(false);
   const [hasJardinInteracted, setHasJardinInteracted] = useState(false);
   const [isJardinConfirmed, setIsJardinConfirmed] = useState(false);
-  const [isJardinStableForNextStep, setIsJardinStableForNextStep] = useState(false);
   const [isPiscineConfirmed, setIsPiscineConfirmed] = useState(false);
   const [hasPiscineInteracted, setHasPiscineInteracted] = useState(false);
-  const [isPiscineStableForNextStep, setIsPiscineStableForNextStep] = useState(false);
   const [hasAutoInteracted, setHasAutoInteracted] = useState(false);
 
   const wcEnabled = watch("wcEnabled");
@@ -44,18 +85,14 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const autoEnabled = watch("autoEnabled");
   const autoLavagesMois = watch("autoLavagesMois");
 
-  const wcDone =
-    !wcEnabled ||
-    (typeof wcPersonnes === "number" && Number.isFinite(wcPersonnes) && wcPersonnes >= 1 && wcPersonnes <= 20);
-  const jardinDone =
-    !jardinEnabled ||
-    (typeof jardinSurface === "number" && Number.isFinite(jardinSurface) && jardinSurface >= 1);
-  const piscineDone =
-    !piscineEnabled ||
-    (typeof piscineSurface === "number" && Number.isFinite(piscineSurface) && piscineSurface >= 1);
-  const autoDone =
-    !autoEnabled ||
-    (typeof autoLavagesMois === "number" && Number.isFinite(autoLavagesMois) && autoLavagesMois >= 1 && autoLavagesMois <= 30);
+  const wcDone = !wcEnabled || isFiniteInRange(wcPersonnes, 1, 20);
+  const jardinDone = !jardinEnabled || isFiniteInRange(jardinSurface, 1);
+  const piscineDone = !piscineEnabled || isFiniteInRange(piscineSurface, 1);
+  const autoDone = !autoEnabled || isFiniteInRange(autoLavagesMois, 1, 30);
+
+  const [isWcStableForNextStep, setIsWcStableForNextStep] = useStabilize(wcEnabled, hasWcInteracted, wcDone, [wcPersonnes]);
+  const [isJardinStableForNextStep, setIsJardinStableForNextStep] = useStabilize(jardinEnabled, hasJardinInteracted, jardinDone, [jardinSurface]);
+  const [isPiscineStableForNextStep, setIsPiscineStableForNextStep] = useStabilize(piscineEnabled, hasPiscineInteracted, piscineDone, [piscineSurface]);
 
   const wcReadyForNextStep = !wcEnabled || (wcDone && isWcStableForNextStep);
   const jardinReadyForNextStep = !jardinEnabled || (jardinDone && (isJardinConfirmed || isJardinStableForNextStep));
@@ -63,20 +100,18 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const autoReadyForNextStep = !autoEnabled || (autoDone && hasAutoInteracted);
   const shouldGuideAutoAfterPiscine = piscineReadyForNextStep && !hasAutoInteracted;
 
-  const activeUsage = !wcReadyForNextStep
-    ? "wc"
-    : !jardinReadyForNextStep
-      ? "jardin"
-      : !piscineReadyForNextStep
-        ? "piscine"
-        : shouldGuideAutoAfterPiscine || !autoReadyForNextStep
-          ? "auto"
-          : null;
+  const activeUsage = getActiveUsage(
+    wcReadyForNextStep,
+    jardinReadyForNextStep,
+    piscineReadyForNextStep,
+    autoReadyForNextStep,
+    shouldGuideAutoAfterPiscine,
+  );
 
   const isWcLocked = false;
   const isJardinLocked = activeUsage === "wc";
   const isPiscineLocked = activeUsage === "wc" || activeUsage === "jardin";
-  const isAutoLocked = activeUsage === "wc" || activeUsage === "jardin" || activeUsage === "piscine";
+  const isAutoLocked = activeUsage !== "auto" && activeUsage !== null;
 
   const previousActiveUsageRef = useRef<typeof activeUsage>(activeUsage);
   const wcSectionRef = useRef<HTMLDivElement>(null);
@@ -97,7 +132,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       setIsJardinConfirmed(false);
       setIsJardinStableForNextStep(false);
     }
-  }, [jardinEnabled, setValue, watch]);
+  }, [jardinEnabled, setValue, watch, setIsJardinStableForNextStep]);
 
   useEffect(() => {
     if (piscineEnabled && watch("piscineSurface") === undefined) {
@@ -113,42 +148,6 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   }, [autoEnabled, setValue, watch]);
 
   useEffect(() => {
-    if (!wcEnabled) {
-      setIsWcStableForNextStep(true);
-      return;
-    }
-
-    if (!hasWcInteracted || !wcDone) {
-      setIsWcStableForNextStep(false);
-      return;
-    }
-
-    const timer = globalThis.setTimeout(() => {
-      setIsWcStableForNextStep(true);
-    }, 1500);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [wcEnabled, hasWcInteracted, wcDone, wcPersonnes]);
-
-  useEffect(() => {
-    if (!jardinEnabled) {
-      setIsJardinStableForNextStep(true);
-      return;
-    }
-
-    if (!hasJardinInteracted || !jardinDone) {
-      setIsJardinStableForNextStep(false);
-      return;
-    }
-
-    const timer = globalThis.setTimeout(() => {
-      setIsJardinStableForNextStep(true);
-    }, 1500);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [jardinEnabled, hasJardinInteracted, jardinDone, jardinSurface]);
-
-  useEffect(() => {
     if (!piscineEnabled) return;
     if (typeof piscineSurface !== "number" || !Number.isFinite(piscineSurface)) return;
     if (piscineSurface > 0) return;
@@ -157,25 +156,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
     setValue("piscineSurface", undefined);
     setIsPiscineConfirmed(false);
     setIsPiscineStableForNextStep(false);
-  }, [piscineEnabled, piscineSurface, setValue]);
-
-  useEffect(() => {
-    if (!piscineEnabled) {
-      setIsPiscineStableForNextStep(true);
-      return;
-    }
-
-    if (!hasPiscineInteracted || !piscineDone) {
-      setIsPiscineStableForNextStep(false);
-      return;
-    }
-
-    const timer = globalThis.setTimeout(() => {
-      setIsPiscineStableForNextStep(true);
-    }, 1500);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [piscineEnabled, hasPiscineInteracted, piscineDone, piscineSurface]);
+  }, [piscineEnabled, piscineSurface, setValue, setIsPiscineStableForNextStep]);
 
   useEffect(() => {
     const previous = previousActiveUsageRef.current;
