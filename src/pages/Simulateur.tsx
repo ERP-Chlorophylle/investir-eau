@@ -34,7 +34,7 @@ const STEPS = [
 ];
 
 const fullSchema = step1Schema.merge(step2Schema).merge(step3Schema).merge(step4Schema);
-const TURNSTILE_ENABLED = false;
+const TURNSTILE_ENABLED = true;
 
 export default function Simulateur() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -304,7 +304,7 @@ export default function Simulateur() {
     }
   };
   if (showTransition) {
-    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={1000} />;
+    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={5000} />;
   }
 
   return (

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 interface TransitionScreenProps {
   onComplete: () => void;
-  /** Durée en ms de la barre de progression (défaut: 4000ms) */
+  /** Durée en ms de la barre de progression (défaut: 5000ms) */
   duration?: number;
 }
 

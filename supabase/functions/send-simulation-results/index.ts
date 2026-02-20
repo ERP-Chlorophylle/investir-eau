@@ -10,7 +10,7 @@ const SENDER_EMAIL = "info@lesjeunespousses.net";
 const SENDER_NAME = "Les Jeunes Pousses";
 // À réactiver plus tard : "info@lesjeunespousses.net", "waterlife@lesjeunespousses.net"
 const ADMIN_EMAILS = ["ia@hchlorophylle.fr"];
-const TURNSTILE_ENABLED = false;
+const TURNSTILE_ENABLED = true;
 
 type Livret = { id: string; name: string; valeurFuture: number; ecart: number };
 type Option = {
