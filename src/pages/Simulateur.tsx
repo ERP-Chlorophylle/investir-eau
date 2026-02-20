@@ -129,6 +129,14 @@ export default function Simulateur() {
         break;
       case 4:
         fieldsToValidate.push("email", "rgpdConsent");
+        if (!turnstileToken) {
+          toast({
+            title: "Vérification anti-bot requise",
+            description: "Veuillez valider le contrôle anti-bot pour continuer.",
+            variant: "destructive",
+          });
+          return false;
+        }
         break;
     }
 
@@ -189,6 +197,15 @@ export default function Simulateur() {
   }
 
   const onSubmit = async (data: SimulationFormData) => {
+    if (!turnstileToken) {
+      toast({
+        title: "Vérification anti-bot requise",
+        description: "Veuillez valider le contrôle anti-bot avant l'envoi.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const { data: results, error: rpcError } = await supabase.rpc("calculate_water_simulation", {
       p_departement: data.departement,
       p_surface_toiture: data.surfaceToiture,
@@ -253,7 +270,14 @@ export default function Simulateur() {
           comparisons: typedResults.comparisons,
           turnstileToken,
         }),
-      }).catch((err) => console.error("Erreur envoi email simulation:", err));
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error("Erreur envoi email simulation:", res.status, errorText);
+          }
+        })
+        .catch((err) => console.error("Erreur envoi email simulation:", err));
     } catch (err) {
       console.error("Erreur envoi email simulation:", err);
     }
