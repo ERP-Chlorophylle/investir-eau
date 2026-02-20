@@ -157,11 +157,6 @@ export default function Resultat() {
         <div className="container-app">
           <div className="mb-3 flex flex-col gap-2 sm:mb-10 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <img
-                src="/image%20LJP.png"
-                alt="Les Jeunes Pousses"
-                className="mb-3 h-12 w-auto md:h-14"
-              />
               <h1 className="text-[clamp(0.92rem,3.1vw,2.25rem)] font-bold leading-tight text-foreground">
                 Résultats de la simulation de vos intérêts
               </h1>
@@ -330,19 +325,37 @@ export default function Resultat() {
             ) : null;
           })()}
 
-          <div className="flex flex-col items-center gap-3">
-            <Button variant="outline" asChild>
-              <Link to="/simulateur">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Nouvelle simulation
-              </Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour à l'accueil
-              </Link>
-            </Button>
+          {/* Section marque LJP + navigation */}
+          <div className="mt-8 rounded-2xl border bg-gradient-to-b from-muted/30 to-muted/60 p-8 text-center">
+            <p className="mb-4 text-sm font-medium text-muted-foreground uppercase tracking-widest">Ce service est proposé par</p>
+            <a
+              href="https://lesjeunespousses.net/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block transition-transform hover:scale-105"
+            >
+              <img
+                src="/image%20LJP.png"
+                alt="Les Jeunes Pousses"
+                className="mx-auto h-24 w-auto object-contain drop-shadow-md"
+              />
+            </a>
+            <p className="mt-3 text-xs text-muted-foreground">Conseil, fourniture et installation de cuves de récupération d'eau</p>
+
+            <div className="mt-6 flex flex-row items-center justify-center gap-3 border-t border-border/60 pt-6">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Retour à l'accueil
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/simulateur">
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Nouvelle simulation
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </main>

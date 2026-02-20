@@ -1,4 +1,4 @@
-﻿import { PiggyBank, ArrowUp, ArrowDown, Info } from "lucide-react";
+﻿import { PiggyBank, ArrowUp, ArrowDown } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +38,9 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
             <div>
               <p className="text-sm font-medium text-foreground">
                 Avec un investissement de {investmentLabel}, que gagnez-vous en {horizonAnnees} ans ?
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                <strong>Note :</strong> Ce simulateur compare les valeurs cumulées sur la période choisie. Les économies d'eau sont calculées avec une augmentation moyenne de +3%/an. Les livrets sont calculés avec les taux nets de décembre 2025.
               </p>
             </div>
           </div>
@@ -128,16 +131,6 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
         </div>
       </div>
 
-      <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-4 text-sm">
-        <Info className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-        <div className="text-muted-foreground">
-          <p>
-            <strong>Note :</strong> Ce simulateur compare les valeurs cumulées sur la période choisie. Les économies
-            d'eau sont calculées avec une augmentation moyenne de +3%/an. Les livrets sont calculés avec les taux nets de
-            décembre 2025.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
