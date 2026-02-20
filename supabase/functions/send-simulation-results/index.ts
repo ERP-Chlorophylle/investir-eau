@@ -58,7 +58,7 @@ function formatNumber(n: number): string {
 function optionTitle(optionType: string): string {
   if (optionType === "eco") return "Essentiel";
   if (optionType === "confort") return "Confort";
-  return "Serenite +";
+  return "S\u00e9r\u00e9nit\u00e9 +";
 }
 
 function livretAGain(comp: Comparison): number | null {
@@ -101,7 +101,7 @@ function computeRanksAndMedals(data: SimulationPayload): {
 
   push(recommended, { rank: 1, label: "Meilleur investissement" });
   push(usage[0]?.type ?? null, { rank: 2, label: "Meilleur usage" });
-  push(data.options.find((o) => o.type === "extra")?.type ?? null, { rank: 3, label: "Meilleure resilience" });
+  push(data.options.find((o) => o.type === "extra")?.type ?? null, { rank: 3, label: "Meilleure r\u00e9silience" });
 
   const rankByType: Record<string, number> = {};
   investment.forEach((e, i) => {
@@ -117,9 +117,9 @@ function computeRanksAndMedals(data: SimulationPayload): {
 function buildClientEmail(data: SimulationPayload): string {
   const usages: string[] = [];
   if (data.usages.wc) usages.push(`WC (${data.usages.wcPersonnes} pers.)`);
-  if (data.usages.jardin) usages.push(`Jardin (${data.usages.jardinSurface} m2)`);
+  if (data.usages.jardin) usages.push(`Jardin (${data.usages.jardinSurface} m\u00b2)`);
   if (data.usages.auto) usages.push(`Lavage auto (${data.usages.autoLavagesMois}x/mois)`);
-  if (data.usages.piscine) usages.push(`Piscine (${data.usages.piscineSurface} m2)`);
+  if (data.usages.piscine) usages.push(`Piscine (${data.usages.piscineSurface} m\u00b2)`);
 
   const { recommended, rankByType, medalsByType } = computeRanksAndMedals(data);
 
@@ -129,12 +129,12 @@ function buildClientEmail(data: SimulationPayload): string {
       const border = o.type === "eco" ? "#8ad4a2" : o.type === "confort" ? "#7ec6f5" : "#d6b3f5";
       const bg = o.type === "eco" ? "#f3fbf5" : o.type === "confort" ? "#f3f9ff" : "#faf6ff";
       const badge = recommended === o.type
-        ? `<div style="display:inline-block;margin-bottom:8px;padding:4px 10px;border-radius:999px;background:#0b73b8;color:#fff;font-size:11px;font-weight:700;">Recommande</div>`
+        ? `<div style="display:inline-block;margin-bottom:8px;padding:4px 10px;border-radius:999px;background:#0b73b8;color:#fff;font-size:11px;font-weight:700;">Recommand\u00e9</div>`
         : "";
-      const price = o.cout ? `${formatNumber(o.cout)} EUR TTC` : "Sur devis";
+      const price = o.cout ? `${formatNumber(o.cout)} \u20ac TTC` : "Sur devis";
       const rank = rankByType[o.type] ?? "-";
       const medals = (medalsByType[o.type] ?? [])
-        .map((m) => `${m.rank === 1 ? "🥇" : m.rank === 2 ? "🥈" : "🥉"} ${m.label}`)
+        .map((m) => `${m.rank === 1 ? "\u{1F947}" : m.rank === 2 ? "\u{1F948}" : "\u{1F949}"} ${m.label}`)
         .map((m) => `<div style="margin-top:6px;padding:4px 8px;border:1px solid #d6e2db;border-radius:999px;background:#fff;font-size:11px;font-weight:600;color:#2d5a3d;white-space:nowrap;">${m}</div>`)
         .join("");
 
@@ -147,7 +147,7 @@ function buildClientEmail(data: SimulationPayload): string {
               <div style="font-size:17px;font-weight:700;color:#1f2937;margin-bottom:4px;">${title}</div>
               <div style="font-size:14px;color:#374151;margin-bottom:2px;"><strong>${formatNumber(o.volumeCuveM3 * 1000)} L</strong></div>
               <div style="font-size:14px;color:#374151;margin-bottom:2px;">Couverture des besoins : <strong>${o.couvertureReelle}%</strong></div>
-              <div style="font-size:14px;color:#374151;margin-bottom:6px;">${(o.volumeAnnuelCouvert / 1000).toFixed(1)} m3/an economises</div>
+              <div style="font-size:14px;color:#374151;margin-bottom:6px;">${(o.volumeAnnuelCouvert / 1000).toFixed(1)} m\u00b3/an \u00e9conomis\u00e9s</div>
               <div style="font-size:15px;font-weight:700;color:#111827;">Investissement : ${price}</div>
             </td>
             <td valign="top" align="right" style="width:1%;white-space:nowrap;">
@@ -164,47 +164,47 @@ function buildClientEmail(data: SimulationPayload): string {
     .map((c) => {
       const label = optionTitle(c.optionType);
       const ga = livretAGain(c);
-      const txt = ga === null ? "Gain vs Livret A : non disponible" : `Gain vs Livret A : ${ga >= 0 ? "+" : "-"}${formatNumber(Math.abs(ga))} EUR`;
-      return `<li style="margin-bottom:8px;"><strong>${label}</strong> : ${formatNumber(c.economiesCumulees)} EUR d'economies sur 10 ans<br><span style="color:#2d5a3d;">${txt}</span></li>`;
+      const txt = ga === null ? "Gain vs Livret A : non disponible" : `Gain vs Livret A : ${ga >= 0 ? "+" : "-"}${formatNumber(Math.abs(ga))} \u20ac`;
+      return `<li style="margin-bottom:8px;"><strong>${label}</strong> : ${formatNumber(c.economiesCumulees)} \u20ac d'\u00e9conomies sur 10 ans<br><span style="color:#2d5a3d;">${txt}</span></li>`;
     })
     .join("");
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
+<html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <body style="font-family:Arial,sans-serif;background:#f8faf8;margin:0;padding:20px;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
       <tr><td align="center" bgcolor="#2d5a3d" style="padding:30px;background-color:#2d5a3d;background-image:linear-gradient(135deg,#2d5a3d,#3a7a52);">
-        <div style="font-size:24px;font-weight:700;line-height:1.25;color:#fff;">Vos resultats de simulation</div>
-        <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#c8e6c9;">Recuperation d'eau de pluie</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.25;color:#fff;">Vos r\u00e9sultats de simulation</div>
+        <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#c8e6c9;">R\u00e9cup\u00e9ration d'eau de pluie</div>
       </td></tr>
     </table>
 
     <div style="padding:24px;">
       <h2 style="color:#2d5a3d;font-size:18px;margin-top:0;">Votre configuration</h2>
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-        <tr><td style="padding:6px 0;color:#666;">Departement</td><td style="padding:6px 0;font-weight:600;">${data.departement}</td></tr>
-        <tr><td style="padding:6px 0;color:#666;">Surface toiture</td><td style="padding:6px 0;font-weight:600;">${data.surfaceToiture} m2</td></tr>
-        <tr><td style="padding:6px 0;color:#666;">Prix de l'eau</td><td style="padding:6px 0;font-weight:600;">${data.prixEau} EUR/m3</td></tr>
+        <tr><td style="padding:6px 0;color:#666;">D\u00e9partement</td><td style="padding:6px 0;font-weight:600;">${data.departement}</td></tr>
+        <tr><td style="padding:6px 0;color:#666;">Surface toiture</td><td style="padding:6px 0;font-weight:600;">${data.surfaceToiture} m\u00b2</td></tr>
+        <tr><td style="padding:6px 0;color:#666;">Prix de l'eau</td><td style="padding:6px 0;font-weight:600;">${data.prixEau} \u20ac/m\u00b3</td></tr>
         <tr><td style="padding:6px 0;color:#666;">Usages</td><td style="padding:6px 0;font-weight:600;">${usages.join(", ")}</td></tr>
       </table>
 
       <div style="background:#e8f5e9;border-radius:8px;padding:16px;margin-bottom:20px;">
-        <p style="margin:0 0 4px;color:#666;font-size:13px;">Potentiel recuperable</p>
-        <p style="margin:0;font-size:22px;font-weight:700;color:#2d5a3d;">${(data.vSupply / 1000).toFixed(1)} m3/an</p>
-        <p style="margin:8px 0 0;color:#666;font-size:13px;">Besoin annuel : <strong>${(data.vDemand / 1000).toFixed(1)} m3/an</strong></p>
+        <p style="margin:0 0 4px;color:#666;font-size:13px;">Potentiel r\u00e9cup\u00e9rable</p>
+        <p style="margin:0;font-size:22px;font-weight:700;color:#2d5a3d;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</p>
+        <p style="margin:8px 0 0;color:#666;font-size:13px;">Besoin annuel : <strong>${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</strong></p>
       </div>
 
-      <h2 style="color:#2d5a3d;font-size:18px;">Options de cuves recommandees</h2>
+      <h2 style="color:#2d5a3d;font-size:18px;">Options de cuves recommand\u00e9es</h2>
       <div style="margin-bottom:20px;">${optionsHtml}</div>
 
-      <h2 style="color:#2d5a3d;font-size:18px;">Economies estimees (10 ans)</h2>
+      <h2 style="color:#2d5a3d;font-size:18px;">\u00c9conomies estim\u00e9es (10 ans)</h2>
       <ul style="padding-left:20px;color:#333;">${comparisonsHtml}</ul>
 
-      <div style="text-align:center;margin-top:24px;"><p style="color:#666;font-size:13px;">Des questions ? Contactez-nous pour un devis personnalise.</p></div>
+      <div style="text-align:center;margin-top:24px;"><p style="color:#666;font-size:13px;">Des questions ? Contactez-nous pour un devis personnalis\u00e9.</p></div>
     </div>
 
-    <div style="background:#f0f7f0;padding:16px;text-align:center;font-size:12px;color:#888;">Les Jeunes Pousses - Recuperation d'eau de pluie</div>
+    <div style="background:#f0f7f0;padding:16px;text-align:center;font-size:12px;color:#888;">Les Jeunes Pousses - R\u00e9cup\u00e9ration d'eau de pluie</div>
   </div>
 </body></html>`;
 }
@@ -212,35 +212,35 @@ function buildClientEmail(data: SimulationPayload): string {
 function buildAdminEmail(data: SimulationPayload): string {
   const usages: string[] = [];
   if (data.usages.wc) usages.push(`WC (${data.usages.wcPersonnes} pers.)`);
-  if (data.usages.jardin) usages.push(`Jardin (${data.usages.jardinSurface} m2)`);
+  if (data.usages.jardin) usages.push(`Jardin (${data.usages.jardinSurface} m\u00b2)`);
   if (data.usages.auto) usages.push(`Lavage auto (${data.usages.autoLavagesMois}x/mois)`);
-  if (data.usages.piscine) usages.push(`Piscine (${data.usages.piscineSurface} m2)`);
+  if (data.usages.piscine) usages.push(`Piscine (${data.usages.piscineSurface} m\u00b2)`);
 
-  const optionsText = data.options.map((o) => `- ${o.label} : ${o.volumeCuveM3} m3 - ${o.cout ? formatNumber(o.cout) + " EUR" : "Sur devis"} - Couverture ${o.couvertureReelle}%`).join("<br>");
+  const optionsText = data.options.map((o) => `- ${o.label} : ${o.volumeCuveM3} m\u00b3 - ${o.cout ? formatNumber(o.cout) + " \u20ac" : "Sur devis"} - Couverture ${o.couvertureReelle}%`).join("<br>");
   const comparisonsText = data.comparisons.map((c) => {
     const l = optionTitle(c.optionType);
     const g = livretAGain(c);
-    const t = g === null ? "Gain vs Livret A non disponible" : `Gain vs Livret A ${g >= 0 ? "+" : "-"}${formatNumber(Math.abs(g))} EUR`;
-    return `- ${l} : ${formatNumber(c.economiesCumulees)} EUR d'economies - ${t}`;
+    const t = g === null ? "Gain vs Livret A non disponible" : `Gain vs Livret A ${g >= 0 ? "+" : "-"}${formatNumber(Math.abs(g))} \u20ac`;
+    return `- ${l} : ${formatNumber(c.economiesCumulees)} \u20ac d'\u00e9conomies - ${t}`;
   }).join("<br>");
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
+<html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <body style="font-family:Arial,sans-serif;padding:20px;">
   <h1 style="color:#2d5a3d;">Nouvelle simulation</h1>
   <table style="border-collapse:collapse;width:100%;max-width:500px;">
     <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Email</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.email}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Departement</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.departement}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Surface toiture</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.surfaceToiture} m2</td></tr>
+    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>D\u00e9partement</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.departement}</td></tr>
+    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Surface toiture</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.surfaceToiture} m\u00b2</td></tr>
     <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Type toiture</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.typeToiture}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Prix eau</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.prixEau} EUR/m3</td></tr>
+    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Prix eau</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.prixEau} \u20ac/m\u00b3</td></tr>
     <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Usages</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${usages.join(", ")}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Potentiel</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vSupply / 1000).toFixed(1)} m3/an</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Besoin</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vDemand / 1000).toFixed(1)} m3/an</td></tr>
+    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Potentiel</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</td></tr>
+    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Besoin</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</td></tr>
   </table>
   <h2 style="color:#2d5a3d;margin-top:20px;">Options</h2>
   <p>${optionsText}</p>
-  <h2 style="color:#2d5a3d;">Economies (10 ans)</h2>
+  <h2 style="color:#2d5a3d;">\u00c9conomies (10 ans)</h2>
   <p>${comparisonsText}</p>
 </body></html>`;
 }
@@ -250,7 +250,7 @@ async function sendBrevoEmail(apiKey: string, to: { email: string; name?: string
     method: "POST",
     headers: {
       accept: "application/json",
-      "content-type": "application/json",
+      "content-type": "application/json; charset=utf-8",
       "api-key": apiKey,
     },
     body: JSON.stringify({
@@ -258,6 +258,9 @@ async function sendBrevoEmail(apiKey: string, to: { email: string; name?: string
       to,
       subject,
       htmlContent,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+      },
     }),
   });
 
@@ -286,11 +289,11 @@ serve(async (req: Request) => {
     const body = await req.json();
     const { turnstileToken, ...data } = body as SimulationPayload & { turnstileToken?: string };
 
-    // Vérification Turnstile anti-bot
+    // V\u00e9rification Turnstile anti-bot
     const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
     if (turnstileSecret) {
       if (!turnstileToken) {
-        return new Response(JSON.stringify({ error: "Vérification anti-bot requise" }), {
+        return new Response(JSON.stringify({ error: "V\u00e9rification anti-bot requise" }), {
           status: 403,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         });
@@ -303,7 +306,7 @@ serve(async (req: Request) => {
       const verifyData = await verifyRes.json();
       if (!verifyData.success) {
         console.error("Turnstile verification failed:", verifyData);
-        return new Response(JSON.stringify({ error: "Vérification anti-bot échouée" }), {
+        return new Response(JSON.stringify({ error: "V\u00e9rification anti-bot \u00e9chou\u00e9e" }), {
           status: 403,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         });

@@ -108,6 +108,18 @@ export function QuoteForm({
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="quote-email">Email</Label>
+              <Input
+                id="quote-email"
+                type="email"
+                value={email}
+                readOnly
+                disabled
+                className="bg-muted"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="quote-phone">Téléphone (optionnel)</Label>
               <Input
                 id="quote-phone"

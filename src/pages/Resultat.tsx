@@ -111,19 +111,7 @@ export default function Resultat() {
     setSelectedOption(optionToSelect);
   }, [results, recommendedOptionType]);
 
-  useEffect(() => {
-    const isMobile = globalThis.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile || isUserScrolling.current) return;
-    // Scroll horizontal vers la carte sélectionnée
-    const target = optionRefs.current[selectedOption];
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-    }
-    // Scroll vertical vers la section recommandations
-    if (recommendationsRef.current) {
-      recommendationsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [selectedOption]);
+  // Plus de scroll auto quand on clique sur un onglet
 
   // Détection auto de la carte centrée lors du swipe mobile
   useEffect(() => {

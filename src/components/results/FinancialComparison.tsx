@@ -1,8 +1,5 @@
-﻿import { TrendingUp, PiggyBank, ArrowUp, ArrowDown, Info, Droplet } from "lucide-react";
+﻿import { PiggyBank, ArrowUp, ArrowDown, Info } from "lucide-react";
 import { FinancialComparison as FinancialComparisonType } from "@/lib/calculations";
-import { FallingBills } from "./FallingBills";
-import { DroughtAlert } from "./DroughtAlert";
-import { QuoteForm } from "./QuoteForm";
 import { cn } from "@/lib/utils";
 
 interface FinancialComparisonProps {
@@ -13,7 +10,7 @@ interface FinancialComparisonProps {
   surfaceToiture?: number;
 }
 
-export function FinancialComparison({ comparison, horizonAnnees, email, departement, surfaceToiture }: FinancialComparisonProps) {
+export function FinancialComparison({ comparison, horizonAnnees }: Readonly<FinancialComparisonProps>) {
 
 
 
@@ -22,51 +19,13 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
       ? comparison.capitalReference
       : (comparison.coutCuve ?? 29500);
   const investmentLabel = comparison.coutCuve
-    ? `${comparison.coutCuve.toLocaleString("fr-FR")} €`
-    : `${capitalReference.toLocaleString("fr-FR")} € (base Sur devis)`;
+    ? `${comparison.coutCuve.toLocaleString("fr-FR")} \u20ac`
+    : `${capitalReference.toLocaleString("fr-FR")} \u20ac (base Sur devis)`;
 
   return (
     <div className="space-y-6">
 
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="flex flex-col gap-6">
-          <div className="relative overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-5">
-            <FallingBills />
-            <div className="absolute -right-3 -top-3 opacity-[0.08]">
-              <Droplet className="h-20 w-20 text-primary" />
-            </div>
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
-                  <TrendingUp className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">Économies cuve cumulées</p>
-                  <p className="text-3xl font-bold text-primary">
-                    {comparison.economiesCumulees.toLocaleString("fr-FR", {
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,
-                    })} €
-                  </p>
-                </div>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">Sur {horizonAnnees} ans (inflation eau +1%/an)</p>
-            </div>
-          </div>
-
-          <DroughtAlert />
-
-          <QuoteForm
-            email={email}
-            selectedOption={comparison.optionType}
-            economiesCumulees={comparison.economiesCumulees}
-            coutCuve={comparison.coutCuve}
-            departement={departement}
-            surfaceToiture={surfaceToiture}
-          />
-        </div>
+      <div className="grid gap-6">
 
         <div className="rounded-xl border bg-card p-6">
           <div className="mb-5 flex items-center gap-3">
