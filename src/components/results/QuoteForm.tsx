@@ -1,28 +1,33 @@
 import { useCallback, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
-import { Send, Check, Loader2 } from "lucide-react";
+import { Send, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+
 interface QuoteFormProps {
   email: string;
+  isOpen: boolean;
+  onClose: () => void;
   selectedOption?: string;
   economiesCumulees?: number;
   coutCuve?: number | null;
   departement?: string;
   surfaceToiture?: number;
 }
+
 export function QuoteForm({
   email,
+  isOpen,
+  onClose,
   selectedOption,
   economiesCumulees,
   coutCuve,
   departement,
   surfaceToiture,
-}: QuoteFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+}: Readonly<QuoteFormProps>) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
@@ -31,9 +36,8 @@ export function QuoteForm({
 
   const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -62,75 +66,92 @@ export function QuoteForm({
       setIsSubmitted(true);
       toast({
         title: "Demande envoyée !",
-        description: "Nous vous recontacterons dans les meilleurs délais."
+        description: "Nous vous recontacterons dans les meilleurs délais.",
       });
     } catch (error) {
-      console.error('Erreur demande de devis:', error);
+      console.error("Erreur demande de devis:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-  if (isSubmitted) {
-    return <div className="rounded-xl border-2 border-accent bg-eco-light p-6 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
-          <Check className="h-6 w-6 text-accent-foreground" />
-        </div>
-        <h3 className="mt-4 text-lg font-semibold">Demande envoyée !</h3>
-        <p className="mt-2 text-muted-foreground">
-          Notre équipe vous recontactera dans les meilleurs délais.
-        </p>
-      </div>;
-  }
-  if (!isOpen) {
-    return <div className="text-center my-[80px]">
-        <Button onClick={() => setIsOpen(true)} variant="gold" size="lg">
-          <Send className="mr-2 h-5 w-5" />
-          Demander un devis
-        </Button>
-      </div>;
-  }
-  return <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 space-y-4">
-      <h3 className="text-lg font-semibold">Demander un devis personnalisé</h3>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="quote-email">Email</Label>
-          <Input id="quote-email" type="email" value={email} disabled />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="quote-phone">Téléphone (optionnel)</Label>
-          <Input id="quote-phone" type="tel" placeholder="06 12 34 56 78" value={phone} onChange={e => setPhone(e.target.value)} />
-        </div>
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="relative mx-auto w-full max-w-md animate-fade-in">
+        {isSubmitted ? (
+          <div className="rounded-xl border-2 border-accent bg-eco-light p-6 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+              <Check className="h-6 w-6 text-accent-foreground" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">Demande envoyée !</h3>
+            <p className="mt-2 text-muted-foreground">
+              Notre équipe vous recontactera dans les meilleurs délais.
+            </p>
+            <Button variant="outline" className="mt-4" onClick={onClose}>
+              Fermer
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Demander un devis personnalisé</h3>
+              <Button type="button" variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quote-phone">Téléphone (optionnel)</Label>
+              <Input
+                id="quote-phone"
+                type="tel"
+                placeholder="06 12 34 56 78"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="quote-comment">Commentaire (optionnel)</Label>
+              <Textarea
+                id="quote-comment"
+                placeholder="Précisez vos besoins ou questions..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={3}
+              />
+            </div>
+
+            <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
+
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+                Annuler
+              </Button>
+              <Button type="submit" variant="cta" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Envoyer ma demande
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="quote-comment">Commentaire (optionnel)</Label>
-        <Textarea id="quote-comment" placeholder="Précisez vos besoins ou questions..." value={comment} onChange={e => setComment(e.target.value)} rows={3} />
-      </div>
-
-      <TurnstileWidget
-        onVerify={handleTurnstileVerify}
-        onExpire={handleTurnstileExpire}
-      />
-
-      <div className="flex gap-3">
-        <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
-          Annuler
-        </Button>
-        <Button type="submit" variant="cta" disabled={isLoading}>
-          {isLoading ? <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Envoi en cours...
-            </> : <>
-              <Send className="mr-2 h-4 w-4" />
-              Envoyer ma demande
-            </>}
-        </Button>
-      </div>
-    </form>;
+    </div>
+  );
 }

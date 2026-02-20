@@ -20,7 +20,7 @@ export default function Resultat() {
   const [email, setEmail] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<string>("confort");
   const optionRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const quoteRef = useRef<HTMLDivElement>(null);
+  const [isQuoteOpen, setIsQuoteOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -262,18 +262,6 @@ export default function Resultat() {
               </Link>
             </Button>
           </div>
-
-          {/* Section Demande de devis */}
-          <section ref={quoteRef} className="mb-8 md:mb-12">
-            <QuoteForm
-              email={email}
-              selectedOption={selectedOption}
-              economiesCumulees={results.comparisons.find((c) => c.optionType === selectedOption)?.economiesCumulees}
-              coutCuve={results.comparisons.find((c) => c.optionType === selectedOption)?.coutCuve}
-              departement={inputs.departement}
-              surfaceToiture={inputs.surfaceToiture}
-            />
-          </section>
         </div>
       </main>
 
@@ -285,12 +273,24 @@ export default function Resultat() {
           variant="gold"
           size="default"
           className="shadow-xl shadow-gold/30 text-sm"
-          onClick={() => quoteRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+          onClick={() => setIsQuoteOpen(true)}
         >
           <Send className="mr-2 h-4 w-4" />
           Demander un devis
         </Button>
       </div>
+
+      {/* Modal formulaire de devis */}
+      <QuoteForm
+        email={email}
+        isOpen={isQuoteOpen}
+        onClose={() => setIsQuoteOpen(false)}
+        selectedOption={selectedOption}
+        economiesCumulees={results.comparisons.find((c) => c.optionType === selectedOption)?.economiesCumulees}
+        coutCuve={results.comparisons.find((c) => c.optionType === selectedOption)?.coutCuve}
+        departement={inputs.departement}
+        surfaceToiture={inputs.surfaceToiture}
+      />
     </div>
   );
 }
