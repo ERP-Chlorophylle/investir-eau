@@ -135,11 +135,33 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
               const interets = livret.valeurFuture - capitalReference;
               return comparison.economiesCumulees - interets > 0;
             });
-            return allCuveWins ? (
-              <div className="mt-4 rounded-lg bg-primary/10 p-4 text-center">
-                <p className="text-lg font-bold text-primary">🏆 La banque perd.</p>
-              </div>
-            ) : null;
+            const allLivretsWin = comparison.livrets.every((livret) => {
+              const interets = livret.valeurFuture - capitalReference;
+              return comparison.economiesCumulees - interets < 0;
+            });
+
+            if (allCuveWins) {
+              return (
+                <div className="mt-4 rounded-lg bg-primary/10 p-4 text-center">
+                  <p className="text-lg font-bold text-primary">🏆 La banque perd.</p>
+                </div>
+              );
+            }
+
+            if (allLivretsWin) {
+              return (
+                <div className="mt-4 space-y-2 rounded-lg border border-amber-500/30 bg-amber-50 p-4 text-center dark:bg-amber-950/20">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                    💰 Financièrement, investir dans une cuve sera moins avantageux que de laisser dormir votre argent sur un livret.
+                  </p>
+                  <p className="text-sm text-amber-700 dark:text-amber-400">
+                    En revanche, un livret ne vous garantit pas d'avoir toujours de l'eau chez vous en cas de restriction ou de sécheresse. 🚰
+                  </p>
+                </div>
+              );
+            }
+
+            return null;
           })()}
         </div>
       </div>
