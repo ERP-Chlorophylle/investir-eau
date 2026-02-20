@@ -20,6 +20,7 @@ export default function Resultat() {
   const [email, setEmail] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<string>("confort");
   const optionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const recommendationsRef = useRef<HTMLDivElement>(null);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
 
   useEffect(() => {
@@ -111,10 +112,16 @@ export default function Resultat() {
   useEffect(() => {
     const isMobile = globalThis.matchMedia("(max-width: 767px)").matches;
     if (!isMobile) return;
+    // Scroll horizontal vers la carte sélectionnée
     const target = optionRefs.current[selectedOption];
-    if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  }, [selectedOption, results]);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+    // Scroll vertical vers la section recommandations
+    if (recommendationsRef.current) {
+      recommendationsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedOption]);
 
   if (!results || !inputs) {
     return null;
@@ -161,7 +168,7 @@ export default function Resultat() {
             </div>
           </div>
 
-          <section className="mb-8 md:mb-12">
+          <section ref={recommendationsRef} className="mb-8 md:mb-12">
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Nos recommandations de cuves</h2>
 
             <div className="mx-0 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible px-1 pb-2 pt-3 [scrollbar-width:none] md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 md:pt-0">
@@ -203,51 +210,6 @@ export default function Resultat() {
               })}
             </div>
 
-            {/* Carte Économies cumulées */}
-            {(() => {
-              const selectedComparison = results.comparisons.find((c) => c.optionType === selectedOption);
-              const economies = selectedComparison?.economiesCumulees ?? 0;
-              return (
-                <div className="relative mt-4 overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-5 md:mt-6">
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                    {Array.from({ length: 9 }).map((_, i) => (
-                      <span
-                        key={`bill-${String(i)}`}
-                        className="absolute animate-fall-bill"
-                        style={{
-                          left: `${10 + Math.random() * 80}%`,
-                          top: "-24px",
-                          fontSize: `${17 + Math.random() * 9}px`,
-                          animationDelay: `${Math.random() * 3}s`,
-                          animationDuration: `${3.5 + Math.random() * 3}s`,
-                          "--bill-rotation": `${(Math.random() - 0.5) * 50}deg`,
-                        } as React.CSSProperties}
-                      >
-                        💶
-                      </span>
-                    ))}
-                  </div>
-                  <div className="absolute -right-3 -top-3 opacity-[0.08]">
-                    <Droplet className="h-20 w-20 text-primary" />
-                  </div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
-                        <TrendingUp className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground">Économies cuve cumulées</p>
-                        <p className="text-3xl font-bold text-primary">
-                          {Math.round(economies).toLocaleString("fr-FR")} €
-                        </p>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +1%/an)</p>
-                  </div>
-                </div>
-              );
-            })()}
-
             {results.isSupplyLimited && (
               <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground md:mt-4 md:text-sm">
                 <Info className="h-4 w-4 shrink-0" />
@@ -261,6 +223,51 @@ export default function Resultat() {
               plus vous avez de chances de disposer d'eau pendant les périodes sèches.
             </p>
           </section>
+
+          {/* Carte Économies cumulées */}
+          {(() => {
+            const selectedComparison = results.comparisons.find((c) => c.optionType === selectedOption);
+            const economies = selectedComparison?.economiesCumulees ?? 0;
+            return (
+              <div className="relative mb-8 overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-5 md:mb-12">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <span
+                      key={`bill-${String(i)}`}
+                      className="absolute animate-fall-bill"
+                      style={{
+                        left: `${10 + Math.random() * 80}%`,
+                        top: "-24px",
+                        fontSize: `${17 + Math.random() * 9}px`,
+                        animationDelay: `${Math.random() * 3}s`,
+                        animationDuration: `${3.5 + Math.random() * 3}s`,
+                        "--bill-rotation": `${(Math.random() - 0.5) * 50}deg`,
+                      } as React.CSSProperties}
+                    >
+                      💶
+                    </span>
+                  ))}
+                </div>
+                <div className="absolute -right-3 -top-3 opacity-[0.08]">
+                  <Droplet className="h-20 w-20 text-primary" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
+                      <TrendingUp className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Économies cuve cumulées</p>
+                      <p className="text-3xl font-bold text-primary">
+                        {Math.round(economies).toLocaleString("fr-FR")} €
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +1%/an)</p>
+                </div>
+              </div>
+            );
+          })()}
 
           <section className="mb-8 md:mb-12">
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Comparaison financière : Cuve vs Livrets</h2>
