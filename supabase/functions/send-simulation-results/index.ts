@@ -135,64 +135,98 @@ function buildClientEmail(data: SimulationPayload): string {
   const bestSpread = bestLivretAGain !== null ? bestComp.economiesCumulees - bestLivretAGain : null;
   const cuveWins = bestSpread !== null && bestSpread > 0;
 
-  // Bloc hero financier
-  const heroFinancialHtml = bestSpread !== null
-    ? cuveWins
-      ? `
-      <div style="margin:0 0 24px;border-radius:12px;background:linear-gradient(135deg,#0b6e27,#1a9e3f);padding:24px;text-align:center;">
-        <div style="font-size:13px;color:#c8e6c9;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;">Votre cuve rapporte plus qu'un Livret A</div>
-        <div style="font-size:36px;font-weight:800;color:#fff;margin-bottom:4px;">+${formatNumber(bestSpread)} \u20ac</div>
-        <div style="font-size:14px;color:#a5d6a7;">de gain suppl\u00e9mentaire sur 10 ans vs Livret A</div>
-        <div style="margin-top:12px;display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:600;">
-          Cuve ${optionTitle(bestType)} ${formatNumber(bestOption.volumeCuveM3 * 1000)} L &bull; ${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies cumul\u00e9es
-        </div>
-      </div>`
-      : `
-      <div style="margin:0 0 24px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e88e5);padding:24px;text-align:center;">
-        <div style="font-size:13px;color:#bbdefb;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;">\u00c9conomies d'eau estim\u00e9es</div>
-        <div style="font-size:36px;font-weight:800;color:#fff;margin-bottom:4px;">${formatNumber(bestComp.economiesCumulees)} \u20ac</div>
-        <div style="font-size:14px;color:#90caf9;">d'\u00e9conomies cumul\u00e9es sur 10 ans</div>
-        <div style="margin-top:12px;display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:600;">
-          + r\u00e9silience en cas de s\u00e9cheresse ou restriction d'eau
-        </div>
-      </div>`
-    : "";
+  // Bloc hero financier — architecture table pour compatibilité email universelle
+  let heroFinancialHtml = "";
+  if (bestSpread !== null) {
+    if (cuveWins) {
+      const label = `Cuve ${optionTitle(bestType)} ${formatNumber(bestOption.volumeCuveM3 * 1000)} L &bull; ${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies cumul\u00e9es`;
+      heroFinancialHtml = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;border-radius:12px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#0b6e27" align="center" style="background:#0b6e27;padding:20px 24px;border-radius:12px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#c8e6c9;text-transform:uppercase;letter-spacing:1px;font-weight:700;font-family:Arial,sans-serif;">Votre cuve rapporte plus qu'un Livret A</p>
+            <p style="margin:0 0 4px;font-size:34px;font-weight:800;color:#ffffff;font-family:Arial,sans-serif;line-height:1;">+${formatNumber(bestSpread)} \u20ac</p>
+            <p style="margin:0 0 12px;font-size:13px;color:#a5d6a7;font-family:Arial,sans-serif;">de gain suppl\u00e9mentaire sur 10 ans vs Livret A</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+              <tr>
+                <td bgcolor="#1a9e3f" style="background:rgba(255,255,255,0.18);border-radius:999px;padding:6px 16px;">
+                  <p style="margin:0;font-size:12px;color:#ffffff;font-weight:600;font-family:Arial,sans-serif;white-space:nowrap;">${label}</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>`;
+    } else {
+      heroFinancialHtml = `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;border-radius:12px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#1565c0" align="center" style="background:#1565c0;padding:20px 24px;border-radius:12px;">
+            <p style="margin:0 0 6px;font-size:12px;color:#bbdefb;text-transform:uppercase;letter-spacing:1px;font-weight:700;font-family:Arial,sans-serif;">\u00c9conomies d'eau estim\u00e9es</p>
+            <p style="margin:0 0 4px;font-size:34px;font-weight:800;color:#ffffff;font-family:Arial,sans-serif;line-height:1;">${formatNumber(bestComp.economiesCumulees)} \u20ac</p>
+            <p style="margin:0 0 12px;font-size:13px;color:#90caf9;font-family:Arial,sans-serif;">d'\u00e9conomies cumul\u00e9es sur 10 ans</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+              <tr>
+                <td bgcolor="#1e88e5" style="border-radius:999px;padding:6px 16px;">
+                  <p style="margin:0;font-size:12px;color:#ffffff;font-weight:600;font-family:Arial,sans-serif;">+ r\u00e9silience en cas de s\u00e9cheresse</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>`;
+    }
+  }
 
-  // Bloc comparaison livrets
+  // Bloc comparaison livrets — table email-safe
   const allLivrets = (bestComp.livrets ?? []).filter((livret) => VISIBLE_LIVRET_IDS.has(livret.id));
-  const livretComparisonHtml = allLivrets.length > 0
-    ? `
-      <div style="margin-bottom:24px;border-radius:12px;border:1px solid #e0e0e0;overflow:hidden;">
-        <div style="background:#f5f5f5;padding:12px 16px;font-size:14px;font-weight:700;color:#333;">
-          Cuve vs Livrets d'\u00e9pargne (sur 10 ans)
-        </div>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr style="background:#fafafa;">
-            <td style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Placement</td>
-            <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Int\u00e9r\u00eats</td>
-            <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Avantage cuve</td>
-          </tr>
-          ${allLivrets.map((l) => {
-            const capitalRef = typeof bestComp.capitalReference === "number" ? bestComp.capitalReference : (bestComp.coutCuve ?? 29500);
-            const interets = l.valeurFuture - capitalRef;
-            const avantage = bestComp.economiesCumulees - interets;
-            const color = avantage > 0 ? "#2e7d32" : "#c62828";
-            const sign = avantage > 0 ? "+" : "";
-            return `<tr>
-              <td style="padding:10px 16px;font-size:14px;color:#333;border-bottom:1px solid #f0f0f0;">${l.name}</td>
-              <td align="right" style="padding:10px 16px;font-size:14px;color:#666;border-bottom:1px solid #f0f0f0;">${formatNumber(interets)} \u20ac</td>
-              <td align="right" style="padding:10px 16px;font-size:14px;font-weight:700;color:${color};border-bottom:1px solid #f0f0f0;">${sign}${formatNumber(avantage)} \u20ac</td>
-            </tr>`;
-          }).join("")}
-          <tr style="background:#e8f5e9;">
-            <td style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;">Cuve ${optionTitle(bestType)}</td>
-            <td align="right" style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;" colspan="2">${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies</td>
-          </tr>
-        </table>
-      </div>`
-    : "";
+  let livretComparisonHtml = "";
+  if (allLivrets.length > 0) {
+    const rows = allLivrets.map((l) => {
+      const capitalRef = typeof bestComp.capitalReference === "number" ? bestComp.capitalReference : (bestComp.coutCuve ?? 29500);
+      const interets = l.valeurFuture - capitalRef;
+      const avantage = bestComp.economiesCumulees - interets;
+      const color = avantage > 0 ? "#2e7d32" : "#c62828";
+      const sign = avantage > 0 ? "+" : "";
+      return `<tr>
+        <td style="padding:10px 16px;font-size:14px;color:#333;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${l.name}</td>
+        <td align="right" style="padding:10px 16px;font-size:14px;color:#666;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${formatNumber(interets)} \u20ac</td>
+        <td align="right" style="padding:10px 16px;font-size:14px;font-weight:700;color:${color};border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${sign}${formatNumber(avantage)} \u20ac</td>
+      </tr>`;
+    }).join("");
+    livretComparisonHtml = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;border-radius:12px;overflow:hidden;border:1px solid #e0e0e0;">
+      <tr>
+        <td bgcolor="#f5f5f5" style="background:#f5f5f5;padding:10px 16px;">
+          <p style="margin:0;font-size:14px;font-weight:700;color:#333;font-family:Arial,sans-serif;">Cuve vs Livrets d'\u00e9pargne (sur 10 ans)</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+            <tr bgcolor="#fafafa">
+              <td style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;font-family:Arial,sans-serif;">Placement</td>
+              <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;font-family:Arial,sans-serif;">Int\u00e9r\u00eats</td>
+              <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;font-family:Arial,sans-serif;">Avantage cuve</td>
+            </tr>
+            ${rows}
+            <tr bgcolor="#e8f5e9">
+              <td style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;font-family:Arial,sans-serif;">Cuve ${optionTitle(bestType)}</td>
+              <td align="right" colspan="2" style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;font-family:Arial,sans-serif;">${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>`;
+  }
 
-  const optionsHtml = data.options
+  const sortedOptions = [...data.options].sort((a, b) => {
+    if (a.type === recommended) return -1;
+    if (b.type === recommended) return 1;
+    return 0;
+  });
+
+  const optionsHtml = sortedOptions
     .map((o) => {
       const title = optionTitle(o.type);
       const isReco = o.type === recommended;
@@ -254,10 +288,10 @@ function buildClientEmail(data: SimulationPayload): string {
 
         <!-- HEADER -->
         <tr>
-          <td align="center" bgcolor="#1a3d28" style="background:linear-gradient(135deg,#1a3d28 0%,#2d5a3d 60%,#3a7a52 100%);padding:28px 32px 24px;">
+          <td align="center" bgcolor="#0d2d6e" style="background:linear-gradient(135deg,#0d2d6e 0%,#1565c0 60%,#1e88e5 100%);padding:28px 32px 24px;">
             <img src="${logoUrl}" alt="Les Jeunes Pousses" width="130" style="display:block;margin:0 auto 16px;max-width:130px;height:auto;" />
             <p style="margin:0 0 6px;font-size:24px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Arial,sans-serif;">Vos r\u00e9sultats de simulation</p>
-            <p style="margin:0;font-size:13px;color:#a8d5b5;font-family:Arial,sans-serif;">R\u00e9cup\u00e9ration d'eau de pluie</p>
+            <p style="margin:0;font-size:13px;color:#90caf9;font-family:Arial,sans-serif;">R\u00e9cup\u00e9ration d'eau de pluie</p>
           </td>
         </tr>
 
@@ -265,39 +299,89 @@ function buildClientEmail(data: SimulationPayload): string {
         <tr><td style="padding:24px 28px;">
       ${heroFinancialHtml}
 
-      <h2 style="color:#2d5a3d;font-size:16px;margin-top:0;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Votre configuration</h2>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
-        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">D\u00e9partement</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.departement}</td></tr>
-        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">Surface toiture</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.surfaceToiture} m\u00b2</td></tr>
-        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">Prix de l'eau</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.prixEau} \u20ac/m\u00b3</td></tr>
-        <tr><td style="padding:8px 0;color:#888;font-size:14px;">Usages</td><td style="padding:8px 0;font-weight:600;font-size:14px;">${usages.join(", ")}</td></tr>
+      <!-- CONFIGURATION 2 COLONNES -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+        <tr>
+          <!-- Colonne gauche : Votre configuration -->
+          <td valign="top" width="48%" style="padding-right:8px;">
+            <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;font-family:Arial,sans-serif;">Votre configuration</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+              ${data.communeNom ? `<tr>
+                <td style="padding:6px 0;font-size:12px;color:#888;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">Commune</td>
+                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#1f2937;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${data.communeNom}</td>
+              </tr>` : ""}
+              <tr>
+                <td style="padding:6px 0;font-size:12px;color:#888;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">Surface toiture</td>
+                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#1f2937;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${data.surfaceToiture} m\u00b2</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;font-size:12px;color:#888;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">Type de toit</td>
+                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#1f2937;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">${data.typeToiture === "pente" ? "En pente" : "Toit plat"}</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;font-size:12px;color:#888;font-family:Arial,sans-serif;">Prix de l'eau</td>
+                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#1f2937;font-family:Arial,sans-serif;">${data.prixEau.toFixed(2)} \u20ac/m\u00b3</td>
+              </tr>
+            </table>
+          </td>
+          <!-- Separateur -->
+          <td width="4%">&nbsp;</td>
+          <!-- Colonne droite : Vos Usages -->
+          <td valign="top" width="48%">
+            <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;font-family:Arial,sans-serif;">Vos Usages</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+              ${data.usages.wc ? `<tr><td style="padding:5px 0;font-size:13px;color:#374151;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">\uD83D\uDEBF WC (${data.usages.wcPersonnes} pers.)</td></tr>` : ""}
+              ${data.usages.jardin ? `<tr><td style="padding:5px 0;font-size:13px;color:#374151;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">\uD83C\uDF3F Jardin (${data.usages.jardinSurface} m\u00b2)</td></tr>` : ""}
+              ${data.usages.auto ? `<tr><td style="padding:5px 0;font-size:13px;color:#374151;border-bottom:1px solid #f0f0f0;font-family:Arial,sans-serif;">\uD83D\uDE97 Lavage auto (${data.usages.autoLavagesMois}x/mois)</td></tr>` : ""}
+              ${data.usages.piscine ? `<tr><td style="padding:5px 0;font-size:13px;color:#374151;font-family:Arial,sans-serif;">\uD83C\uDFCA Piscine (${data.usages.piscineSurface} m\u00b2)</td></tr>` : ""}
+            </table>
+          </td>
+        </tr>
       </table>
 
-      <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:10px;padding:16px;margin-bottom:24px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr>
-            <td style="width:50%;">
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">Potentiel r\u00e9cup\u00e9rable</div>
-              <div style="font-size:22px;font-weight:800;color:#2d5a3d;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</div>
-            </td>
-            <td style="width:50%;">
-              <div style="font-size:12px;color:#666;margin-bottom:4px;">Besoin annuel</div>
-              <div style="font-size:22px;font-weight:800;color:#1565c0;">${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</div>
-            </td>
-          </tr>
-        </table>
-      </div>
+      <!-- POTENTIEL / BESOIN -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;border-radius:10px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#e8f4fd" style="background:#e8f4fd;padding:16px;border-radius:10px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="50%">
+                  <p style="margin:0 0 4px;font-size:12px;color:#666;font-family:Arial,sans-serif;">Potentiel r\u00e9cup\u00e9rable</p>
+                  <p style="margin:0;font-size:22px;font-weight:800;color:#1565c0;font-family:Arial,sans-serif;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</p>
+                </td>
+                <td width="50%">
+                  <p style="margin:0 0 4px;font-size:12px;color:#666;font-family:Arial,sans-serif;">Besoin annuel</p>
+                  <p style="margin:0;font-size:22px;font-weight:800;color:#0d2d6e;font-family:Arial,sans-serif;">${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
 
-      <h2 style="color:#2d5a3d;font-size:16px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Options de cuves recommand\u00e9es</h2>
+      ${data.vSupply < data.vDemand ? `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;border-radius:10px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#fff8e1" style="background:#fff8e1;padding:14px 16px;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;">
+            <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#92400e;font-family:Arial,sans-serif;">&#x26A1; Votre potentiel r\u00e9cup\u00e9rable est inf\u00e9rieur \u00e0 votre besoin annuel</p>
+            <p style="margin:0;font-size:13px;color:#78350f;font-family:Arial,sans-serif;">Nous pouvons vous aider \u00e0 <strong>augmenter votre potentiel de r\u00e9cup\u00e9ration</strong> : extension de surface de collecte, optimisation des versants de toiture, ou syst\u00e8mes compl\u00e9mentaires. Contactez-nous pour une \u00e9tude personnalis\u00e9e.</p>
+          </td>
+        </tr>
+      </table>` : ""}
+      <h2 style="color:#1565c0;font-size:16px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;font-family:Arial,sans-serif;">Nous recommandons ces cuves :</h2>
       <div style="margin-bottom:24px;">${optionsHtml}</div>
 
       ${livretComparisonHtml}
 
-      <div style="text-align:center;margin:32px 0 16px;">
-        <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#2d5a3d,#3a7a52);color:#fff;text-decoration:none;border-radius:999px;font-size:16px;font-weight:700;box-shadow:0 4px 12px rgba(45,90,61,0.3);">
-          Demander un devis gratuit
-        </a>
-        <div style="margin-top:10px;font-size:12px;color:#999;">R\u00e9ponse sous 48h</div>
+      <div style="text-align:center;margin:28px 0 16px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+          <tr>
+            <td bgcolor="#1565c0" style="background:#1565c0;border-radius:999px;">
+              <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;color:#fff;text-decoration:none;font-size:15px;font-weight:700;font-family:Arial,sans-serif;">\uD83D\uDCA7 Demander un devis gratuit</a>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:8px 0 0;font-size:12px;color:#999;font-family:Arial,sans-serif;">R\u00e9ponse sous 48h</p>
       </div>
 
       <div style="margin-top:24px;padding:14px;border-radius:8px;background:#fff8e1;border:1px solid #ffe082;">
@@ -308,32 +392,38 @@ function buildClientEmail(data: SimulationPayload): string {
         </div>
       </div>
 
-      <div style="margin-top:32px;border-top:1px solid #e8f5e9;padding-top:24px;">
-        <div style="text-align:center;margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:700;color:#2d5a3d;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Nos services</div>
-          <div style="font-size:12px;color:#888;">Les Jeunes Pousses &bull; Conseil, fourniture et installation</div>
-        </div>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-          <tr>
-            <td style="padding:4px;" align="center" width="33%">
-              <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#2d5a3d;color:#fff;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;">\uD83D\uDCCB Demander un devis</a>
-            </td>
-            <td style="padding:4px;" align="center" width="33%">
-              <a href="https://lesjeunespousses.net/" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83C\uDF31 Notre site web</a>
-            </td>
-            <td style="padding:4px;" align="center" width="33%">
-              <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
-            </td>
-          </tr>
-        </table>
-      </div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:28px;border-top:1px solid #e3eaf6;padding-top:20px;">
+        <tr>
+          <td align="center" style="padding-bottom:12px;">
+            <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#1565c0;text-transform:uppercase;letter-spacing:1px;font-family:Arial,sans-serif;">Nos services</p>
+            <p style="margin:0;font-size:11px;color:#888;font-family:Arial,sans-serif;">Les Jeunes Pousses &bull; Conseil, fourniture et installation</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 4px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:4px;" align="center" width="33%">
+                  <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#1565c0;color:#fff;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;font-family:Arial,sans-serif;">\uD83D\uDCCB Demander un devis</a>
+                </td>
+                <td style="padding:4px;" align="center" width="33%">
+                  <a href="https://lesjeunespousses.net/" style="display:block;padding:10px 8px;background:#e3f2fd;color:#1565c0;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #90caf9;font-family:Arial,sans-serif;">\uD83C\uDF31 Notre site web</a>
+                </td>
+                <td style="padding:4px;" align="center" width="33%">
+                  <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#e3f2fd;color:#1565c0;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #90caf9;font-family:Arial,sans-serif;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
         </td></tr>
 
         <!-- FOOTER -->
         <tr>
-          <td style="background:#1a3d28;padding:20px 32px;text-align:center;">
-            <div style="font-size:13px;color:#a8d5b5;margin-bottom:4px;"><strong style="color:#ffffff;">Les Jeunes Pousses</strong></div>
-            <div style="font-size:11px;color:#6a9a7a;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation<br><a href="https://lesjeunespousses.net/" style="color:#6a9a7a;text-decoration:none;">lesjeunespousses.net</a></div>
+          <td bgcolor="#0d2d6e" align="center" style="background:#0d2d6e;padding:18px 32px;">
+            <p style="margin:0 0 3px;font-size:13px;font-family:Arial,sans-serif;"><strong style="color:#ffffff;">Les Jeunes Pousses</strong></p>
+            <p style="margin:0;font-size:11px;color:#90caf9;font-family:Arial,sans-serif;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation<br><a href="https://lesjeunespousses.net/" style="color:#90caf9;text-decoration:none;">lesjeunespousses.net</a></p>
           </td>
         </tr>
 
