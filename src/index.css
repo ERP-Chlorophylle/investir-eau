@@ -259,11 +259,17 @@
   .delay-400 { animation-delay: 400ms; }
 
   .animate-bounce-subtle {
-    animation: bounceSubtle 1.5s ease-in-out infinite;
+    animation: bounceAttention 0.5s ease-in-out 5, bounceSubtle 1.5s ease-in-out 2.5s infinite;
+  }
+
+  @keyframes bounceAttention {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-10px) scale(1.05); }
+    60% { transform: translateY(-4px) scale(1.02); }
   }
 
   @keyframes bounceSubtle {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+    50% { transform: translateY(-5px); }
   }
 }
