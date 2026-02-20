@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { TransitionScreen } from "@/components/TransitionScreen";
 import { scrollToElement } from "@/lib/scroll";
 import { Stepper } from "@/components/Stepper";
 import { Step1Location } from "@/components/simulation/Step1Location";
@@ -39,6 +40,7 @@ export default function Simulateur() {
   const [isStep1AutoAdvanceEnabled, setIsStep1AutoAdvanceEnabled] = useState(true);
   const [currentStepFillPercent, setCurrentStepFillPercent] = useState(0);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [showTransition, setShowTransition] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -219,7 +221,8 @@ export default function Simulateur() {
     sessionStorage.setItem("simulationEmail", data.email);
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
 
-    navigate("/resultat");
+    // Afficher la page de transition au lieu de naviguer directement
+    setShowTransition(true);
 
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -254,6 +257,9 @@ export default function Simulateur() {
       console.error("Erreur envoi email simulation:", err);
     }
   };
+  if (showTransition) {
+    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={3500} />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/30">
