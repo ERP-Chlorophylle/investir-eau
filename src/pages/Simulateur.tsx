@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useForm, FormProvider } from "react-hook-form";
@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { scrollToElement } from "@/lib/scroll";
 import { Stepper } from "@/components/Stepper";
 import { Step1Location } from "@/components/simulation/Step1Location";
 import { Step2Usages } from "@/components/simulation/Step2Usages";
@@ -64,7 +65,7 @@ export default function Simulateur() {
   });
 
   const { handleSubmit, trigger, getValues } = methods;
-  const [surfaceToiture, typeToiture] = methods.watch(["surfaceToiture", "typeToiture"]);
+  const [surfaceToiture, typeToiture, rgpdConsent] = methods.watch(["surfaceToiture", "typeToiture", "rgpdConsent"]);
 
   const showPrevButton = currentStep > 1;
   const showNextButton = currentStep < 4 && (currentStep !== 1 || !isStep1AutoAdvanceEnabled);
@@ -150,6 +151,18 @@ export default function Simulateur() {
     }
   };
 
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Scroll vers le bouton quand le consentement est coché
+  useEffect(() => {
+    if (rgpdConsent === true && currentStep === 4) {
+      const timer = globalThis.setTimeout(() => {
+        scrollToElement(submitButtonRef.current);
+      }, 300);
+      return () => globalThis.clearTimeout(timer);
+    }
+  }, [rgpdConsent, currentStep]);
+
   let rightActionButton: JSX.Element = <div />;
 
   if (showNextButton) {
@@ -161,9 +174,14 @@ export default function Simulateur() {
     );
   } else if (showSubmitButton) {
     rightActionButton = (
-      <Button type="submit" variant="cta">
+      <Button
+        ref={submitButtonRef}
+        type="submit"
+        variant="cta"
+        className={rgpdConsent === true ? "animate-bounce-subtle ring-2 ring-primary/50 shadow-lg shadow-primary/25" : ""}
+      >
         <Send className="mr-2 h-4 w-4" />
-        Voir mon resultat
+        Voir mon résultat
       </Button>
     );
   }

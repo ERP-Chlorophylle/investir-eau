@@ -1,10 +1,12 @@
 ﻿import { useFormContext } from "react-hook-form";
+import { useRef, useEffect, useState } from "react";
 import { Mail, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SimulationFormData } from "@/lib/validation";
 import { Link } from "react-router-dom";
+import { scrollToElement } from "@/lib/scroll";
 
 export function Step4Consent() {
   const {
@@ -17,6 +19,26 @@ export function Step4Consent() {
 
   const rgpdConsent = watch("rgpdConsent");
   const emailValue = watch("email");
+
+  const consentRef = useRef<HTMLDivElement>(null);
+  const [hasScrolledToConsent, setHasScrolledToConsent] = useState(false);
+
+  // Email valide = format correct et au moins 5 caractères
+  const isEmailValid =
+    typeof emailValue === "string" &&
+    emailValue.length >= 5 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+  // Auto-scroll vers la zone de consentement quand l'email est validé
+  useEffect(() => {
+    if (isEmailValid && !hasScrolledToConsent && !rgpdConsent) {
+      const timer = globalThis.setTimeout(() => {
+        scrollToElement(consentRef.current);
+        setHasScrolledToConsent(true);
+      }, 400);
+      return () => globalThis.clearTimeout(timer);
+    }
+  }, [isEmailValid, hasScrolledToConsent, rgpdConsent]);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -46,7 +68,14 @@ export function Step4Consent() {
         </div>
 
         {/* RGPD + Newsletter combined */}
-        <div className="rounded-xl border-2 p-5">
+        <div
+          ref={consentRef}
+          className={`rounded-xl border-2 p-5 transition-all duration-300 ${
+            isEmailValid && !rgpdConsent
+              ? "ring-2 ring-primary/70 bg-primary/5 border-primary/40"
+              : ""
+          }`}
+        >
           <div className="flex items-start gap-4">
             <Checkbox
               id="rgpdConsent"
@@ -101,5 +130,3 @@ export function Step4Consent() {
     </div>
   );
 }
-
-
