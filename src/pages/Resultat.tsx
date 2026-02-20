@@ -130,32 +130,7 @@ export default function Resultat() {
             </div>
           </div>
 
-          <div className="mb-5 grid grid-cols-2 gap-3 md:mb-8 md:gap-4">
-            <div className="rounded-2xl border border-water-medium/40 bg-card p-3 shadow-sm md:p-4">
-              <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-water-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
-                <Droplets className="h-3.5 w-3.5 text-water-dark md:h-4 md:w-4" />
-                Potentiel récupérable
-              </div>
-              <p className="flex items-end gap-1 whitespace-nowrap leading-none">
-                <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
-                  {(results.vSupply / 1000).toFixed(1)}
-                </span>
-                <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
-              </p>
-            </div>
-            <div className="rounded-2xl border border-eco-medium/40 bg-card p-3 shadow-sm md:p-4">
-              <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-eco-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
-                <Droplets className="h-3.5 w-3.5 text-eco-dark md:h-4 md:w-4" />
-                Besoin annuel
-              </div>
-              <p className="flex items-end gap-1 whitespace-nowrap leading-none">
-                <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
-                  {(results.vDemand / 1000).toFixed(1)}
-                </span>
-                <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
-              </p>
-            </div>
-          </div>
+
 
           <section className="mb-8 md:mb-12">
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Nos recommandations de cuves</h2>
@@ -211,6 +186,33 @@ export default function Resultat() {
               Ceci est une estimation. Les précipitations varient d'une année à l'autre. Plus la cuve est volumineuse,
               plus vous avez de chances de disposer d'eau pendant les périodes sèches.
             </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
+              <div className="rounded-2xl border border-water-medium/40 bg-card p-3 shadow-sm md:p-4">
+                <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-water-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
+                  <Droplets className="h-3.5 w-3.5 text-water-dark md:h-4 md:w-4" />
+                  Potentiel récupérable
+                </div>
+                <p className="flex items-end gap-1 whitespace-nowrap leading-none">
+                  <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
+                    {(results.vSupply / 1000).toFixed(1)}
+                  </span>
+                  <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
+                </p>
+              </div>
+              <div className="rounded-2xl border border-eco-medium/40 bg-card p-3 shadow-sm md:p-4">
+                <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-eco-light/60 px-2 py-0.5 text-[11px] text-muted-foreground md:text-xs">
+                  <Droplets className="h-3.5 w-3.5 text-eco-dark md:h-4 md:w-4" />
+                  Besoin annuel
+                </div>
+                <p className="flex items-end gap-1 whitespace-nowrap leading-none">
+                  <span className="text-[clamp(0.95rem,3vw,1.45rem)] font-bold tabular-nums text-foreground">
+                    {(results.vDemand / 1000).toFixed(1)}
+                  </span>
+                  <span className="pb-[1px] text-[clamp(0.7rem,2vw,0.9rem)] font-semibold text-muted-foreground">m³/an</span>
+                </p>
+              </div>
+            </div>
           </section>
 
           <section className="mb-8 md:mb-12">
