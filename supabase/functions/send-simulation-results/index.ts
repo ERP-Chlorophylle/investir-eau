@@ -283,7 +283,32 @@ serve(async (req: Request) => {
     const apiKey = Deno.env.get("BREVO_API_KEY");
     if (!apiKey) throw new Error("BREVO_API_KEY not configured");
 
-    const data: SimulationPayload = await req.json();
+    const body = await req.json();
+    const { turnstileToken, ...data } = body as SimulationPayload & { turnstileToken?: string };
+
+    // Vérification Turnstile anti-bot
+    const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
+    if (turnstileSecret) {
+      if (!turnstileToken) {
+        return new Response(JSON.stringify({ error: "Vérification anti-bot requise" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+      const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${encodeURIComponent(turnstileSecret)}&response=${encodeURIComponent(turnstileToken)}`,
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) {
+        console.error("Turnstile verification failed:", verifyData);
+        return new Response(JSON.stringify({ error: "Vérification anti-bot échouée" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+    }
 
     await sendBrevoEmail(
       apiKey,

@@ -1,5 +1,6 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Send } from "lucide-react";
@@ -36,8 +37,12 @@ export default function Simulateur() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isStep1AutoAdvanceEnabled, setIsStep1AutoAdvanceEnabled] = useState(true);
   const [currentStepFillPercent, setCurrentStepFillPercent] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
 
   const methods = useForm<SimulationFormData>({
     resolver: zodResolver(fullSchema),
@@ -224,6 +229,7 @@ export default function Simulateur() {
           vDemand: typedResults.vDemand,
           options: typedResults.options,
           comparisons: typedResults.comparisons,
+          turnstileToken,
         }),
       }).catch((err) => console.error("Erreur envoi email simulation:", err));
     } catch (err) {
@@ -248,7 +254,15 @@ export default function Simulateur() {
                   {currentStep === 1 && <Step1Location onProgressChange={setCurrentStepFillPercent} />}
                   {currentStep === 2 && <Step2Usages onProgressChange={setCurrentStepFillPercent} />}
                   {currentStep === 3 && <Step3Financial />}
-                  {currentStep === 4 && <Step4Consent />}
+                  {currentStep === 4 && (
+                    <>
+                      <Step4Consent />
+                      <TurnstileWidget
+                        onVerify={handleTurnstileVerify}
+                        onExpire={handleTurnstileExpire}
+                      />
+                    </>
+                  )}
 
                   {showNavigation && (
                     <div className="mt-10 flex items-center justify-between border-t pt-6">

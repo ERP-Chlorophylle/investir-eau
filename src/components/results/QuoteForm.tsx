@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { Send, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,10 @@ export function QuoteForm({
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
+  const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
   const {
     toast
   } = useToast();
@@ -46,6 +51,7 @@ export function QuoteForm({
           coutCuve: coutCuve ?? null,
           departement: departement || "",
           surfaceToiture: surfaceToiture || 0,
+          turnstileToken,
         }),
       });
 
@@ -106,6 +112,11 @@ export function QuoteForm({
         <Label htmlFor="quote-comment">Commentaire (optionnel)</Label>
         <Textarea id="quote-comment" placeholder="Précisez vos besoins ou questions..." value={comment} onChange={e => setComment(e.target.value)} rows={3} />
       </div>
+
+      <TurnstileWidget
+        onVerify={handleTurnstileVerify}
+        onExpire={handleTurnstileExpire}
+      />
 
       <div className="flex gap-3">
         <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isLoading}>
