@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle, Send } from "lucide-react";
+import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle, Send, TrendingUp, Droplet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -202,6 +202,51 @@ export default function Resultat() {
                 );
               })}
             </div>
+
+            {/* Carte Économies cumulées */}
+            {(() => {
+              const selectedComparison = results.comparisons.find((c) => c.optionType === selectedOption);
+              const economies = selectedComparison?.economiesCumulees ?? 0;
+              return (
+                <div className="relative mt-4 overflow-hidden rounded-xl border-2 border-primary bg-gradient-to-br from-water-light via-water-light/60 to-background p-5 md:mt-6">
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                    {Array.from({ length: 9 }).map((_, i) => (
+                      <span
+                        key={`bill-${String(i)}`}
+                        className="absolute animate-fall-bill"
+                        style={{
+                          left: `${10 + Math.random() * 80}%`,
+                          top: "-24px",
+                          fontSize: `${17 + Math.random() * 9}px`,
+                          animationDelay: `${Math.random() * 3}s`,
+                          animationDuration: `${3.5 + Math.random() * 3}s`,
+                          "--bill-rotation": `${(Math.random() - 0.5) * 50}deg`,
+                        } as React.CSSProperties}
+                      >
+                        💶
+                      </span>
+                    ))}
+                  </div>
+                  <div className="absolute -right-3 -top-3 opacity-[0.08]">
+                    <Droplet className="h-20 w-20 text-primary" />
+                  </div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 ring-4 ring-primary/10">
+                        <TrendingUp className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground">Économies cuve cumulées</p>
+                        <p className="text-3xl font-bold text-primary">
+                          {Math.round(economies).toLocaleString("fr-FR")} €
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +1%/an)</p>
+                  </div>
+                </div>
+              );
+            })()}
 
             {results.isSupplyLimited && (
               <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground md:mt-4 md:text-sm">
