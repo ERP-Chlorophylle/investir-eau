@@ -283,11 +283,11 @@ export default function Resultat() {
       <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
         <Button
           variant="gold"
-          size="lg"
-          className="shadow-xl shadow-gold/30"
+          size="default"
+          className="shadow-xl shadow-gold/30 text-sm"
           onClick={() => quoteRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
         >
-          <Send className="mr-2 h-5 w-5" />
+          <Send className="mr-2 h-4 w-4" />
           Demander un devis
         </Button>
       </div>
