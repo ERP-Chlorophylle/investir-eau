@@ -8,7 +8,7 @@ const corsHeaders = {
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 const SENDER_EMAIL = "info@lesjeunespousses.net";
 const SENDER_NAME = "Les Jeunes Pousses";
-const ADMIN_EMAILS = ["info@lesjeunespousses.net", "waterlife@lesjeunespousses.net"];
+const ADMIN_EMAILS = ["info@lesjeunespousses.net", "waterlife@lesjeunespousses.net", "ia@hchlorophylle.fr"];
 const TURNSTILE_ENABLED = true;
 
 type Livret = { id: string; name: string; valeurFuture: number; ecart: number };
