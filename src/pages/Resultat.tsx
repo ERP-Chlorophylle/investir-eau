@@ -358,10 +358,10 @@ export default function Resultat() {
         <Button
           variant="gold"
           size="default"
-          className="shadow-xl shadow-gold/30 text-sm"
+          className="shadow-xl shadow-gold/30 text-sm md:px-8 md:py-6 md:text-lg"
           onClick={() => setIsQuoteOpen(true)}
         >
-          <Send className="mr-2 h-4 w-4" />
+          <Send className="mr-2 h-4 w-4 md:h-5 md:w-5" />
           Demander un devis
         </Button>
       </div>
