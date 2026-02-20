@@ -284,11 +284,11 @@ export default function Resultat() {
         <Button
           variant="gold"
           size="lg"
-          className="shadow-xl shadow-gold/30 animate-bounce-subtle"
+          className="shadow-xl shadow-gold/30"
           onClick={() => quoteRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
         >
           <Send className="mr-2 h-5 w-5" />
-          Demander un devis gratuit
+          Demander un devis
         </Button>
       </div>
     </div>
