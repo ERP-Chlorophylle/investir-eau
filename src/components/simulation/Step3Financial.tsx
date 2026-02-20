@@ -343,11 +343,13 @@ export function Step3Financial() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-center gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className={`rounded-md border px-3 py-1 text-xs ${
-                  !includeSanitation ? "border-primary bg-primary text-primary-foreground" : "border-muted bg-background"
+                className={`flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
+                  !includeSanitation
+                    ? "border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
+                    : "border-muted-foreground/20 bg-background text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
                 }`}
                 onClick={() => setIncludeSanitation(false)}
                 disabled={!communeRates}
@@ -356,8 +358,10 @@ export function Step3Financial() {
               </button>
               <button
                 type="button"
-                className={`rounded-md border px-3 py-1 text-xs ${
-                  includeSanitation ? "border-primary bg-primary text-primary-foreground" : "border-muted bg-background"
+                className={`flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-semibold transition-all ${
+                  includeSanitation
+                    ? "border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
+                    : "border-muted-foreground/20 bg-background text-muted-foreground hover:border-primary/40 hover:bg-primary/5"
                 }`}
                 onClick={() => setIncludeSanitation(true)}
                 disabled={!communeRates}
