@@ -124,32 +124,109 @@ function buildClientEmail(data: SimulationPayload): string {
 
   const { recommended, rankByType, medalsByType } = computeRanksAndMedals(data);
 
+  // Trouver la meilleure option (recommandée ou eco par défaut)
+  const bestType = recommended ?? "eco";
+  const bestComp = data.comparisons.find((c) => c.optionType === bestType) ?? data.comparisons[0];
+  const bestOption = data.options.find((o) => o.type === bestType) ?? data.options[0];
+  const bestLivretAGain = livretAGain(bestComp);
+  const bestSpread = bestLivretAGain !== null ? bestComp.economiesCumulees - bestLivretAGain : null;
+  const cuveWins = bestSpread !== null && bestSpread > 0;
+
+  // Bloc hero financier
+  const heroFinancialHtml = bestSpread !== null
+    ? cuveWins
+      ? `
+      <div style="margin:0 0 24px;border-radius:12px;background:linear-gradient(135deg,#0b6e27,#1a9e3f);padding:24px;text-align:center;">
+        <div style="font-size:13px;color:#c8e6c9;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;">Votre cuve rapporte plus qu'un Livret A</div>
+        <div style="font-size:36px;font-weight:800;color:#fff;margin-bottom:4px;">+${formatNumber(bestSpread)} \u20ac</div>
+        <div style="font-size:14px;color:#a5d6a7;">de gain suppl\u00e9mentaire sur 10 ans vs Livret A</div>
+        <div style="margin-top:12px;display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:600;">
+          Cuve ${optionTitle(bestType)} ${formatNumber(bestOption.volumeCuveM3 * 1000)} L &bull; ${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies cumul\u00e9es
+        </div>
+      </div>`
+      : `
+      <div style="margin:0 0 24px;border-radius:12px;background:linear-gradient(135deg,#1565c0,#1e88e5);padding:24px;text-align:center;">
+        <div style="font-size:13px;color:#bbdefb;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;">\u00c9conomies d'eau estim\u00e9es</div>
+        <div style="font-size:36px;font-weight:800;color:#fff;margin-bottom:4px;">${formatNumber(bestComp.economiesCumulees)} \u20ac</div>
+        <div style="font-size:14px;color:#90caf9;">d'\u00e9conomies cumul\u00e9es sur 10 ans</div>
+        <div style="margin-top:12px;display:inline-block;padding:6px 16px;border-radius:999px;background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:600;">
+          + r\u00e9silience en cas de s\u00e9cheresse ou restriction d'eau
+        </div>
+      </div>`
+    : "";
+
+  // Bloc comparaison livrets
+  const allLivrets = bestComp.livrets ?? [];
+  const livretComparisonHtml = allLivrets.length > 0
+    ? `
+      <div style="margin-bottom:24px;border-radius:12px;border:1px solid #e0e0e0;overflow:hidden;">
+        <div style="background:#f5f5f5;padding:12px 16px;font-size:14px;font-weight:700;color:#333;">
+          Cuve vs Livrets d'\u00e9pargne (sur 10 ans)
+        </div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr style="background:#fafafa;">
+            <td style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Placement</td>
+            <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Int\u00e9r\u00eats</td>
+            <td align="right" style="padding:8px 16px;font-size:12px;font-weight:700;color:#888;border-bottom:1px solid #e8e8e8;">Avantage cuve</td>
+          </tr>
+          ${allLivrets.map((l) => {
+            const capitalRef = typeof bestComp.capitalReference === "number" ? bestComp.capitalReference : (bestComp.coutCuve ?? 29500);
+            const interets = l.valeurFuture - capitalRef;
+            const avantage = bestComp.economiesCumulees - interets;
+            const color = avantage > 0 ? "#2e7d32" : "#c62828";
+            const sign = avantage > 0 ? "+" : "";
+            return `<tr>
+              <td style="padding:10px 16px;font-size:14px;color:#333;border-bottom:1px solid #f0f0f0;">${l.name}</td>
+              <td align="right" style="padding:10px 16px;font-size:14px;color:#666;border-bottom:1px solid #f0f0f0;">${formatNumber(interets)} \u20ac</td>
+              <td align="right" style="padding:10px 16px;font-size:14px;font-weight:700;color:${color};border-bottom:1px solid #f0f0f0;">${sign}${formatNumber(avantage)} \u20ac</td>
+            </tr>`;
+          }).join("")}
+          <tr style="background:#e8f5e9;">
+            <td style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;">Cuve ${optionTitle(bestType)}</td>
+            <td align="right" style="padding:10px 16px;font-size:14px;font-weight:700;color:#2d5a3d;" colspan="2">${formatNumber(bestComp.economiesCumulees)} \u20ac d'\u00e9conomies</td>
+          </tr>
+        </table>
+      </div>`
+    : "";
+
   const optionsHtml = data.options
     .map((o) => {
       const title = optionTitle(o.type);
-      const border = o.type === "eco" ? "#8ad4a2" : o.type === "confort" ? "#7ec6f5" : "#d6b3f5";
-      const bg = o.type === "eco" ? "#f3fbf5" : o.type === "confort" ? "#f3f9ff" : "#faf6ff";
-      const badge = recommended === o.type
-        ? `<div style="display:inline-block;margin-bottom:8px;padding:4px 10px;border-radius:999px;background:#0b73b8;color:#fff;font-size:11px;font-weight:700;">Recommand\u00e9</div>`
+      const isReco = o.type === recommended;
+      const border = isReco ? "#2d5a3d" : o.type === "confort" ? "#7ec6f5" : "#e0e0e0";
+      const bg = isReco ? "#f0faf3" : "#fafafa";
+      const badge = isReco
+        ? `<div style="display:inline-block;margin-bottom:8px;padding:4px 10px;border-radius:999px;background:#2d5a3d;color:#fff;font-size:11px;font-weight:700;">Recommand\u00e9</div>`
         : "";
       const price = o.cout ? `${formatNumber(o.cout)} \u20ac TTC` : "Sur devis";
       const rank = rankByType[o.type] ?? "-";
       const medals = (medalsByType[o.type] ?? [])
         .map((m) => `${m.rank === 1 ? "\u{1F947}" : m.rank === 2 ? "\u{1F948}" : "\u{1F949}"} ${m.label}`)
-        .map((m) => `<div style="margin-top:6px;padding:4px 8px;border:1px solid #d6e2db;border-radius:999px;background:#fff;font-size:11px;font-weight:600;color:#2d5a3d;white-space:nowrap;">${m}</div>`)
+        .map((m) => `<div style="margin-top:6px;padding:4px 8px;border-radius:999px;background:#fff;border:1px solid #d6e2db;font-size:11px;font-weight:600;color:#2d5a3d;white-space:nowrap;">${m}</div>`)
         .join("");
 
+      // Gain vs Livret A pour cette option
+      const comp = data.comparisons.find((c) => c.optionType === o.type);
+      const gainLA = comp ? livretAGain(comp) : null;
+      const spreadLA = comp && gainLA !== null ? comp.economiesCumulees - gainLA : null;
+      const gainLine = spreadLA !== null
+        ? spreadLA > 0
+          ? `<div style="margin-top:6px;font-size:13px;font-weight:700;color:#2e7d32;">+${formatNumber(spreadLA)} \u20ac vs Livret A</div>`
+          : `<div style="margin-top:6px;font-size:13px;font-weight:600;color:#e65100;">${formatNumber(spreadLA)} \u20ac vs Livret A</div>`
+        : "";
+
       return `
-      <div style="margin-bottom:12px;border:1px solid ${border};background:${bg};border-radius:12px;padding:12px;">
+      <div style="margin-bottom:12px;border:${isReco ? "2px" : "1px"} solid ${border};background:${bg};border-radius:12px;padding:14px;">
         ${badge}
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
           <tr>
             <td valign="top" style="padding-right:8px;">
               <div style="font-size:17px;font-weight:700;color:#1f2937;margin-bottom:4px;">${title}</div>
               <div style="font-size:14px;color:#374151;margin-bottom:2px;"><strong>${formatNumber(o.volumeCuveM3 * 1000)} L</strong></div>
-              <div style="font-size:14px;color:#374151;margin-bottom:2px;">Couverture des besoins : <strong>${o.couvertureReelle}%</strong></div>
-              <div style="font-size:14px;color:#374151;margin-bottom:6px;">${(o.volumeAnnuelCouvert / 1000).toFixed(1)} m\u00b3/an \u00e9conomis\u00e9s</div>
-              <div style="font-size:15px;font-weight:700;color:#111827;">Investissement : ${price}</div>
+              <div style="font-size:14px;color:#374151;margin-bottom:2px;">Couverture : <strong>${o.couvertureReelle}%</strong> des besoins</div>
+              <div style="font-size:14px;color:#374151;margin-bottom:2px;">${(o.volumeAnnuelCouvert / 1000).toFixed(1)} m\u00b3/an \u00e9conomis\u00e9s</div>
+              <div style="font-size:15px;font-weight:700;color:#111827;margin-top:6px;">Investissement : ${price}</div>
+              ${gainLine}
             </td>
             <td valign="top" align="right" style="width:1%;white-space:nowrap;">
               <div style="display:inline-block;padding:4px 8px;border-radius:999px;background:#e9f3ee;color:#2d5a3d;font-size:11px;font-weight:700;">Classement #${rank}</div>
@@ -161,54 +238,75 @@ function buildClientEmail(data: SimulationPayload): string {
     })
     .join("");
 
-  const comparisonsHtml = data.comparisons
-    .map((c) => {
-      const label = optionTitle(c.optionType);
-      const ga = livretAGain(c);
-      const txt = ga === null ? "Gain vs Livret A : non disponible" : `Gain vs Livret A : ${ga >= 0 ? "+" : "-"}${formatNumber(Math.abs(ga))} \u20ac`;
-      return `<li style="margin-bottom:8px;"><strong>${label}</strong> : ${formatNumber(c.economiesCumulees)} \u20ac d'\u00e9conomies sur 10 ans<br><span style="color:#2d5a3d;">${txt}</span></li>`;
-    })
-    .join("");
+  const ctaUrl = "https://investir-eau.lesjeunespousses.net";
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
-<body style="font-family:Arial,sans-serif;background:#f8faf8;margin:0;padding:20px;">
-  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+<body style="font-family:Arial,sans-serif;background:#f4f7f4;margin:0;padding:20px;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-      <tr><td align="center" bgcolor="#2d5a3d" style="padding:30px;background-color:#2d5a3d;background-image:linear-gradient(135deg,#2d5a3d,#3a7a52);">
-        <div style="font-size:24px;font-weight:700;line-height:1.25;color:#fff;">Vos r\u00e9sultats de simulation</div>
-        <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#c8e6c9;">R\u00e9cup\u00e9ration d'eau de pluie</div>
+      <tr><td align="center" bgcolor="#2d5a3d" style="padding:32px 24px;background-color:#2d5a3d;background-image:linear-gradient(135deg,#1e4a2e,#3a7a52);">
+        <div style="font-size:26px;font-weight:800;line-height:1.25;color:#fff;">Vos r\u00e9sultats de simulation</div>
+        <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#a5d6a7;">R\u00e9cup\u00e9ration d'eau de pluie</div>
       </td></tr>
     </table>
 
     <div style="padding:24px;">
-      <h2 style="color:#2d5a3d;font-size:18px;margin-top:0;">Votre configuration</h2>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-        <tr><td style="padding:6px 0;color:#666;">D\u00e9partement</td><td style="padding:6px 0;font-weight:600;">${data.departement}</td></tr>
-        <tr><td style="padding:6px 0;color:#666;">Surface toiture</td><td style="padding:6px 0;font-weight:600;">${data.surfaceToiture} m\u00b2</td></tr>
-        <tr><td style="padding:6px 0;color:#666;">Prix de l'eau</td><td style="padding:6px 0;font-weight:600;">${data.prixEau} \u20ac/m\u00b3</td></tr>
-        <tr><td style="padding:6px 0;color:#666;">Usages</td><td style="padding:6px 0;font-weight:600;">${usages.join(", ")}</td></tr>
+
+      ${heroFinancialHtml}
+
+      <h2 style="color:#2d5a3d;font-size:16px;margin-top:0;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Votre configuration</h2>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">D\u00e9partement</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.departement}</td></tr>
+        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">Surface toiture</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.surfaceToiture} m\u00b2</td></tr>
+        <tr><td style="padding:8px 0;color:#888;font-size:14px;border-bottom:1px solid #f0f0f0;">Prix de l'eau</td><td style="padding:8px 0;font-weight:600;font-size:14px;border-bottom:1px solid #f0f0f0;">${data.prixEau} \u20ac/m\u00b3</td></tr>
+        <tr><td style="padding:8px 0;color:#888;font-size:14px;">Usages</td><td style="padding:8px 0;font-weight:600;font-size:14px;">${usages.join(", ")}</td></tr>
       </table>
 
-      <div style="background:#e8f5e9;border-radius:8px;padding:16px;margin-bottom:20px;">
-        <p style="margin:0 0 4px;color:#666;font-size:13px;">Potentiel r\u00e9cup\u00e9rable</p>
-        <p style="margin:0;font-size:22px;font-weight:700;color:#2d5a3d;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</p>
-        <p style="margin:8px 0 0;color:#666;font-size:13px;">Besoin annuel : <strong>${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</strong></p>
+      <div style="background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border-radius:10px;padding:16px;margin-bottom:24px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr>
+            <td style="width:50%;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">Potentiel r\u00e9cup\u00e9rable</div>
+              <div style="font-size:22px;font-weight:800;color:#2d5a3d;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</div>
+            </td>
+            <td style="width:50%;">
+              <div style="font-size:12px;color:#666;margin-bottom:4px;">Besoin annuel</div>
+              <div style="font-size:22px;font-weight:800;color:#1565c0;">${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</div>
+            </td>
+          </tr>
+        </table>
       </div>
 
-      <h2 style="color:#2d5a3d;font-size:18px;">Options de cuves recommand\u00e9es</h2>
-      <div style="margin-bottom:20px;">${optionsHtml}</div>
+      <h2 style="color:#2d5a3d;font-size:16px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Options de cuves recommand\u00e9es</h2>
+      <div style="margin-bottom:24px;">${optionsHtml}</div>
 
-      <h2 style="color:#2d5a3d;font-size:18px;">\u00c9conomies estim\u00e9es (10 ans)</h2>
-      <ul style="padding-left:20px;color:#333;">${comparisonsHtml}</ul>
+      ${livretComparisonHtml}
 
-      <div style="text-align:center;margin-top:24px;"><p style="color:#666;font-size:13px;">Des questions ? Contactez-nous pour un devis personnalis\u00e9.</p></div>
+      <div style="text-align:center;margin:32px 0 16px;">
+        <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#2d5a3d,#3a7a52);color:#fff;text-decoration:none;border-radius:999px;font-size:16px;font-weight:700;box-shadow:0 4px 12px rgba(45,90,61,0.3);">
+          Demander un devis gratuit
+        </a>
+        <div style="margin-top:10px;font-size:12px;color:#999;">R\u00e9ponse sous 48h</div>
+      </div>
+
+      <div style="margin-top:24px;padding:14px;border-radius:8px;background:#fff8e1;border:1px solid #ffe082;">
+        <div style="font-size:13px;color:#795548;line-height:1.5;">
+          <strong>Le saviez-vous ?</strong> Le prix de l'eau augmente en moyenne de 3% par an en France.
+          Sur 10 ans, votre cuve devient un v\u00e9ritable investissement qui se rentabilise
+          tout en vous prot\u00e9geant des restrictions d'eau li\u00e9es aux s\u00e9cheresses.
+        </div>
+      </div>
     </div>
 
-    <div style="background:#f0f7f0;padding:16px;text-align:center;font-size:12px;color:#888;">Les Jeunes Pousses - R\u00e9cup\u00e9ration d'eau de pluie</div>
+    <div style="background:#f0f7f0;padding:20px;text-align:center;">
+      <div style="font-size:13px;color:#666;margin-bottom:4px;">Les Jeunes Pousses</div>
+      <div style="font-size:11px;color:#999;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation</div>
+    </div>
   </div>
 </body></html>`;
 }
+
 
 function buildAdminEmail(data: SimulationPayload): string {
   const usages: string[] = [];
@@ -217,32 +315,71 @@ function buildAdminEmail(data: SimulationPayload): string {
   if (data.usages.auto) usages.push(`Lavage auto (${data.usages.autoLavagesMois}x/mois)`);
   if (data.usages.piscine) usages.push(`Piscine (${data.usages.piscineSurface} m\u00b2)`);
 
-  const optionsText = data.options.map((o) => `- ${o.label} : ${o.volumeCuveM3} m\u00b3 - ${o.cout ? formatNumber(o.cout) + " \u20ac" : "Sur devis"} - Couverture ${o.couvertureReelle}%`).join("<br>");
-  const comparisonsText = data.comparisons.map((c) => {
-    const l = optionTitle(c.optionType);
-    const g = livretAGain(c);
-    const t = g === null ? "Gain vs Livret A non disponible" : `Gain vs Livret A ${g >= 0 ? "+" : "-"}${formatNumber(Math.abs(g))} \u20ac`;
-    return `- ${l} : ${formatNumber(c.economiesCumulees)} \u20ac d'\u00e9conomies - ${t}`;
-  }).join("<br>");
+  const { recommended, rankByType, medalsByType } = computeRanksAndMedals(data);
+
+  const optionsHtml = data.options.map((o) => {
+    const title = optionTitle(o.type);
+    const price = o.cout ? `${formatNumber(o.cout)} \u20ac` : "Sur devis";
+    const rank = rankByType[o.type] ?? "-";
+    const medals = (medalsByType[o.type] ?? [])
+      .map((m) => `${m.rank === 1 ? "\u{1F947}" : m.rank === 2 ? "\u{1F948}" : "\u{1F949}"} ${m.label}`)
+      .join(" &bull; ");
+    const isReco = o.type === recommended;
+    const recoBadge = isReco ? ' <span style="background:#2d5a3d;color:#fff;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">RECOMMAND\u00c9</span>' : "";
+    const comp = data.comparisons.find((c) => c.optionType === o.type);
+    const ga = comp ? livretAGain(comp) : null;
+    const spreadLA = comp && ga !== null ? comp.economiesCumulees - ga : null;
+    const gainText = spreadLA !== null
+      ? spreadLA > 0
+        ? `<span style="color:#2e7d32;font-weight:700;">+${formatNumber(spreadLA)} \u20ac vs Livret A</span>`
+        : `<span style="color:#c62828;font-weight:700;">${formatNumber(spreadLA)} \u20ac vs Livret A</span>`
+      : "";
+    const ecoCumulees = comp ? `${formatNumber(comp.economiesCumulees)} \u20ac d'\u00e9co. sur 10 ans` : "";
+
+    const bgColor = isReco ? "#f0faf3" : "#fafafa";
+    const borderColor = isReco ? "#2d5a3d" : "#e0e0e0";
+
+    return `
+    <tr>
+      <td style="padding:12px;border:1px solid ${borderColor};border-radius:8px;background:${bgColor};margin-bottom:8px;">
+        <div style="font-size:16px;font-weight:700;color:#1f2937;margin-bottom:4px;">
+          #${rank} ${title} — ${formatNumber(o.volumeCuveM3 * 1000)} L${recoBadge}
+        </div>
+        <div style="font-size:13px;color:#555;margin-bottom:2px;">
+          Couverture : <strong>${o.couvertureReelle}%</strong> &bull; 
+          ${(o.volumeAnnuelCouvert / 1000).toFixed(1)} m\u00b3/an &bull; 
+          Investissement : <strong>${price}</strong>
+        </div>
+        <div style="font-size:13px;margin-top:4px;">
+          ${ecoCumulees}${gainText ? " &bull; " + gainText : ""}
+        </div>
+        ${medals ? `<div style="font-size:12px;color:#2d5a3d;margin-top:4px;">${medals}</div>` : ""}
+      </td>
+    </tr>
+    <tr><td style="height:8px;"></td></tr>`;
+  }).join("");
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
-<body style="font-family:Arial,sans-serif;padding:20px;">
-  <h1 style="color:#2d5a3d;">Nouvelle simulation</h1>
-  <table style="border-collapse:collapse;width:100%;max-width:500px;">
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Email</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.email}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>D\u00e9partement</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.departement}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Surface toiture</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.surfaceToiture} m\u00b2</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Type toiture</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.typeToiture}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Prix eau</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${data.prixEau} \u20ac/m\u00b3</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Usages</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${usages.join(", ")}</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Potentiel</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</td></tr>
-    <tr><td style="padding:6px;color:#666;border-bottom:1px solid #eee;"><strong>Besoin</strong></td><td style="padding:6px;border-bottom:1px solid #eee;">${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</td></tr>
+<body style="font-family:Arial,sans-serif;padding:20px;background:#f8f8f8;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+  <h1 style="color:#2d5a3d;font-size:20px;margin-top:0;">Nouvelle simulation re\u00e7ue</h1>
+
+  <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
+    <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;width:120px;">Email</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;"><a href="mailto:${data.email}" style="color:#1565c0;">${data.email}</a></td></tr>
+    <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">D\u00e9partement</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.departement}</td></tr>
+    <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Toiture</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.surfaceToiture} m\u00b2 (${data.typeToiture})</td></tr>
+    <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Prix eau</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.prixEau} \u20ac/m\u00b3</td></tr>
+    <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Usages</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${usages.join(", ")}</td></tr>
+    <tr><td style="padding:6px 8px;color:#888;font-size:13px;">Potentiel / Besoin</td><td style="padding:6px 8px;font-weight:600;font-size:14px;">${(data.vSupply / 1000).toFixed(1)} m\u00b3 / ${(data.vDemand / 1000).toFixed(1)} m\u00b3 (${data.vSupply >= data.vDemand ? "supply OK" : "supply limit\u00e9"})</td></tr>
   </table>
-  <h2 style="color:#2d5a3d;margin-top:20px;">Options</h2>
-  <p>${optionsText}</p>
-  <h2 style="color:#2d5a3d;">\u00c9conomies (10 ans)</h2>
-  <p>${comparisonsText}</p>
+
+  <h2 style="color:#2d5a3d;font-size:16px;margin-bottom:8px;">Options propos\u00e9es au prospect</h2>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+    ${optionsHtml}
+  </table>
+
+  </div>
 </body></html>`;
 }
 
