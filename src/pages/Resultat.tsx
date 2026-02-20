@@ -10,6 +10,8 @@ import { FunMetrics } from "@/components/results/FunMetrics";
 import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+type Medal = { rank: 1 | 2 | 3; label: string };
+
 export default function Resultat() {
   const navigate = useNavigate();
   const [results, setResults] = useState<SimulationResults | null>(null);
@@ -39,7 +41,7 @@ export default function Resultat() {
     if (!results) {
       return {
         recommendedOptionType: null as string | null,
-        medalsByOptionType: {} as Record<string, { rank: 1 | 2 | 3; label: string }[]>,
+        medalsByOptionType: {} as Record<string, Medal[]>,
       };
     }
 
@@ -60,7 +62,7 @@ export default function Resultat() {
           spreadVsLivretA,
         };
       })
-      .filter((entry): entry is { optionType: string; spreadVsLivretA: number } => entry !== null)
+      .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
       .sort((a, b) => b.spreadVsLivretA - a.spreadVsLivretA);
 
     const recommended = investmentCandidates[0]?.optionType ?? null;
@@ -77,8 +79,8 @@ export default function Resultat() {
         return a.cost - b.cost;
       });
 
-    const medalMap: Record<string, { rank: 1 | 2 | 3; label: string }[]> = {};
-    const pushMedal = (optionType: string | null, medal: { rank: 1 | 2 | 3; label: string }) => {
+    const medalMap: Record<string, Medal[]> = {};
+    const pushMedal = (optionType: string | null, medal: Medal) => {
       if (!optionType) return;
       if (!medalMap[optionType]) medalMap[optionType] = [];
       medalMap[optionType].push(medal);
@@ -105,7 +107,7 @@ export default function Resultat() {
   }, [results, recommendedOptionType]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const isMobile = globalThis.matchMedia("(max-width: 767px)").matches;
     if (!isMobile) return;
     const target = optionRefs.current[selectedOption];
     if (!target) return;
