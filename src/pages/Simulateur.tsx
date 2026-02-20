@@ -34,6 +34,7 @@ const STEPS = [
 ];
 
 const fullSchema = step1Schema.merge(step2Schema).merge(step3Schema).merge(step4Schema);
+const TURNSTILE_ENABLED = false;
 
 export default function Simulateur() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -129,7 +130,7 @@ export default function Simulateur() {
         break;
       case 4:
         fieldsToValidate.push("email", "rgpdConsent");
-        if (!turnstileToken) {
+        if (TURNSTILE_ENABLED && !turnstileToken) {
           toast({
             title: "Vérification anti-bot requise",
             description: "Veuillez valider le contrôle anti-bot pour continuer.",
@@ -197,7 +198,7 @@ export default function Simulateur() {
   }
 
   const onSubmit = async (data: SimulationFormData) => {
-    if (!turnstileToken) {
+    if (TURNSTILE_ENABLED && !turnstileToken) {
       toast({
         title: "Vérification anti-bot requise",
         description: "Veuillez valider le contrôle anti-bot avant l'envoi.",
@@ -268,7 +269,7 @@ export default function Simulateur() {
           vDemand: typedResults.vDemand,
           options: typedResults.options,
           comparisons: typedResults.comparisons,
-          turnstileToken,
+          turnstileToken: TURNSTILE_ENABLED ? turnstileToken : undefined,
         }),
       })
         .then(async (res) => {
@@ -283,7 +284,7 @@ export default function Simulateur() {
     }
   };
   if (showTransition) {
-    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={6000} />;
+    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={1000} />;
   }
 
   return (
@@ -306,10 +307,12 @@ export default function Simulateur() {
                   {currentStep === 4 && (
                     <>
                       <Step4Consent />
-                      <TurnstileWidget
-                        onVerify={handleTurnstileVerify}
-                        onExpire={handleTurnstileExpire}
-                      />
+                      {TURNSTILE_ENABLED && (
+                        <TurnstileWidget
+                          onVerify={handleTurnstileVerify}
+                          onExpire={handleTurnstileExpire}
+                        />
+                      )}
                     </>
                   )}
 

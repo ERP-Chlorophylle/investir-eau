@@ -10,6 +10,7 @@ const SENDER_EMAIL = "info@lesjeunespousses.net";
 const SENDER_NAME = "Les Jeunes Pousses";
 // À réactiver plus tard : "info@lesjeunespousses.net", "waterlife@lesjeunespousses.net"
 const ADMIN_EMAILS = ["ia@hchlorophylle.fr"];
+const TURNSTILE_ENABLED = false;
 
 type Livret = { id: string; name: string; valeurFuture: number; ecart: number };
 type Option = {
@@ -461,7 +462,7 @@ serve(async (req: Request) => {
 
     // V\u00e9rification Turnstile anti-bot
     const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
-    if (turnstileSecret) {
+    if (TURNSTILE_ENABLED && turnstileSecret) {
       if (!turnstileToken) {
         return new Response(JSON.stringify({ error: "V\u00e9rification anti-bot requise" }), {
           status: 403,

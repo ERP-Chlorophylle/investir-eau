@@ -224,6 +224,10 @@ export function Step3Financial() {
         prixAc = await fetchDepartmentAverageAc(suggestion.citycode);
         acEstimated = prixAc !== null;
       }
+
+      // ✅ FIX : injecter le code département extrait du citycode de la commune
+      const deptCode = getDepartmentCode(suggestion.citycode);
+      setValue("departement", deptCode, { shouldDirty: true });
       setValue("pluieAnnuelleCommune", pluieAnnuelle ?? undefined, { shouldDirty: true });
       setValue("communeNom", suggestion.label, { shouldDirty: true });
 
