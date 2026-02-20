@@ -262,7 +262,7 @@ export default function Simulateur() {
       <main className={cn("flex-1 md:py-12", currentStep === 1 ? "py-3" : "py-8")}>
         <div className="container-app">
           <div className="mx-auto max-w-3xl">
-            <div className={cn("sticky top-16 z-40 rounded-xl border bg-background/95 p-2 backdrop-blur", currentStep === 1 ? "mb-4" : "mb-10")}>
+            <div className={cn("sticky top-16 z-40 rounded-xl border-2 border-primary/20 bg-background p-3 shadow-md backdrop-blur", currentStep === 1 ? "mb-4" : "mb-10")}>
               <Stepper currentStep={currentStep} steps={STEPS} currentStepFillPercent={currentStepFillPercent} />
             </div>
 
