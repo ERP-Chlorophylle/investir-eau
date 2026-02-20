@@ -1,12 +1,13 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { TankOptionCard } from "@/components/results/TankOptionCard";
 import { FinancialComparison } from "@/components/results/FinancialComparison";
 import { FunMetrics } from "@/components/results/FunMetrics";
+import { QuoteForm } from "@/components/results/QuoteForm";
 import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -19,6 +20,7 @@ export default function Resultat() {
   const [email, setEmail] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<string>("confort");
   const optionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const quoteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -260,10 +262,35 @@ export default function Resultat() {
               </Link>
             </Button>
           </div>
+
+          {/* Section Demande de devis */}
+          <section ref={quoteRef} className="mb-8 md:mb-12">
+            <QuoteForm
+              email={email}
+              selectedOption={selectedOption}
+              economiesCumulees={results.comparisons.find((c) => c.optionType === selectedOption)?.economiesCumulees}
+              coutCuve={results.comparisons.find((c) => c.optionType === selectedOption)?.coutCuve}
+              departement={inputs.departement}
+              surfaceToiture={inputs.surfaceToiture}
+            />
+          </section>
         </div>
       </main>
 
       <Footer />
+
+      {/* Bouton flottant Demander un devis */}
+      <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2">
+        <Button
+          variant="gold"
+          size="lg"
+          className="shadow-xl shadow-gold/30 animate-bounce-subtle"
+          onClick={() => quoteRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+        >
+          <Send className="mr-2 h-5 w-5" />
+          Demander un devis gratuit
+        </Button>
+      </div>
     </div>
   );
 }
