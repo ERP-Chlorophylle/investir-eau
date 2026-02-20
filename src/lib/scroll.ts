@@ -10,7 +10,7 @@ export function scrollToElement(element: HTMLElement | null): void {
   const stepperHeight = stepper instanceof HTMLElement ? stepper.offsetHeight : 0;
   const stickyOffset = headerHeight + stepperHeight;
   const availableHeight = window.innerHeight - stickyOffset;
-  const topThirdOffset = availableHeight / 3;
-  const top = element.getBoundingClientRect().top + window.scrollY - stickyOffset - topThirdOffset;
+  const topOffset = availableHeight / 5;
+  const top = element.getBoundingClientRect().top + window.scrollY - stickyOffset - topOffset;
   window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
 }
