@@ -243,19 +243,6 @@ export default function Resultat() {
                 );
               })}
             </div>
-
-            {results.isSupplyLimited && (
-              <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground md:mt-4 md:text-sm">
-                <Info className="h-4 w-4 shrink-0" />
-                Vos besoins dépassent le potentiel récupérable de votre toiture. La couverture réelle sera limitée.
-              </p>
-            )}
-
-            <p className="mt-2 flex items-start gap-2 text-xs text-muted-foreground md:mt-4">
-              <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              Ceci est une estimation. Les précipitations varient d'une année à l'autre. Plus la cuve est volumineuse,
-              plus vous avez de chances de disposer d'eau pendant les périodes sèches.
-            </p>
           </section>
 
           {/* Carte Économies cumulées */}
@@ -302,6 +289,19 @@ export default function Resultat() {
               </div>
             );
           })()}
+
+          {results.isSupplyLimited && (
+            <p className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+              <Info className="h-4 w-4 shrink-0" />
+              Vos besoins dépassent le potentiel récupérable de votre toiture. La couverture réelle sera limitée.
+            </p>
+          )}
+
+          <p className="mb-8 flex items-start gap-2 text-xs text-muted-foreground md:mb-12">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            Ceci est une estimation. Les précipitations varient d'une année à l'autre. Plus la cuve est volumineuse,
+            plus vous avez de chances de disposer d'eau pendant les périodes sèches.
+          </p>
 
           <section className="mb-8 md:mb-12">
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Comparaison financière : Cuve vs Livrets</h2>
