@@ -281,6 +281,67 @@ export default function Resultat() {
             );
           })()}
 
+          <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-4">
+            Notre avis d'expert
+          </h2>
+
+          {/* Bandeau 1 : cuve moins rentable que Livret A */}
+          {(() => {
+            const selectedComp = results.comparisons.find((c) => c.optionType === selectedOption);
+            const livretA = selectedComp?.livrets.find((l) => l.id === "livretA");
+            const capitalRef = typeof selectedComp?.capitalReference === "number" && Number.isFinite(selectedComp.capitalReference)
+              ? selectedComp.capitalReference
+              : selectedComp?.coutCuve ?? 0;
+            const livretAGain = livretA ? livretA.valeurFuture - capitalRef : null;
+            const cuveGain = selectedComp?.economiesCumulees ?? 0;
+            if (livretAGain === null || cuveGain >= livretAGain) return null;
+            return (
+              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 md:mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                    <Info className="h-4 w-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="mb-1 text-sm font-semibold text-amber-800">
+                      Cette option est moins rentable financièrement qu'un Livret A
+                    </p>
+                    <p className="text-xs text-amber-700 leading-relaxed">
+                      Sur 10 ans, placer {capitalRef.toLocaleString("fr-FR")} € sur un Livret A rapporterait
+                      environ {Math.round(livretAGain).toLocaleString("fr-FR")} € de plus que cette cuve.
+                      Mais une cuve, c'est aussi la{" "}
+                      <strong>garantie d'avoir de l'eau pendant les restrictions d'usage</strong>,
+                      {" "}l'indépendance face aux hausses tarifaires, et une bien meilleure empreinte écologique.
+                      Avec quelques petits travaux d'optimisation, ce bilan peut rapidement s'inverser.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Bandeau 2 : potentiel bien supérieur au besoin */}
+          {results.vSupply > results.vDemand * 1.25 && (
+            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 md:mb-6">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                  <Droplets className="h-4 w-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="mb-1 text-sm font-semibold text-emerald-800">
+                    💧 Votre toiture a un potentiel de récupération bien supérieur à vos besoins actuels
+                  </p>
+                  <p className="text-xs text-emerald-700 leading-relaxed">
+                    Vous récupérez jusqu'à <strong>{(results.vSupply / 1000).toFixed(1)} m³/an</strong> pour
+                    seulement <strong>{(results.vDemand / 1000).toFixed(1)} m³/an</strong> de besoins déclarés.
+                    Avec quelques travaux simples — arrosage automatique, nettoyage haute-pression, usage sanitaire
+                    étendu — vous pourriez exploiter ce surplus et <strong>multiplier vos économies</strong>.
+                    Contactez-nous pour une étude personnalisée.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {results.isSupplyLimited && (
             <p className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
               <Info className="h-4 w-4 shrink-0" />

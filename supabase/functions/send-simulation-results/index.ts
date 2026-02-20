@@ -368,6 +368,25 @@ function buildClientEmail(data: SimulationPayload): string {
           </td>
         </tr>
       </table>` : ""}
+      <h2 style="color:#1565c0;font-size:16px;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px;font-family:Arial,sans-serif;">&#x1F4A1; Notre avis d'expert</h2>
+      ${!cuveWins && bestLivretAGain !== null ? `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;border-radius:10px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#fff8e1" style="background:#fff8e1;padding:14px 16px;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;">
+            <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#92400e;font-family:Arial,sans-serif;">&#x26A0; Investissement moins rentable qu'un Livret A sur 10 ans</p>
+            <p style="margin:0;font-size:13px;color:#78350f;font-family:Arial,sans-serif;line-height:1.5;">Sur 10 ans, placer ce capital sur un Livret A rapporterait environ <strong>${formatNumber(Math.abs(bestSpread ?? 0))} \u20ac de plus</strong>. Mais une cuve, c\u2019est aussi la <strong>garantie d\u2019avoir de l\u2019eau pendant les restrictions d\u2019usage</strong>, l\u2019ind\u00e9pendance face aux hausses tarifaires et une empreinte \u00e9cologique bien meilleure. Avec quelques travaux d\u2019optimisation, ce bilan peut rapidement s\u2019inverser.</p>
+          </td>
+        </tr>
+      </table>` : ""}
+      ${data.vSupply > data.vDemand * 1.25 ? `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;border-radius:10px;overflow:hidden;">
+        <tr>
+          <td bgcolor="#f0fdf4" style="background:#f0fdf4;padding:14px 16px;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+            <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#14532d;font-family:Arial,sans-serif;">&#x1F4A7; Votre toiture a un potentiel bien sup\u00e9rieur \u00e0 vos besoins actuels</p>
+            <p style="margin:0;font-size:13px;color:#166534;font-family:Arial,sans-serif;line-height:1.5;">Vous r\u00e9cup\u00e9rez jusqu\u2019\u00e0 <strong>${(data.vSupply / 1000).toFixed(1)} m\u00b3/an</strong> pour seulement <strong>${(data.vDemand / 1000).toFixed(1)} m\u00b3/an</strong> de besoins d\u00e9clar\u00e9s. Avec quelques travaux simples \u2014 arrosage automatique, nettoyage haute-pression, usage sanitaire \u00e9tendu \u2014 vous pourriez exploiter ce surplus et <strong>multiplier vos \u00e9conomies</strong>. Contactez-nous pour une \u00e9tude personnalis\u00e9e.</p>
+          </td>
+        </tr>
+      </table>` : ""}
       <h2 style="color:#1565c0;font-size:16px;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;font-family:Arial,sans-serif;">Nous recommandons ces cuves :</h2>
       <div style="margin-bottom:24px;">${optionsHtml}</div>
 

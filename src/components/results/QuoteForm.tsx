@@ -60,7 +60,9 @@ export function QuoteForm({
       });
 
       if (!response.ok) {
-        throw new Error("Erreur serveur");
+        const errData = await response.json().catch(() => ({}));
+        const msg = errData?.error ?? `Erreur serveur (${response.status})`;
+        throw new Error(msg);
       }
 
       setIsSubmitted(true);
@@ -72,7 +74,7 @@ export function QuoteForm({
       console.error("Erreur demande de devis:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        description: error instanceof Error ? error.message : "Une erreur est survenue. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {
