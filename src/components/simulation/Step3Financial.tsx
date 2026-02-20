@@ -392,7 +392,7 @@ export function Step3Financial() {
 
           <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground">
             <p>
-              <span className="font-medium text-foreground">+1% par an d'inflation appliquée</span>
+              <span className="font-medium text-foreground">+3% par an d'inflation appliquée</span>
             </p>
           </div>
         </div>

@@ -73,7 +73,7 @@ export const SAVINGS_ACCOUNTS = [
 ];
 
 // Water price inflation
-export const WATER_INFLATION = 0.01; // 1% per year
+export const WATER_INFLATION = 0.03; // 3% per year
 
 // Minimum water event (mm)
 export const MIN_RAIN_EVENT = 10;
