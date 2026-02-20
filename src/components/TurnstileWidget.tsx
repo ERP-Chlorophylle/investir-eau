@@ -39,7 +39,7 @@ export function TurnstileWidget({
       "expired-callback": onExpire,
       "error-callback": onError,
       theme: "auto",
-      size: "normal",
+      size: "invisible",
     });
   }, [onVerify, onExpire, onError]);
 
