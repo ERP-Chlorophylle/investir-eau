@@ -62,7 +62,9 @@ export function TransitionScreen({ onComplete, duration = 4000 }: Readonly<Trans
 
         {/* Titre */}
         <h2 className="text-xl font-bold text-foreground sm:text-2xl animate-fade-in">
-          Nous calculons le potentiel d'une cuve selon vos caractéristiques…
+          {isReady
+            ? "Les résultats de la simulation sont prêts !"
+            : "Nous calculons le potentiel d'une cuve selon vos caractéristiques…"}
         </h2>
 
         {/* Barre de progression */}
