@@ -12,6 +12,7 @@ import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Medal = { rank: 1 | 2 | 3; label: string };
+const VISIBLE_LIVRET_IDS = new Set(["livretA", "ldds", "pel"]);
 
 export default function Resultat() {
   const navigate = useNavigate();
@@ -203,7 +204,9 @@ export default function Resultat() {
                 const interestGains = comparison
                   ? [
                       { name: "Cuve", gain: cuveGain },
-                      ...comparison.livrets.map((livret) => ({
+                      ...comparison.livrets
+                        .filter((livret) => VISIBLE_LIVRET_IDS.has(livret.id))
+                        .map((livret) => ({
                         name: livret.name,
                         gain: livret.valeurFuture - capitalReference,
                       })),
@@ -272,7 +275,7 @@ export default function Resultat() {
                       </p>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +1%/an)</p>
+                  <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +3%/an)</p>
                 </div>
               </div>
             );
@@ -295,9 +298,9 @@ export default function Resultat() {
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Comparaison financière : Cuve vs Livrets</h2>
             <Tabs value={selectedOption} onValueChange={setSelectedOption} className="w-full">
               <TabsList className="mb-6 grid w-full grid-cols-3">
-                <TabsTrigger value="eco">Éco</TabsTrigger>
+                <TabsTrigger value="eco">Essentiel</TabsTrigger>
                 <TabsTrigger value="confort">Confort</TabsTrigger>
-                <TabsTrigger value="extra">Extra</TabsTrigger>
+                <TabsTrigger value="extra">Sérénité +</TabsTrigger>
               </TabsList>
               {results.comparisons.map((comparison) => (
                 <TabsContent key={comparison.optionType} value={comparison.optionType}>
@@ -368,5 +371,3 @@ export default function Resultat() {
     </div>
   );
 }
-
-

@@ -10,6 +10,8 @@ interface FinancialComparisonProps {
   surfaceToiture?: number;
 }
 
+const VISIBLE_LIVRET_IDS = new Set(["livretA", "ldds", "pel"]);
+
 export function FinancialComparison({ comparison, horizonAnnees }: Readonly<FinancialComparisonProps>) {
 
 
@@ -21,6 +23,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
   const investmentLabel = comparison.coutCuve
     ? `${comparison.coutCuve.toLocaleString("fr-FR")} \u20ac`
     : `${capitalReference.toLocaleString("fr-FR")} \u20ac (base Sur devis)`;
+  const visibleLivrets = comparison.livrets.filter((livret) => VISIBLE_LIVRET_IDS.has(livret.id));
 
   return (
     <div className="space-y-6">
@@ -40,7 +43,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
           </div>
 
           <div className="space-y-4">
-            {comparison.livrets.map((livret) => {
+            {visibleLivrets.map((livret) => {
               const interetsLivret = livret.valeurFuture - capitalReference;
               const gainCuve = comparison.economiesCumulees - interetsLivret;
               const cuveGagne = gainCuve > 0;
@@ -90,11 +93,11 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
           </div>
 
           {(() => {
-            const allCuveWins = comparison.livrets.every((livret) => {
+            const allCuveWins = visibleLivrets.every((livret) => {
               const interets = livret.valeurFuture - capitalReference;
               return comparison.economiesCumulees - interets > 0;
             });
-            const allLivretsWin = comparison.livrets.every((livret) => {
+            const allLivretsWin = visibleLivrets.every((livret) => {
               const interets = livret.valeurFuture - capitalReference;
               return comparison.economiesCumulees - interets < 0;
             });

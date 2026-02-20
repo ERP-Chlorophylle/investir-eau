@@ -52,6 +52,7 @@ interface SimulationPayload {
 }
 
 type Medal = { rank: 1 | 2 | 3; label: string };
+const VISIBLE_LIVRET_IDS = new Set(["livretA", "ldds", "pel"]);
 
 function formatNumber(n: number): string {
   return n.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -157,7 +158,7 @@ function buildClientEmail(data: SimulationPayload): string {
     : "";
 
   // Bloc comparaison livrets
-  const allLivrets = bestComp.livrets ?? [];
+  const allLivrets = (bestComp.livrets ?? []).filter((livret) => VISIBLE_LIVRET_IDS.has(livret.id));
   const livretComparisonHtml = allLivrets.length > 0
     ? `
       <div style="margin-bottom:24px;border-radius:12px;border:1px solid #e0e0e0;overflow:hidden;">
