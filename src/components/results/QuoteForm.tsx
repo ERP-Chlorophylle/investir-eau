@@ -131,11 +131,12 @@ export function QuoteForm({
 
             <TurnstileWidget onVerify={handleTurnstileVerify} onExpire={handleTurnstileExpire} />
 
-            <div className="flex gap-3">
-              <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
+              <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
                 Annuler
               </Button>
-              <Button type="submit" variant="cta" disabled={isLoading}>
+              <Button type="submit" variant="cta" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
