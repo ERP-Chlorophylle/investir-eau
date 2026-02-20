@@ -83,8 +83,8 @@ export function QuoteForm({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="relative mx-auto w-full max-w-md animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="relative mx-auto w-full max-w-md max-h-[90vh] overflow-y-auto animate-fade-in">
         {isSubmitted ? (
           <div className="rounded-xl border-2 border-accent bg-eco-light p-6 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
