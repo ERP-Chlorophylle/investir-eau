@@ -245,6 +245,7 @@ export default function Simulateur() {
             piscineSurface: data.piscineSurface,
           },
           prixEau: data.prixEau,
+          communeNom: data.communeNom,
           pluieAnnuelleCommune: data.pluieAnnuelleCommune,
           vSupply: typedResults.vSupply,
           vDemand: typedResults.vDemand,

@@ -225,6 +225,7 @@ export function Step3Financial() {
         acEstimated = prixAc !== null;
       }
       setValue("pluieAnnuelleCommune", pluieAnnuelle ?? undefined, { shouldDirty: true });
+      setValue("communeNom", suggestion.label, { shouldDirty: true });
 
       if (prixAep === null && prixAc === null) {
         setApiMessage(`Tarif non disponible pour ${suggestion.city}.`);

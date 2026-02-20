@@ -44,6 +44,7 @@ interface SimulationPayload {
     piscineSurface?: number;
   };
   prixEau: number;
+  communeNom?: string;
   vSupply: number;
   vDemand: number;
   options: Option[];
@@ -297,11 +298,32 @@ function buildClientEmail(data: SimulationPayload): string {
           tout en vous prot\u00e9geant des restrictions d'eau li\u00e9es aux s\u00e9cheresses.
         </div>
       </div>
+
+      <div style="margin-top:32px;border-top:1px solid #e8f5e9;padding-top:24px;">
+        <div style="text-align:center;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:#2d5a3d;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Nos services</div>
+          <div style="font-size:12px;color:#888;">Les Jeunes Pousses &bull; Conseil, fourniture et installation</div>
+        </div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+          <tr>
+            <td style="padding:4px;" align="center" width="33%">
+              <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#2d5a3d;color:#fff;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;">\uD83D\uDCCB Demander un devis</a>
+            </td>
+            <td style="padding:4px;" align="center" width="33%">
+              <a href="https://www.lesjeunespousses.net" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83C\uDF31 Notre site web</a>
+            </td>
+            <td style="padding:4px;" align="center" width="33%">
+              <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
 
-    <div style="background:#f0f7f0;padding:20px;text-align:center;">
-      <div style="font-size:13px;color:#666;margin-bottom:4px;">Les Jeunes Pousses</div>
-      <div style="font-size:11px;color:#999;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation</div>
+    <div style="background:#2d5a3d;padding:20px;text-align:center;">
+      <div style="font-size:13px;color:#a5d6a7;margin-bottom:4px;">Les Jeunes Pousses</div>
+      <div style="font-size:11px;color:#81c784;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation</div>
+      <div style="margin-top:8px;font-size:11px;color:#81c784;"><a href="https://www.lesjeunespousses.net" style="color:#a5d6a7;text-decoration:none;">www.lesjeunespousses.net</a></div>
     </div>
   </div>
 </body></html>`;
@@ -367,6 +389,7 @@ function buildAdminEmail(data: SimulationPayload): string {
 
   <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">
     <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;width:120px;">Email</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;"><a href="mailto:${data.email}" style="color:#1565c0;">${data.email}</a></td></tr>
+    ${data.communeNom ? `<tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Commune</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.communeNom}</td></tr>` : ""}
     <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">D\u00e9partement</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.departement}</td></tr>
     <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Toiture</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.surfaceToiture} m\u00b2 (${data.typeToiture})</td></tr>
     <tr><td style="padding:6px 8px;color:#888;border-bottom:1px solid #f0f0f0;font-size:13px;">Prix eau</td><td style="padding:6px 8px;border-bottom:1px solid #f0f0f0;font-weight:600;font-size:14px;">${data.prixEau} \u20ac/m\u00b3</td></tr>
