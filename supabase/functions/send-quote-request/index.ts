@@ -9,8 +9,7 @@ const corsHeaders = {
 const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 const SENDER_EMAIL = "info@lesjeunespousses.net";
 const SENDER_NAME = "Les Jeunes Pousses";
-// À réactiver en prod : "info@lesjeunespousses.net", "waterlife@lesjeunespousses.net"
-const ADMIN_EMAILS = ["ia@hchlorophylle.fr"];
+const ADMIN_EMAILS = ["info@lesjeunespousses.net", "waterlife@lesjeunespousses.net"];
 
 // URL absolue du logo hébergé sur Supabase Storage (bucket public email-assets)
 const LOGO_URL = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
