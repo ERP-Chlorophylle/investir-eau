@@ -60,13 +60,13 @@ function buildClientConfirmation(data: QuotePayload): string {
 
           <!-- HEADER avec logo -->
           <tr>
-            <td style="background:linear-gradient(135deg,#1a3d28 0%,#2d5a3d 60%,#3a7a52 100%);border-radius:16px 16px 0 0;padding:36px 40px 28px;text-align:center;">
+            <td style="background:#ffffff;border-radius:16px 16px 0 0;padding:36px 40px 28px;text-align:center;border-bottom:3px solid #2d5a3d;">
               <img src="${LOGO_URL}" alt="Les Jeunes Pousses" width="140" style="display:block;margin:0 auto 20px;max-width:140px;height:auto;" />
-              <h1 style="margin:0 0 8px;font-family:Georgia,serif;font-size:26px;font-weight:700;color:#ffffff;line-height:1.2;">
+              <h1 style="margin:0 0 8px;font-family:Georgia,serif;font-size:26px;font-weight:700;color:#111827;line-height:1.2;">
                 Votre demande de devis<br>a bien été reçue ✅
               </h1>
-              <p style="margin:0;font-size:15px;color:#a8d5b5;font-family:Arial,sans-serif;">
-                Récupération d'eau de pluie — Option <strong style="color:#ffffff;">${optionLabel}</strong>
+              <p style="margin:0;font-size:15px;color:#374151;font-family:Arial,sans-serif;">
+                Récupération d'eau de pluie — Option <strong style="color:#1a3d28;">${optionLabel}</strong>
               </p>
             </td>
           </tr>
