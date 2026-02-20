@@ -242,24 +242,27 @@ function buildClientEmail(data: SimulationPayload): string {
     .join("");
 
   const ctaUrl = "https://investir-eau.lesjeunespousses.net";
-  const logoUrl = `${ctaUrl}/image%20LJP.png`;
+  const logoUrl = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
-<body style="font-family:Arial,sans-serif;background:#f4f7f4;margin:0;padding:20px;">
-  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
-      <tr><td align="center" bgcolor="#2d5a3d" style="padding:32px 24px;background-color:#2d5a3d;background-image:linear-gradient(135deg,#1e4a2e,#3a7a52);">
-        <div style="margin-bottom:12px;">
-          <img src="${logoUrl}" alt="Les Jeunes Pousses" style="height:44px;width:auto;display:inline-block;" />
-        </div>
-        <div style="font-size:26px;font-weight:800;line-height:1.25;color:#fff;">Vos r\u00e9sultats de simulation</div>
-        <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#a5d6a7;">R\u00e9cup\u00e9ration d'eau de pluie</div>
-      </td></tr>
-    </table>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#f0f4f0;font-family:Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f0;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
 
-    <div style="padding:24px;">
+        <!-- HEADER -->
+        <tr>
+          <td align="center" bgcolor="#1a3d28" style="background:linear-gradient(135deg,#1a3d28 0%,#2d5a3d 60%,#3a7a52 100%);padding:28px 32px 24px;">
+            <img src="${logoUrl}" alt="Les Jeunes Pousses" width="130" style="display:block;margin:0 auto 16px;max-width:130px;height:auto;" />
+            <p style="margin:0 0 6px;font-size:24px;font-weight:700;color:#ffffff;line-height:1.2;font-family:Arial,sans-serif;">Vos r\u00e9sultats de simulation</p>
+            <p style="margin:0;font-size:13px;color:#a8d5b5;font-family:Arial,sans-serif;">R\u00e9cup\u00e9ration d'eau de pluie</p>
+          </td>
+        </tr>
 
+        <!-- CORPS -->
+        <tr><td style="padding:24px 28px;">
       ${heroFinancialHtml}
 
       <h2 style="color:#2d5a3d;font-size:16px;margin-top:0;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Votre configuration</h2>
@@ -324,14 +327,19 @@ function buildClientEmail(data: SimulationPayload): string {
           </tr>
         </table>
       </div>
-    </div>
+        </td></tr>
 
-    <div style="background:#2d5a3d;padding:20px;text-align:center;">
-      <div style="font-size:13px;color:#a5d6a7;margin-bottom:4px;">Les Jeunes Pousses</div>
-      <div style="font-size:11px;color:#81c784;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation</div>
-      <div style="margin-top:8px;font-size:11px;color:#81c784;"><a href="https://lesjeunespousses.net/" style="color:#a5d6a7;text-decoration:none;">lesjeunespousses.net</a></div>
-    </div>
-  </div>
+        <!-- FOOTER -->
+        <tr>
+          <td style="background:#1a3d28;padding:20px 32px;text-align:center;">
+            <div style="font-size:13px;color:#a8d5b5;margin-bottom:4px;"><strong style="color:#ffffff;">Les Jeunes Pousses</strong></div>
+            <div style="font-size:11px;color:#6a9a7a;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation<br><a href="https://lesjeunespousses.net/" style="color:#6a9a7a;text-decoration:none;">lesjeunespousses.net</a></div>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
 </body></html>`;
 }
 
@@ -387,7 +395,7 @@ function buildAdminEmail(data: SimulationPayload): string {
     <tr><td style="height:8px;"></td></tr>`;
   }).join("");
 
-  const logoUrl = "https://investir-eau.lesjeunespousses.net/image%20LJP.png";
+  const logoUrl = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <body style="font-family:Arial,sans-serif;padding:20px;background:#f8f8f8;">
