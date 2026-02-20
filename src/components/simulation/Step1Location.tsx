@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ROOF_TYPES } from "@/lib/constants";
 import { SimulationFormData } from "@/lib/validation";
 import { cn } from "@/lib/utils";
+import { scrollToElement } from "@/lib/scroll";
 
 interface Step1LocationProps {
   onProgressChange?: (progressPercent: number) => void;
@@ -52,11 +53,10 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
   }, [isSurfaceConfirmed, hasSurfaceChanged, isSurfaceValid, surfaceToiture]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
     const previousActiveField = previousActiveFieldRef.current;
 
-    if (isMobile && previousActiveField === "surface" && activeField === "toiture") {
-      toitureSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (previousActiveField === "surface" && activeField === "toiture") {
+      scrollToElement(toitureSectionRef.current);
     }
 
     previousActiveFieldRef.current = activeField;

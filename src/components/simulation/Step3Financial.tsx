@@ -4,6 +4,7 @@ import { Euro, MapPin, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SimulationFormData } from "@/lib/validation";
+import { scrollToElement } from "@/lib/scroll";
 
 type CommuneSuggestion = {
   label: string;
@@ -265,7 +266,7 @@ export function Step3Financial() {
   useEffect(() => {
     if (!communeRates) return;
     const timer = window.setTimeout(() => {
-      sanitationCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      scrollToElement(sanitationCardRef.current);
     }, 120);
     return () => window.clearTimeout(timer);
   }, [communeRates]);

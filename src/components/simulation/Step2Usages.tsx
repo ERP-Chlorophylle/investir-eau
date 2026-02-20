@@ -1,4 +1,5 @@
-﻿import { useFormContext } from "react-hook-form";
+﻿import { scrollToElement } from "@/lib/scroll";
+import { useFormContext } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import { Droplets, Flower2, Car, Waves, Info, Users, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,19 +84,7 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const piscineSectionRef = useRef<HTMLDivElement>(null);
   const autoSectionRef = useRef<HTMLDivElement>(null);
 
-  const scrollToWithHeaderOffset = (element: HTMLElement | null) => {
-    if (!element) return;
-    const header = document.querySelector("header");
-    const headerHeight = header instanceof HTMLElement ? header.offsetHeight : 0;
-    const stepper = document.querySelector("[class*='sticky top-16']");
-    const stepperHeight = stepper instanceof HTMLElement ? stepper.offsetHeight : 0;
-    const stickyOffset = headerHeight + stepperHeight;
-    // Positionne l'élément au 1/3 supérieur de l'espace disponible
-    const availableHeight = window.innerHeight - stickyOffset;
-    const topThirdOffset = availableHeight / 3;
-    const top = element.getBoundingClientRect().top + window.scrollY - stickyOffset - topThirdOffset;
-    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-  };
+  const scrollToWithHeaderOffset = scrollToElement;
 
   useEffect(() => {
     if (wcEnabled && watch("wcPersonnes") === undefined) {
