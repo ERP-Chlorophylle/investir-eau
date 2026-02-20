@@ -187,10 +187,9 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   }, [piscineEnabled, hasPiscineInteracted, piscineDone, piscineSurface]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
     const previous = previousActiveUsageRef.current;
 
-    if (!isMobile || activeUsage === null || previous === activeUsage) {
+    if (activeUsage === null || previous === activeUsage) {
       previousActiveUsageRef.current = activeUsage;
       return;
     }
@@ -207,8 +206,6 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   }, [activeUsage]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile) return;
     if (!wcReadyForNextStep) return;
 
     const timer = window.setTimeout(() => {
@@ -219,8 +216,6 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   }, [wcReadyForNextStep]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile) return;
     if (!jardinReadyForNextStep) return;
 
     const timer = window.setTimeout(() => {
@@ -241,8 +236,6 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   }, [activeUsage]);
 
   useEffect(() => {
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile) return;
     if (!piscineReadyForNextStep) return;
 
     const timer = window.setTimeout(() => {
