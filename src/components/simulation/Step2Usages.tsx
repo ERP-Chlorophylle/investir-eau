@@ -160,11 +160,9 @@ export function Step2Usages({ onProgressChange }: Readonly<Step2UsagesProps>) {
 
   useEffect(() => {
     const previous = previousActiveUsageRef.current;
+    previousActiveUsageRef.current = activeUsage;
 
-    if (activeUsage === null || previous === activeUsage) {
-      previousActiveUsageRef.current = activeUsage;
-      return;
-    }
+    if (activeUsage === null || previous === activeUsage) return;
 
     const refs = {
       wc: wcSectionRef,
@@ -173,49 +171,12 @@ export function Step2Usages({ onProgressChange }: Readonly<Step2UsagesProps>) {
       auto: autoSectionRef,
     } as const;
 
-    scrollToElement(refs[activeUsage].current);
-    previousActiveUsageRef.current = activeUsage;
-  }, [activeUsage]);
-
-  useEffect(() => {
-    if (!wcReadyForNextStep) return;
-
     const timer = globalThis.setTimeout(() => {
-      scrollToElement(jardinSectionRef.current);
-    }, 50);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [wcReadyForNextStep]);
-
-  useEffect(() => {
-    if (!jardinReadyForNextStep) return;
-
-    const timer = globalThis.setTimeout(() => {
-      scrollToElement(piscineSectionRef.current);
-    }, 50);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [jardinReadyForNextStep]);
-
-  useEffect(() => {
-    if (activeUsage !== "piscine") return;
-
-    const timer = globalThis.setTimeout(() => {
-      scrollToElement(piscineSectionRef.current);
-    }, 60);
+      scrollToElement(refs[activeUsage].current);
+    }, 100);
 
     return () => globalThis.clearTimeout(timer);
   }, [activeUsage]);
-
-  useEffect(() => {
-    if (!piscineReadyForNextStep) return;
-
-    const timer = globalThis.setTimeout(() => {
-      scrollToElement(autoSectionRef.current);
-    }, 50);
-
-    return () => globalThis.clearTimeout(timer);
-  }, [piscineReadyForNextStep]);
 
   useEffect(() => {
     const totalSteps = autoEnabled ? 4 : 3;
