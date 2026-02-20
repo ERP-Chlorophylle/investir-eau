@@ -45,11 +45,11 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
     if (!hasSurfaceChanged) return;
     if (!isSurfaceValid) return;
 
-    const timer = window.setTimeout(() => {
+    const timer = globalThis.setTimeout(() => {
       setIsSurfaceConfirmed(true);
     }, 1500);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [isSurfaceConfirmed, hasSurfaceChanged, isSurfaceValid, surfaceToiture]);
 
   useEffect(() => {
@@ -103,8 +103,7 @@ export function Step1Location({ onProgressChange }: Step1LocationProps) {
                   setHasSurfaceChanged(true);
                   setIsSurfaceConfirmed(false);
                 }}
-                onFocus={(e) => {
-                  surfaceRegister.onFocus?.(e);
+                onFocus={() => {
                   setIsSurfaceConfirmed(false);
                   setValue("surfaceToiture", undefined, { shouldValidate: true });
                 }}

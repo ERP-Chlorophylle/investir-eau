@@ -116,7 +116,7 @@ async function fetchLatestIndicator(codeInsee: string, typeService: "AEP" | "AC"
   const rows: HubeauRow[] = Array.isArray(json.data) ? json.data : [];
   const sortedRows = rows
     .filter((row) => typeof row?.annee === "number")
-    .sort((a, b) => (b.annee as number) - (a.annee as number));
+    .sort((a, b) => b.annee - a.annee);
 
   for (const row of sortedRows) {
     const value = toNumberOrNull(row?.indicateurs?.[indicatorCode]);
@@ -191,7 +191,7 @@ export function Step3Financial() {
       return;
     }
 
-    const timer = window.setTimeout(async () => {
+    const timer = globalThis.setTimeout(async () => {
       setIsSearching(true);
       try {
         const results = await fetchCommuneSuggestions(value);
@@ -201,7 +201,7 @@ export function Step3Financial() {
       }
     }, 250);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [communeQuery]);
 
   const handleSelectSuggestion = async (suggestion: CommuneSuggestion) => {
@@ -265,10 +265,10 @@ export function Step3Financial() {
 
   useEffect(() => {
     if (!communeRates) return;
-    const timer = window.setTimeout(() => {
+    const timer = globalThis.setTimeout(() => {
       scrollToElement(sanitationCardRef.current);
     }, 120);
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [communeRates]);
 
   return (

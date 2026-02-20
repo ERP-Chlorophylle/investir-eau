@@ -84,7 +84,6 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
   const piscineSectionRef = useRef<HTMLDivElement>(null);
   const autoSectionRef = useRef<HTMLDivElement>(null);
 
-  const scrollToWithHeaderOffset = scrollToElement;
 
   useEffect(() => {
     if (wcEnabled && watch("wcPersonnes") === undefined) {
@@ -124,11 +123,11 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       return;
     }
 
-    const timer = window.setTimeout(() => {
+    const timer = globalThis.setTimeout(() => {
       setIsWcStableForNextStep(true);
     }, 1500);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [wcEnabled, hasWcInteracted, wcDone, wcPersonnes]);
 
   useEffect(() => {
@@ -142,11 +141,11 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       return;
     }
 
-    const timer = window.setTimeout(() => {
+    const timer = globalThis.setTimeout(() => {
       setIsJardinStableForNextStep(true);
     }, 1500);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [jardinEnabled, hasJardinInteracted, jardinDone, jardinSurface]);
 
   useEffect(() => {
@@ -171,11 +170,11 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       return;
     }
 
-    const timer = window.setTimeout(() => {
+    const timer = globalThis.setTimeout(() => {
       setIsPiscineStableForNextStep(true);
     }, 1500);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [piscineEnabled, hasPiscineInteracted, piscineDone, piscineSurface]);
 
   useEffect(() => {
@@ -193,48 +192,48 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
       auto: autoSectionRef,
     } as const;
 
-    scrollToWithHeaderOffset(refs[activeUsage].current);
+    scrollToElement(refs[activeUsage].current);
     previousActiveUsageRef.current = activeUsage;
   }, [activeUsage]);
 
   useEffect(() => {
     if (!wcReadyForNextStep) return;
 
-    const timer = window.setTimeout(() => {
-      scrollToWithHeaderOffset(jardinSectionRef.current);
+    const timer = globalThis.setTimeout(() => {
+      scrollToElement(jardinSectionRef.current);
     }, 50);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [wcReadyForNextStep]);
 
   useEffect(() => {
     if (!jardinReadyForNextStep) return;
 
-    const timer = window.setTimeout(() => {
-      scrollToWithHeaderOffset(piscineSectionRef.current);
+    const timer = globalThis.setTimeout(() => {
+      scrollToElement(piscineSectionRef.current);
     }, 50);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [jardinReadyForNextStep]);
 
   useEffect(() => {
     if (activeUsage !== "piscine") return;
 
-    const timer = window.setTimeout(() => {
-      scrollToWithHeaderOffset(piscineSectionRef.current);
+    const timer = globalThis.setTimeout(() => {
+      scrollToElement(piscineSectionRef.current);
     }, 60);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [activeUsage]);
 
   useEffect(() => {
     if (!piscineReadyForNextStep) return;
 
-    const timer = window.setTimeout(() => {
-      scrollToWithHeaderOffset(autoSectionRef.current);
+    const timer = globalThis.setTimeout(() => {
+      scrollToElement(autoSectionRef.current);
     }, 50);
 
-    return () => window.clearTimeout(timer);
+    return () => globalThis.clearTimeout(timer);
   }, [piscineReadyForNextStep]);
 
   useEffect(() => {
@@ -397,8 +396,8 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                           setHasJardinInteracted(true);
                           setIsJardinConfirmed(true);
                           setIsJardinStableForNextStep(true);
-                          window.setTimeout(() => {
-                            scrollToWithHeaderOffset(piscineSectionRef.current);
+                          globalThis.setTimeout(() => {
+                            scrollToElement(piscineSectionRef.current);
                           }, 60);
                         }}
                       >
@@ -485,8 +484,8 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
                         disabled={!piscineDone}
                         onClick={() => {
                           setIsPiscineConfirmed(true);
-                          window.setTimeout(() => {
-                            scrollToWithHeaderOffset(autoSectionRef.current);
+                          globalThis.setTimeout(() => {
+                            scrollToElement(autoSectionRef.current);
                           }, 60);
                         }}
                       >
