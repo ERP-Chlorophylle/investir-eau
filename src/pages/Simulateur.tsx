@@ -258,7 +258,7 @@ export default function Simulateur() {
     }
   };
   if (showTransition) {
-    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={3500} />;
+    return <TransitionScreen onComplete={() => navigate("/resultat")} duration={6000} />;
   }
 
   return (

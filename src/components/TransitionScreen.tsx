@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Droplets, Home, PiggyBank } from "lucide-react";
+import { Droplets, Home, PiggyBank, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TransitionScreenProps {
   onComplete: () => void;
-  /** Durée en ms avant d'appeler onComplete (défaut: 3500ms) */
+  /** Durée en ms de la barre de progression (défaut: 4000ms) */
   duration?: number;
 }
 
@@ -31,11 +32,11 @@ const AVANTAGES = [
   },
 ];
 
-export function TransitionScreen({ onComplete, duration = 3500 }: TransitionScreenProps) {
+export function TransitionScreen({ onComplete, duration = 4000 }: Readonly<TransitionScreenProps>) {
   const [progress, setProgress] = useState(0);
+  const isReady = progress >= 100;
 
   useEffect(() => {
-    // Anime la barre de progression
     const start = Date.now();
     const interval = globalThis.setInterval(() => {
       const elapsed = Date.now() - start;
@@ -46,14 +47,10 @@ export function TransitionScreen({ onComplete, duration = 3500 }: TransitionScre
       }
     }, 30);
 
-    // Timer pour appeler onComplete
-    const timer = globalThis.setTimeout(onComplete, duration);
-
     return () => {
       globalThis.clearInterval(interval);
-      globalThis.clearTimeout(timer);
     };
-  }, [onComplete, duration]);
+  }, [duration]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
@@ -95,6 +92,14 @@ export function TransitionScreen({ onComplete, duration = 3500 }: TransitionScre
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Bouton CTA — apparaît quand la barre est complète */}
+        <div className={`mt-8 transition-all duration-500 ${isReady ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}>
+          <Button variant="cta" size="lg" onClick={onComplete} className="animate-bounce-subtle">
+            Voir mes résultats
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </div>
       </div>
     </div>
