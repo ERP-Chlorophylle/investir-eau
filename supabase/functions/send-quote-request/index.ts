@@ -124,8 +124,8 @@ function buildClientConfirmation(data: QuotePayload): string {
               <!-- CTA -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
                 <tr>
-                  <td align="center">
-                    <a href="${SITE_URL}" style="display:inline-block;background:linear-gradient(135deg,#2d5a3d,#3a7a52);color:#ffffff;text-decoration:none;font-family:Arial,sans-serif;font-size:15px;font-weight:700;padding:14px 36px;border-radius:50px;letter-spacing:0.5px;">
+                  <td align="center" style="padding-bottom:12px;">
+                    <a href="https://economie-eau.lesjeunespousses.net/simulateur" style="display:inline-block;background:#ffffff;color:#1a3d28;text-decoration:none;font-family:Arial,sans-serif;font-size:14px;font-weight:700;padding:12px 32px;border-radius:50px;letter-spacing:0.5px;border:2px solid #2d5a3d;">
                       🌿 Revoir ma simulation
                     </a>
                   </td>

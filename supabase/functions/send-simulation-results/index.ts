@@ -50,6 +50,7 @@ interface SimulationPayload {
   vDemand: number;
   options: Option[];
   comparisons: Comparison[];
+  sessionId?: string | null;
 }
 
 type Medal = { rank: 1 | 2 | 3; label: string };
@@ -275,7 +276,10 @@ function buildClientEmail(data: SimulationPayload): string {
     })
     .join("");
 
-  const ctaUrl = "https://investir-eau.lesjeunespousses.net";
+  const BASE_URL = "https://economie-eau.lesjeunespousses.net";
+  const ctaUrl = data.sessionId
+    ? `${BASE_URL}/resultat?session=${encodeURIComponent(data.sessionId)}&devis=1`
+    : `${BASE_URL}/simulateur`;
   const logoUrl = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
 
   return `<!DOCTYPE html>

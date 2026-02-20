@@ -239,6 +239,26 @@ export default function Simulateur() {
     sessionStorage.setItem("simulationEmail", data.email);
     sessionStorage.setItem("simulationNewsletter", String(data.newsletterOptIn));
 
+    // Sauvegarde de la session en base pour accès depuis l'email
+    let sessionId: string | null = null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: sessionData } = await (supabase as any)
+        .from("simulation_sessions")
+        .insert({
+          email: data.email,
+          inputs: data,
+          results: typedResults,
+          selected_option: typedResults.options[0]?.type ?? null,
+        })
+        .select("id")
+        .single();
+      sessionId = (sessionData as { id: string } | null)?.id ?? null;
+      if (sessionId) sessionStorage.setItem("simulationSessionId", sessionId);
+    } catch (err) {
+      console.warn("Impossible de sauvegarder la session:", err);
+    }
+
     // Afficher la page de transition au lieu de naviguer directement
     setShowTransition(true);
 
@@ -269,7 +289,7 @@ export default function Simulateur() {
           vDemand: typedResults.vDemand,
           options: typedResults.options,
           comparisons: typedResults.comparisons,
-          turnstileToken: TURNSTILE_ENABLED ? turnstileToken : undefined,
+          sessionId,
         }),
       })
         .then(async (res) => {

@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Droplets, RefreshCw, Info, AlertTriangle, Send, TrendingUp, Droplet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
@@ -10,12 +10,14 @@ import { FunMetrics } from "@/components/results/FunMetrics";
 import { QuoteForm } from "@/components/results/QuoteForm";
 import { SimulationInputs, SimulationResults } from "@/lib/calculations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
 
 type Medal = { rank: 1 | 2 | 3; label: string };
 const VISIBLE_LIVRET_IDS = new Set(["livretA", "ldds", "pel"]);
 
 export default function Resultat() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [results, setResults] = useState<SimulationResults | null>(null);
   const [inputs, setInputs] = useState<SimulationInputs | null>(null);
   const [email, setEmail] = useState<string>("");
@@ -29,6 +31,33 @@ export default function Resultat() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 
+    const sessionParam = searchParams.get("session");
+    const devisParam = searchParams.get("devis");
+
+    if (sessionParam) {
+      // Chargement depuis Supabase (accès depuis email)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any)
+        .from("simulation_sessions")
+        .select("results, inputs, email")
+        .eq("id", sessionParam)
+        .single()
+        .then(({ data: sessionData, error }: { data: { results: SimulationResults; inputs: SimulationInputs; email: string } | null; error: unknown }) => {
+          if (error || !sessionData) {
+            navigate("/simulateur");
+            return;
+          }
+          setResults(sessionData.results);
+          setInputs(sessionData.inputs);
+          setEmail(sessionData.email ?? "");
+          if (devisParam === "1") {
+            // Légèr délai pour laisser le rendu se faire
+            globalThis.setTimeout(() => setIsQuoteOpen(true), 400);
+          }
+        });
+      return;
+    }
+
     const storedResults = sessionStorage.getItem("simulationResults");
     const storedInputs = sessionStorage.getItem("simulationInputs");
     const storedEmail = sessionStorage.getItem("simulationEmail");
@@ -41,7 +70,7 @@ export default function Resultat() {
     setResults(JSON.parse(storedResults));
     setInputs(JSON.parse(storedInputs));
     setEmail(storedEmail || "");
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   const { recommendedOptionType, medalsByOptionType } = useMemo(() => {
     if (!results) {
