@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Droplets } from "lucide-react";
+
+const LJP_LOGO = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
 
 interface HeaderProps {
   title?: string;
@@ -13,10 +14,12 @@ export function Header({
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container-app flex h-16 items-center">
-        <Link to="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <Droplets className="h-5 w-5 text-primary-foreground" />
-          </div>
+        <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+          <img
+            src={LJP_LOGO}
+            alt="Les Jeunes Pousses"
+            className="h-9 w-auto object-contain"
+          />
           {mobileTitle ? (
             <>
               <span className="text-[clamp(0.66rem,2.3vw,1.125rem)] font-bold leading-tight text-foreground md:hidden">
