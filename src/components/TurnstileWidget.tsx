@@ -39,7 +39,7 @@ export function TurnstileWidget({
       "expired-callback": onExpire,
       "error-callback": onError,
       theme: "auto",
-      size: "invisible",
+      size: "normal",
     });
   }, [onVerify, onExpire, onError]);
 
@@ -76,5 +76,9 @@ export function TurnstileWidget({
 
   if (!SITE_KEY) return null;
 
-  return <div ref={containerRef} className="sr-only" aria-hidden="true" />;
+  return (
+    <div className="mt-4 flex justify-center">
+      <div ref={containerRef} />
+    </div>
+  );
 }

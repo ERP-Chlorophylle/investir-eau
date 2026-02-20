@@ -109,7 +109,7 @@ export default function Landing() {
                 </div>
                 <h3 className="mt-6 text-xl font-semibold">Économies croissantes</h3>
                 <p className="mt-3 text-muted-foreground">
-                  Le prix de l'eau augmente de <strong>+1%/an en moyenne</strong>. 
+                  Le prix de l'eau augmente de <strong>+3%/an en moyenne</strong>. 
                   Vos économies s'amplifient chaque année.
                 </p>
               </div>

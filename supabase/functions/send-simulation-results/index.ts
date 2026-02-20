@@ -241,6 +241,7 @@ function buildClientEmail(data: SimulationPayload): string {
     .join("");
 
   const ctaUrl = "https://investir-eau.lesjeunespousses.net";
+  const logoUrl = `${ctaUrl}/image%20LJP.png`;
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
@@ -248,6 +249,9 @@ function buildClientEmail(data: SimulationPayload): string {
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
       <tr><td align="center" bgcolor="#2d5a3d" style="padding:32px 24px;background-color:#2d5a3d;background-image:linear-gradient(135deg,#1e4a2e,#3a7a52);">
+        <div style="margin-bottom:12px;">
+          <img src="${logoUrl}" alt="Les Jeunes Pousses" style="height:44px;width:auto;display:inline-block;" />
+        </div>
         <div style="font-size:26px;font-weight:800;line-height:1.25;color:#fff;">Vos r\u00e9sultats de simulation</div>
         <div style="margin-top:8px;font-size:14px;line-height:1.3;color:#a5d6a7;">R\u00e9cup\u00e9ration d'eau de pluie</div>
       </td></tr>
@@ -311,7 +315,7 @@ function buildClientEmail(data: SimulationPayload): string {
               <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#2d5a3d;color:#fff;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;">\uD83D\uDCCB Demander un devis</a>
             </td>
             <td style="padding:4px;" align="center" width="33%">
-              <a href="https://www.lesjeunespousses.net" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83C\uDF31 Notre site web</a>
+              <a href="https://lesjeunespousses.net/" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83C\uDF31 Notre site web</a>
             </td>
             <td style="padding:4px;" align="center" width="33%">
               <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#f0f7f0;color:#2d5a3d;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #c8e6c9;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
@@ -324,7 +328,7 @@ function buildClientEmail(data: SimulationPayload): string {
     <div style="background:#2d5a3d;padding:20px;text-align:center;">
       <div style="font-size:13px;color:#a5d6a7;margin-bottom:4px;">Les Jeunes Pousses</div>
       <div style="font-size:11px;color:#81c784;">R\u00e9cup\u00e9ration d'eau de pluie &bull; Conseil et installation</div>
-      <div style="margin-top:8px;font-size:11px;color:#81c784;"><a href="https://www.lesjeunespousses.net" style="color:#a5d6a7;text-decoration:none;">www.lesjeunespousses.net</a></div>
+      <div style="margin-top:8px;font-size:11px;color:#81c784;"><a href="https://lesjeunespousses.net/" style="color:#a5d6a7;text-decoration:none;">lesjeunespousses.net</a></div>
     </div>
   </div>
 </body></html>`;
@@ -382,10 +386,14 @@ function buildAdminEmail(data: SimulationPayload): string {
     <tr><td style="height:8px;"></td></tr>`;
   }).join("");
 
+  const logoUrl = "https://investir-eau.lesjeunespousses.net/image%20LJP.png";
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
 <body style="font-family:Arial,sans-serif;padding:20px;background:#f8f8f8;">
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+  <div style="margin-bottom:12px;text-align:center;">
+    <img src="${logoUrl}" alt="Les Jeunes Pousses" style="height:36px;width:auto;display:inline-block;" />
+  </div>
   <h1 style="color:#2d5a3d;font-size:20px;margin-top:0;">Nouvelle simulation re\u00e7ue</h1>
 
   <table style="border-collapse:collapse;width:100%;margin-bottom:20px;">

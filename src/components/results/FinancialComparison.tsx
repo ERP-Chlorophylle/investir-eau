@@ -133,7 +133,7 @@ export function FinancialComparison({ comparison, horizonAnnees }: Readonly<Fina
         <div className="text-muted-foreground">
           <p>
             <strong>Note :</strong> Ce simulateur compare les valeurs cumulées sur la période choisie. Les économies
-            d'eau sont calculées avec une inflation de +3%/an. Les livrets sont calculés avec les taux nets de
+            d'eau sont calculées avec une augmentation moyenne de +3%/an. Les livrets sont calculés avec les taux nets de
             décembre 2025.
           </p>
         </div>

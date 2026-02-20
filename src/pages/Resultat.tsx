@@ -157,6 +157,11 @@ export default function Resultat() {
         <div className="container-app">
           <div className="mb-3 flex flex-col gap-2 sm:mb-10 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
+              <img
+                src="/image%20LJP.png"
+                alt="Les Jeunes Pousses"
+                className="mb-3 h-12 w-auto md:h-14"
+              />
               <h1 className="text-[clamp(0.92rem,3.1vw,2.25rem)] font-bold leading-tight text-foreground">
                 Résultats de la simulation de vos intérêts
               </h1>
@@ -275,7 +280,7 @@ export default function Resultat() {
                       </p>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (inflation eau +3%/an)</p>
+                  <p className="mt-3 text-xs text-muted-foreground">Sur 10 ans (augmentation moyenne du prix de l'eau : +3%/an)</p>
                 </div>
               </div>
             );
