@@ -433,7 +433,7 @@ function buildClientEmail(data: SimulationPayload): string {
                   <a href="https://lesjeunespousses.net/" style="display:block;padding:10px 8px;background:#e3f2fd;color:#1565c0;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #90caf9;font-family:Arial,sans-serif;">\uD83C\uDF31 Notre site web</a>
                 </td>
                 <td style="padding:4px;" align="center" width="33%">
-                  <a href="${ctaUrl}" style="display:block;padding:10px 8px;background:#e3f2fd;color:#1565c0;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #90caf9;font-family:Arial,sans-serif;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
+                   <a href="${BASE_URL}/simulateur" style="display:block;padding:10px 8px;background:#e3f2fd;color:#1565c0;text-decoration:none;border-radius:8px;font-size:12px;font-weight:700;text-align:center;border:1px solid #90caf9;font-family:Arial,sans-serif;">\uD83D\uDCA7 Simuler \u00e0 nouveau</a>
                 </td>
               </tr>
             </table>

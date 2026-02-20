@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Droplets } from "lucide-react";
 
 const LJP_LOGO = "https://bkoecslauxzbmkzxntdq.supabase.co/storage/v1/object/public/email-assets/image%20LJP.png";
 
@@ -20,6 +21,7 @@ export function Header({
             alt="Les Jeunes Pousses"
             className="h-9 w-auto object-contain"
           />
+          <Droplets className="h-6 w-6 shrink-0 text-primary" />
           {mobileTitle ? (
             <>
               <span className="text-[clamp(0.66rem,2.3vw,1.125rem)] font-bold leading-tight text-foreground md:hidden">
