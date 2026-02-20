@@ -32,7 +32,9 @@ export function QuoteForm({
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(
+    import.meta.env.DEV ? "dev-bypass" : null
+  );
 
   const handleTurnstileVerify = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
@@ -150,7 +152,7 @@ export function QuoteForm({
               <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
                 Annuler
               </Button>
-              <Button type="submit" variant="cta" disabled={isLoading} className="w-full sm:w-auto">
+              <Button type="submit" variant="cta" disabled={isLoading || !turnstileToken} className="w-full sm:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

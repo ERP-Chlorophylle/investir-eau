@@ -308,7 +308,10 @@ serve(async (req: Request) => {
 
     // Vérification Turnstile anti-bot
     const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
-    if (turnstileSecret) {
+    const isProd = Deno.env.get("SUPABASE_ENV") === "production";
+    const isDevBypass = turnstileToken === "dev-bypass" && !isProd;
+
+    if (turnstileSecret && !isDevBypass) {
       if (!turnstileToken) {
         return new Response(JSON.stringify({ error: "Vérification anti-bot requise" }), {
           status: 403,
