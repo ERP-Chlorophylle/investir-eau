@@ -87,11 +87,13 @@ export function Step2Usages({ onProgressChange }: Step2UsagesProps) {
     if (!element) return;
     const header = document.querySelector("header");
     const headerHeight = header instanceof HTMLElement ? header.offsetHeight : 0;
-    // Le stepper est sticky sous le header, on doit aussi le prendre en compte
     const stepper = document.querySelector("[class*='sticky top-16']");
     const stepperHeight = stepper instanceof HTMLElement ? stepper.offsetHeight : 0;
-    const stickyOffset = headerHeight + stepperHeight + 16; // 16px de marge
-    const top = element.getBoundingClientRect().top + window.scrollY - stickyOffset;
+    const stickyOffset = headerHeight + stepperHeight;
+    // Positionne l'élément au 1/3 supérieur de l'espace disponible
+    const availableHeight = window.innerHeight - stickyOffset;
+    const topThirdOffset = availableHeight / 3;
+    const top = element.getBoundingClientRect().top + window.scrollY - stickyOffset - topThirdOffset;
     window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
   };
 
