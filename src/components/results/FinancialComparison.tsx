@@ -14,11 +14,8 @@ interface FinancialComparisonProps {
 }
 
 export function FinancialComparison({ comparison, horizonAnnees, email, departement, surfaceToiture }: FinancialComparisonProps) {
-  const optionLabels = {
-    eco: "Essentiel",
-    confort: "Confort",
-    extra: "Sérénité +",
-  };
+
+
 
   const capitalReference =
     typeof comparison.capitalReference === "number" && Number.isFinite(comparison.capitalReference)
@@ -30,18 +27,7 @@ export function FinancialComparison({ comparison, horizonAnnees, email, departem
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border bg-card p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-foreground">Option {optionLabels[comparison.optionType]}</h3>
-            <p className="text-sm text-muted-foreground">Comparaison sur {horizonAnnees} ans</p>
-          </div>
-          <div className="rounded-lg bg-muted px-4 py-2 text-center sm:text-right">
-            <p className="text-sm text-muted-foreground">Investissement initial</p>
-            <p className="text-xl font-bold text-foreground">{investmentLabel}</p>
-          </div>
-        </div>
-      </div>
+
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
