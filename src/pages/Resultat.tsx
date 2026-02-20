@@ -21,7 +21,9 @@ export default function Resultat() {
   const [selectedOption, setSelectedOption] = useState<string>("confort");
   const optionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const recommendationsRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
+  const isUserScrolling = useRef(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -111,7 +113,7 @@ export default function Resultat() {
 
   useEffect(() => {
     const isMobile = globalThis.matchMedia("(max-width: 767px)").matches;
-    if (!isMobile) return;
+    if (!isMobile || isUserScrolling.current) return;
     // Scroll horizontal vers la carte sélectionnée
     const target = optionRefs.current[selectedOption];
     if (target) {
@@ -122,6 +124,37 @@ export default function Resultat() {
       recommendationsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [selectedOption]);
+
+  // Détection auto de la carte centrée lors du swipe mobile
+  useEffect(() => {
+    const isMobile = globalThis.matchMedia("(max-width: 767px)").matches;
+    if (!isMobile || !carouselRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const optionType = (entry.target as HTMLElement).dataset.optionType;
+            if (optionType) {
+              isUserScrolling.current = true;
+              setSelectedOption(optionType);
+              // Reset après le scroll automatique
+              globalThis.setTimeout(() => { isUserScrolling.current = false; }, 300);
+            }
+          }
+        }
+      },
+      {
+        root: carouselRef.current,
+        threshold: 0.6,
+      }
+    );
+
+    const cards = carouselRef.current.querySelectorAll("[data-option-type]");
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [results]);
 
   if (!results || !inputs) {
     return null;
@@ -171,7 +204,7 @@ export default function Resultat() {
           <section ref={recommendationsRef} className="mb-8 md:mb-12">
             <h2 className="mb-3 text-[clamp(1rem,2.6vw,1.5rem)] font-bold text-foreground md:mb-6">Nos recommandations de cuves</h2>
 
-            <div className="mx-0 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible px-1 pb-2 pt-3 [scrollbar-width:none] md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 md:pt-0">
+            <div ref={carouselRef} className="mx-0 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-visible px-1 pb-2 pt-3 [scrollbar-width:none] md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0 md:pt-0">
               {results.options.map((option) => {
                 const comparison = results.comparisons.find((c) => c.optionType === option.type);
                 const capitalReference =
@@ -192,6 +225,7 @@ export default function Resultat() {
                 return (
                   <div
                     key={option.type}
+                    data-option-type={option.type}
                     ref={(el) => {
                       optionRefs.current[option.type] = el;
                     }}
